@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>         <html class="lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>         <html class="lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+	<meta charset="utf-8"/>
+	<!--[if IE]><meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'><![endif]-->
+
+	<title> Treant.js - javascript library for drawing tree diagrams  </title>
+	<link rel="shortcut icon" href="favicon.ico" />
+    <meta name="description" content="JavaScript library for creating interactive organizational charts. Check our examples to find out many other uses as well.">
+    <meta name="robots" content="index, follow"/>
+    <meta name="viewport" content="width=device-width">
+
+	<!-- JavaScript Detection -->
+	<script>document.documentElement.className += " js";</script>
+
+
+	<link href="http://fonts.googleapis.com/css?family=Droid+Serif:400,400italic,700|Droid+Sans:700" rel="stylesheet" type="text/css">
+	<link href="manual/css/layout-min.css" rel="stylesheet" type="text/css"/>
+	<link href="manual/css/jquery.snippet.min.css" rel="stylesheet" type="text/css"/>
+	<link href="manual/css/snippet.css" rel="stylesheet" type="text/css"/>
+	<link href="manual/css/styles.css" rel="stylesheet" type="text/css"/>
+
+	<!--[if lt IE 9]>
+	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+
+
+</head>
+<body id="yaml-top" class="doc">
+
+<div role="contentinfo" id="intro">
+	SVG based JS library for drawing tree diagrams - even supports IE
+</div>
+<header role="banner">
+	<div class="ym-wrapper">
+		<div class="ym-wbox">
+			<a href="./" class="flexible">
+				<h1> Treant.js </h1>
+			</a>
+			<p> JavaScipt library for visualization of tree diagrams </p>
+		</div>
+	</div>
+</header>
+<!-- begin: main navigation #nav -->
+<nav id="level2" class="fix" role="navigation">
+	<div class="ym-wrapper">
+		<div class="ym-wbox">
+			<div class="ym-hlist">
+				<ul>
+					<li class="active"><a href="#orgchart-quickstart"> Quick Start </a></li>
+					<li><a href="#orgchart-introduction"> Introduction </a></li>
+					<li><a href="#orgchart-initialization"> Construction & Initialization </a></li>
+					<li><a href="#orgchart-api"> API </a>
+						<ul>
+							<li><a href="#orgchart-api-general"> Genereal </a></li>	
+							<li><a href="#orgchart-api-node"> Node </a></li>	
+						</ul>
+					</li>
+					<li><a href="#orgchart-examples"> Examples </a></li>
+					<li><a href="#orgchart-download"> Download </a></li>
+				</ul>
+				<select name="nav-select">
+					<option value="#orgchart-quickstart"> Quick start</a> </option>
+					<option value="#orgchart-introduction"> Introduction </option>
+					<option value="#orgchart-initialization"> Construction & Initialization </option>
+					<option value="#orgchart-api-general"> Api - General </option>
+					<option value="#orgchart-api-node"> Api - Node </option>
+					<option value="#orgchart-examples"> Download </option>
+					<option value="#orgchart-download"> Download </option>
+				</select>
+			</div>
+		</div>
+	</div>
+</nav>
+
+<div id="overview" role="main">
+	<div class="ym-wrapper">
+		<div class="ym-wbox quick-examples">
+			<h3 id="orgchart-quickstart">Quick Start Demos</h3>
+			<p>These examples show the <em>Treant.js</em> in use. With the possibilities and combination of CSS and SVG, opportunities are infinite.</p>
+			<div class="ym-grid linearize-level-1">
+
+				<div class="ym-g40 ym-gl">
+					<div class="ym-grid linearize-level-2">
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<h4>Simple company chart</h4>
+								<a href="examples/basic-example" class="img" target="_blank">
+									<img alt="simle chart exwamle" class="flexible bordered center" src="manual/img/simple-thumb.png" />
+								</a>
+								<p>Organizational chart of the company structure along with pictures and basic information about each member.</p>
+								<a class="ym-button ym-next" href="examples/basic-example"> View Example </a>
+							</div>
+						</div>
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<h4>Sport results tree</h4>
+								<a href="examples/tennis-draw" class="img">
+									<img alt="sport result chart example" class="flexible bordered center" src="manual/img/tennis-thumb.png" />
+								</a>
+								<p>Tennis results are displayed in a classic tree structure. Tree structure is an adequate method of representation for any type of bracketed events.</p>
+								<a class="ym-button ym-next" href="examples/tennis-draw">View Example</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="ym-g40 ym-gl">
+					<div class="ym-grid linearize-level-2">
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<h4>Collapsable structure</h4>
+								<a href="examples/collapsable" class="img">
+									<img alt="collapsable example" class="flexible bordered center" src="manual/img/collapsable-thumb.png" />
+								</a>
+								<p>Every chart may be created collapsible if needed. All animations can be customized to fit the clients desires.</p>
+								<a class="ym-button ym-next" href="examples/collapsable">View Example</a>
+							</div>
+						</div>
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<h4>Evolution tree chart</h4>
+								<a href="examples/evolution-tree" class="img">
+									<img alt="evolution tree example" class="flexible bordered center" src="manual/img/evolution-thumb.png" />
+								</a>
+								<p>This is a very simple and effective representation of an evolution branch. It shows the use of scroller.</p>
+								<a class="ym-button ym-next" href="examples/evolution-tree">View Example</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="ym-g20 ym-gl">
+					<div class="ym-gbox ym-gbox-left">
+						<h4>Custom colored items</h4>
+						<a href="examples/custom-colored" class="img">
+							<img alt="custom colored example" class="flexible bordered center" src="manual/img/simple-colored-thumb.png" />
+						</a>
+						<p>This is a demo displaying how the use of colors can represent each department in the company structure.</p>
+						<a class="ym-button ym-next" href="examples/custom-colored">View Example</a>
+					</div>
+				</div>
+
+		</div>
+	</div>
+</div>
+
+<div id="main" class="ym-clearfix" role="main">
+
+	<div class="ym-wrapper">
+		<div class="ym-wbox">
+
+			<h2 id="orgchart-introduction" data-manual="true" tabindex="-1">Introduction</h2>
+			<div class="ym-grid linearize-level-1" data-manual="true">
+				<div class="ym-g25 ym-gl">
+					<div class="ym-gbox-left">
+						<h3>About</h3>
+						<p> Treant.js is a Javascript library for createing tree structure charts with the power of HTML, CSS and SVG... </p>
+					</div>
+				</div>
+				<div class="ym-g75 ym-gr">
+					<div class="ym-gbox-right">
+						<h3>File Structure</h3>
+						<p>Within the download package fo you will find a folder called <em>Treant</em> with
+							the following file stucture. This folder contains all components of the framework needed to get you started.</p>
+						<pre class="box info">
+	<small>
+	Treant/
+	  ├── Treant.min.js
+	  ├── Treant.css
+	  ├── vendor/raphael.js
+	  ├── perfect-scrollbar/
+	  |  ├── jquery.min.js
+	  |  ├── jquery.mousewheel.js
+	  |  ├── perfect-scrollbar.js
+	  |  └── perfect-scrollbar.css
+	  ├── examples/
+	  |  └── ...
+	  └── api-manual/
+	     └── ...
+	</small>
+						</pre>
+
+						<h3>Basic HTML Template</h3>
+						<p>Here's a template of an empty HTML5 file containing the integration of Treant's core stylesheet and javascript files:</p>
+						<pre class="htmlCode">
+&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+    &lt;meta charset="utf-8"/&gt;
+    &lt;title&gt;&lt;/title&gt;
+
+    &lt;!-- stylesheets --&gt;
+    &lt;link rel=&quot;stylesheet&quot; href=&quot;Treant.css&quot; type=&quot;text/css&quot;/&gt;
+
+&lt;/head&gt;
+&lt;body&gt;
+    ...
+
+    &lt;!-- javascript --&gt;
+    &lt;script src=&quot;vendor/raphael.js&quot;&gt;&lt;/script&gt;
+    &lt;script src=&quot;Treant.min.js&quot;&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+					</div>
+				</div>
+			</div>
+
+<!-- ###### ##### ##### ##### ##### ##### ##### ###### ##### ##### ##### ##### ##### ##### ###### ##### ##### ##### ##### ##### ##### -->
+<!-- ###### ##### Construction & Initialization ###### ##### Construction & Initialization ###### ##### Construction & Initialization  -->
+<!-- ###### ##### ##### ##### ##### ##### ##### ###### ##### ##### ##### ##### ##### ##### ###### ##### ##### ##### ##### ##### ##### -->
+
+			<h2 id="orgchart-initialization" data-manual="true">Construction & Initialization</h2>
+			<div class="ym-grid linearize-level-1" data-manual="true">
+				<div class="ym-g25 ym-gl">
+					<div class="ym-gbox-left">
+						<h4>Setting up</h4>
+						<p>
+							Treant provides two different standard methods for configuration and constructing of organizational charts.
+						</p>
+						<p> It is up to you to choose which fits your needs the best! </p>
+					</div>
+				</div>
+				<div class="ym-g75 ym-gr">
+					<div class="ym-gbox-right">
+						<p>
+							In the following article, a simple exemple is given for presentation purposes.   
+							The initialization of the Treant library is perfomed by inserting a simple HTML and JavaScript snippet on your website:
+						</p>
+						<pre class="htmlCode">
+&lt;!-- HTML --&gt;
+&lt;div id="tree-simple" style="width:335px; height: 160px"&gt; &lt;/div&gt;
+</pre>
+						<pre class="jsCode">
+/* javascript */
+var my_chart = new Treant(simple_chart_config);
+</pre>
+
+						<p>
+							The only unknown part of the shown snippet is the variable called <code>simple_chart_config</code>. That variable contains all the information necessary to reneder and visualize the required chart. Luckily, two ways are used for defining this variable. It can either be defined as an Javascript
+							<code>Array</code> or as a Javascript Object known as a <code>JSON</code> structure.
+						</p>
+
+						<div class="ym-grid linearize-level-2">
+							<div class="ym-g50 ym-gl">
+								<div class="ym-gbox-left">
+									<h3> Array approach <span class="muted">[ ]</span> </h3>
+									<p>
+										The <code>Array</code> approach is characterized by the need to individually define every node,
+										along with the global config for the Chart object (called <code>config</code> in the example)
+									</p>
+									<h4> Default Markup </h4>
+<pre class="jsCode">
+config = {
+    container: "#tree-simple"
+};
+
+parent_node = {
+    text: { name: "Parent node" }
+};
+
+first_child = {
+    parent: parent_node,
+    text: { name: "First child" }
+};
+
+second_child = {
+    parent: parent_node,
+    text: { name: "Second child" }
+};
+
+simple_chart_config = [
+    config, parent_node,
+    first_child, second_child
+];
+</pre>
+									<h4> Result </h4>
+									<div class="center">
+										<div id="OrganiseChart-array-result" class="chart Treant loaded bordered">
+											<div class="node  " style="left: 100px; top: 34.5px;">
+												<p class="node-name">Parent node</p>
+											</div>
+											<div class="node  " style="left: 27.5px; top: 94.5px;">
+												<p class="node-name">First child</p>
+											</div>
+											<div class="node  " style="left: 160.5px; top: 94.5px;">
+												<p class="node-name">Second child</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="ym-g50 ym-gr">
+								<div class="ym-gbox-right">
+									<h3> JSON approach <span class="muted">{ }</span> </h3>
+									<p>
+										<code>JSON</code> approach is slightly different. The whole chart config is made as a single Javascript Object with <code>chart</code> and <code>nodeStructure</code> properties.
+									</p>
+									<h4> Default Markup </h4>
+<pre class="jsCode">
+simple_chart_config = {
+    chart: {
+        container: "#tree-simple"
+    },
+    
+    nodeStructure: {
+        text: { name: "Parent node" },
+        children: [
+            {
+                text: { name: "First child" }
+            },
+            {
+                text: { name: "Second child" }
+            }
+        ]
+    }
+};
+
+
+
+
+/**/
+</pre>
+									<h4> Result </h4>
+									<div class="center">
+										<div id="OrganiseChart-json-result" class="chart Treant loaded bordered">
+											<div class="node  " style="left: 100px; top: 34.5px;">
+												<p class="node-name">Parent node</p>
+											</div>
+											<div class="node  " style="left: 27.5px; top: 94.5px;">
+												<p class="node-name">First child</p>
+											</div>
+											<div class="node  " style="left: 160.5px; top: 94.5px;">
+												<p class="node-name">Second child</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<p>
+							As seen from the above example the two approaches are not that much different. The outcome of <code>Treant</code> initialization is the same no matter which approach is used. It is your choice which method you consider best for your needs. A few differences to keep in mind are:
+						</p>
+
+						<div class="ym-grid linearize-level-2">
+							<div class="ym-g50 ym-gl">
+								<div class="ym-gbox-left">
+									<h4>Array</h4>
+									<ul>
+										<li>
+											Each node except the root node and config node must have a <var>parent</var>
+											property which references the parent node.
+										</li>
+										<li>
+											The order of node variables in the final array matters, since the node layout is determined from the given order. 
+										</li>
+									</ul>
+								</div>
+							</div>
+							<div class="ym-g50 ym-gr">
+								<div class="ym-gbox-right">
+									<h4>JSON</h4>
+									<ul>
+										<li> 
+											Two main properties are required: <var>chart</var> and <var>nodeStructure</var>
+										</li>
+										<li>
+											Nodes are defined in <var>nodeStructure</var>. Each node can have children which are then
+											defined in <var>children</var> property. Property <var>children</var> is an Array which contains other nodes who can also have a <var>children</var> property.
+										</li>
+										<li>
+											Order of nodes also matters, like in the <code>Array</code> approach.
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<p class="box info"><strong>Performance Hint:</strong> <code>JSON</code> approach is known to be a bit faster, since using the <code>Array</code> approach genereates the <code>JSON</code> config before procedeing to chart initalization. </p>
+					</div>
+				</div>
+			</div>
+
+			<h2 id="orgchart-api" data-manual="true" tabindex="-1"> API documentation </h2>
+			<div class="ym-grid linearize-level-1 api-documentation" data-manual="true">
+				<div class="ym-g25 ym-gl">
+					<div class="ym-gbox-left">
+						<p>
+							The documentation may be divided into two mayor parts.
+						</p>
+						<p>
+							One part explains the general chart configuration possibilities, and the other focuses on the configuration possibilities available for each individual node.
+						</p>
+					</div>
+				</div>
+				<div class="ym-g75 ym-gr">
+					<div class="ym-gbox-right">
+						<h3> Treant contructor </h3>
+						<p>
+							Before stating a wider explanation of all the possible chart configurations, it is first required to briefly describe the Treant Javascript constructor which accepts the configuration object with all the data necessary to draw the wanted chart.
+						</p>
+						<table>
+							<thead>
+								<tr>
+									<th colspan="3"> <var>Treant</var> constructor </th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										parameters
+									</td>
+									<td>
+										<code> chart_structure <span class="muted"> {Array or JSON} </span> </code>
+										<br/>
+										<br/>
+										<code> callback <span class="muted"> {function} optional </span> </code>
+									</td>
+									<td>
+										<p>
+											<code> chart_structure </code> is a required parameter. Its detailed definition is explained
+											further down in the API documentation. <br/>
+											<code> callback </code> is an optional parameter. Function passed as callback will be executed after chart initialization.
+										</p>
+
+										<h6> Usage </h6>
+										<pre class="jsCode"> var my_chart = new Treant(chart_structure, callback); </pre>
+									</td>
+								</tr>
+
+							</tbody>
+						</table>
+						
+						<br/>
+						<p>
+							As seen above, the <code>chart_structure</code> parameter should be provided for the Treant constructor. Further documentation explains the possible solutions for generating the <code>chart_structure</code> which will eventually give the desired result. 
+						</p>
+						<br/>
+
+						<h4 id="orgchart-api-general">Part 1: General chart API</h4>
+						<p>
+							The first part of the API explains all the properties that can be passed to chart config variable.
+						</p>
+						<q>What is a chart config variable?</q>
+						<p class="box info">
+							<strong>Example: </strong> Below is a simple example in <a href="#orgchart-initialization" class="offset">Construction & Initialization</a>.
+							 In the Array example the <var>config</var> variable and in the JSON example the <var>simple_chart_config.chart</var> property are editable withe the properties listed bellow.
+						</p>
+						<h5>List of properties</h5>
+						<table>
+							<thead>
+								<tr>
+									<th > Property </th>
+									<th > Values </th>
+									<th> Short Description </th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										container
+										<br/><span class="muted">{string}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> - </code><br/>
+										<span class="muted">(required)</span>
+									</td>
+									<td>
+										<p>
+											A string that identifies a HTML element that will contain the organizational chart (nodes and connections). A string should be specified as a jQuery ID selector <br/>
+											(ex: <code>"#some-element-id"</code>)
+										</p>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										rootOrientation
+										<br/><span class="muted">{string}</span>
+									</td>
+									<td>
+										<code class="muted" title="default">NORTH</code><br/>
+										<code>EAST</code><br/>
+										<code>WEST</code><br/>
+										<code>SOUTH</code>
+									</td>
+									<td>
+										This property specifies the position of the root node, and the orientation of its children which depend on it.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										nodeAlign
+										<br/><span class="muted">{string}</span>
+									</td>
+									<td>
+										<code class="muted" title="default">CENTER</code><br/>
+										<code>TOP</code><br/>
+										<code>BOTTOM</code>
+									</td>
+									<td>
+										Specifies the vertical alignment of nodes on the same level. Is one node has a bigger height than the others, the ones with the smaller height should be properly vertical aligned.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										levelSeparation
+										<br/><span class="muted">{number}</span>
+									</td>
+									<td>
+										<code class="muted" title="default">30<small>(px)</small></code><br/>
+									</td>
+									<td>
+										The levelSeparation property defines the separation between chart levels.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										siblingSeparation
+										<br/><span class="muted">{number}</span>
+									</td>
+									<td>
+										<code class="muted" title="default">30<small>(px)</small></code><br/>
+									</td>
+									<td>
+										The siblingSeparation property defines the separation between two sibling on the same level.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										subTeeSeparation
+										<br/><span class="muted">{number}</span>
+									</td>
+									<td>
+										<code class="muted" title="default">30<small>(px)</small></code><br/>
+									</td>
+									<td>
+										The siblingSeparation property defines the separation between two neighbor branches of the organizational chart.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										hideRootNode
+										<br/><span class="muted">{boolean}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> false </code><br/>
+										<code> true </code>
+									</td>
+									<td>
+										The root node can be hidden by defining this as <code>true</code>. Root node should still be defined in the chart structure but it won't be shown.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										animateOnInit
+										<br/><span class="muted">{boolean}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> false </code><br/>
+									</td>
+									<td>
+										Every chart can be animated uppon initialization if this option is set to <code>true</code>.
+										For more animation options see <a class="offset" href="#config-animation">chart config</a> animation. (jQuery required)
+									</td>
+								</tr>
+								<tr>
+									<td>
+										animateOnInitDelay
+										<br/><span class="muted">{number}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> 500<small>(ms)</small> </code><br/>
+									</td>
+									<td>
+										This option indicates a number of miliseconds before an init animation is triggered.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										scrollbar
+										<br/><span class="muted">{string}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> native </code><br/>
+										<code> fancy </code><br/>
+										<code> None </code>
+									</td>
+									<td>
+										<p>	
+											If the chart container is smaller than the chart content a scrollbar will be shown. There are tree possibilities. Use a native browser scrollbar, use a fancy jquery powered scrollbar or don't use scrollbar at all with the <var>"None"</var> property.
+										</p>
+										<h6> Usage </h6>
+										<pre class="htmlCode">
+&lt;!-- include this files if "fancy" is set --&gt;
+&lt;link href=&quot;[path]/perfect-scrollbar.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;/&gt;
+&lt;script src=&quot;[path]/jquery.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;[path]/jquery.mousewheel.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;[path]/perfect-scrollbar.js&quot;&gt;&lt;/script&gt;</pre>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										padding
+										<br/><span class="muted">{number}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> 15<small>(px)</small> </code><br/>
+									</td>
+									<td>
+										If the scrollbar is shown, this defines the padding between the chart structure and the chart container.
+									</td>
+								</tr>
+								<tr>
+									<td  id="config-connectors">
+										connectors
+										<br/><span class="muted">{object}</span>
+									</td>
+									<td>
+										<p>
+											<strong>type</strong>
+											<small><span class="muted">{string}</span></small><br/>
+											<code class="muted" title="default"> curve </code><br/>
+											<code>bCurve</code><br/>
+											<code>step</code><br/>
+											<code>straight</code>
+										</p>
+										<p>
+											<strong>style</strong>
+											<small><small><span class="muted">{object}</span><br/>
+											<code class="muted" title="default"> stroke: 'black' </code><br/>
+											<code>arrow-end: {string}</code><br/>
+											<code>cursor: {string}</code><br/>
+											<code>fill: {string}</code><br/>
+											<code>fill-opacity: {number}</code><br/>
+											<code>opacity: {number}</code><br/>
+											<code>stroke: {string}</code><br/>
+											<code>stroke-dasharray: {string}</code><br/>
+											<code>stroke-linecap: {string}</code><br/>
+											<code>stroke-opacity: {number}</code><br/>
+											<code>stroke-width: {number}</code></small></small>
+										</p>
+										<p>
+											<small><strong>stackIndent</strong><br/>
+											<span class="muted">{number}</span></small>
+											<code class="muted" title="default"> 15<small>(px)</small> </code>
+										</p>
+									</td>
+									<td>
+										<p class="margin-bottom-zero">
+											<code>type</code> defines which type of connector line should be drawn between a parent node and its children.Several possibilities are available, their appearance is the following:
+											<span class="center margin-top-ten">
+												<img alt="connector types" class="bordered margin-bottom-zero" src="manual/img/connector-types.png"/>
+											</span>
+										</p>
+										<p>
+											<code>style</code> parameter requires you to define an object. Its definition can be found at RaphaelJS <a href="http://raphaeljs.com/reference.html#Element.attr" target="_blank">documentation</a> under <i>possible parameters</i> section.
+										</p>
+										<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+										<p class="margin-top-ten">	
+											<code> stackIndent </code> is the property which will be applied to <i>stacked children</i>.
+											See <small><code>stackChildren</code></small> under <a href="#orgchart-stackchildren" class="offset">part 2</a> of the API.
+										</p>
+									</td>
+								</tr>
+									
+								<tr>
+									<td  id="config-node">
+										node
+										<br/><span class="muted">{object}</span>
+									</td>
+									<td>
+										<p>
+											<strong>HTMLclass</strong> <br/>
+											<small><span class="muted">{string}</span></small>
+											<code class="muted" title="default"> - </code>
+										</p>
+										<p>
+											<strong>drawLineThrough</strong><br/>
+											<small><span class="muted">{boolean}</span></small>
+											<code class="muted" title="default"> false </code>
+										</p>
+										<p>
+											<strong>collapsable</strong><br/>
+											<small><span class="muted">{boolean}</span></small>
+											<code class="muted" title="default"> false </code>
+										</p>
+										<p>
+											<strong>link</strong>
+											<small><span class="muted">{object}</span></small><br/>
+											<code class="muted" title="default"> target: '_self' </code>
+										</p>
+									</td>
+									<td>
+										<p>
+											A string can be entered under <code>HTMLclass</code>. That class will be given to each node in the cart along with the default <code>.node</code> class.
+										</p>
+										<p>
+											<code>drawLineThrough</code> accepts a boolean. If set to <code>true</code>, each node will have a connector line drawn through it.
+										</p>
+										<p>
+											A <code>collapsable</code> option enables the node to interactively collapse its children. A collapse switch is added to the node. (jQuery required)
+										</p>
+										<p>
+											If you are planning of making a lot of <code>&lt;a&gt;</code> nodes then here is the possibility to assign <code>target="_blank"</code> to each of those nodes in one blow.
+										</p>
+									</td>
+								</tr>
+								<tr>
+									<td id="config-animation">
+										animation
+										<br/><span class="muted">{object}</span>
+									</td>
+									<td>
+										<strong>nodeSpeed</strong><br/>
+										<small><span class="muted">{number}</span></small>
+										<code class="muted" title="default"> 450<small>(ms)</small> </code>
+										<br/>
+										<br/>
+										<strong>nodeAnimation</strong>
+										<small><span class="muted">{string}</span></small>
+										<code class="muted" title="default"> linear </code>
+										<br/>
+										<br/>
+										<strong>connectorsSpeed</strong>
+										<small><span class="muted">{number}</span></small>
+										<code class="muted" title="default"> 450<small>(ms)</small> </code>
+										<br/>
+										<br/>
+										<strong>connectorsAnimation</strong>
+										<small><span class="muted">{string}</span></small>
+										<code class="muted" title="default"> linear </code>
+									</td>
+									<td>
+										<p>
+											How the chart animates can be fully customised. Here, animation speed and animation functions can be set. jQuery is required in oreder for animations to work.
+										</p>
+										<p>
+											<code>nodeAnimation</code> accepts one of
+											<a href="http://easings.net/">
+												jquery.easing functions
+											</a>.
+											<br>
+											<a href="http://gsgd.co.uk/sandbox/jquery/easing/">jquery.easing plugin</a> needs to be included.
+										</p>
+										<p>
+											<code>connectorsAnimation</code> accepts one of
+											<a href="http://raphaeljs.com/reference.html#Raphael.easing_formulas">
+												Raphael.easing_formulas
+											</a> or CSS format: cubic‐bezier(XX, XX, XX, XX)
+										</p>
+										<p class="box info">
+											<strong>Performance Hint: </strong>
+											In order to animate nodes with hardware-accelerated transitions use
+											<a href="https://github.com/louisremi/jquery.transition.js/"> jquery.transition.js </a> plugin
+
+										</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<br/>
+						<br/>
+
+<!-- ###### ##### ##### ##### ##### ##### ##### ###### ##### ##### ##### ##### ##### ##### ###### ##### ##### ##### ##### ##### ##### -->
+<!-- ###### ##### API-2 ###### ##### API-2 ###### ##### API-2 ###### ##### API-2 ###### ##### API-2 ###### ##### API-2 ###### ##### API-2 -->
+<!-- ###### ##### ##### ##### ##### ##### ##### ###### ##### ##### ##### ##### ##### ##### ###### ##### ##### ##### ##### ##### ##### -->
+
+						<h4 id="orgchart-api-node">Part 2: Individual node configuration</h4>
+						<p>
+							The second part explains the properties which can be passed to every single node.
+						</p>
+						<q>Where do I define node configuration?</q>
+						<p class="box info">
+							<strong>Example: </strong> Look at the simple example in <a href="#orgchart-initialization" class="offset">Construction & Initialization</a>.
+							In the Array example the <var> parent_node, first_child, second_child </var> variables, and in the JSON example, each node in the <var>simple_chart_config.nodeStructure</var> property are editable withe the properties listed bellow.
+						</p>
+						<h5>List of properties</h5>
+						<table>
+							<thead>
+								<tr>
+									<th > Property </th>
+									<th > Values </th>
+									<th> Short Description </th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>
+										text
+										<br/><span class="muted">{object}</span>
+									</td>
+									<td>
+										<strong>name</strong><br/>
+										<small><span class="muted nowrap">{string} or {object}</span></small><br/>
+										<small><var class="muted nowrap">class: .node-name</var></small><br/>
+										<code class="muted" title="default"> - </code><br/>
+										<strong>title</strong><br/>
+										<small><span class="muted nowrap">{string} or {object}</span></small><br/>
+										<small><var class="muted nowrap">class: .node-title</var></small><br/>
+										<code class="muted" title="default"> - </code><br/>
+										<strong>desc</strong><br/>
+										<small><span class="muted nowrap">{string} or {object}</span></small><br/>
+										<small><var class="muted nowrap">class: .node-desc</var></small><br/>
+										<code class="muted" title="default"> - </code><br/>
+										<strong>contact</strong><br/>
+										<small><span class="muted nowrap">{string} or {object}</span></small><br/>
+										<small><var class="muted nowrap">class: .node-contact</var></small><br/>
+										<code class="muted" title="default"> - </code><br/>
+									</td>
+									<td>
+										<p>
+											A <code>text</code> property can be given to each node. Here you can describe the content of a node in detail. For each <code>text</code> property a <code>&lt;p&gt;</code> tag will be created inside the node container. Corresponding HTML classes will be given to each created tag so they can be styled what ever way you like. <br/>
+											If you pass an object instead off a string, an <code>&lt;a&gt;</code> tag will be created instead of <code>&lt;p&gt;</code> tag.
+										</p>
+										<h6> Usage </h6>
+										<pre class="jsCode">
+node = {
+    parent: some_parent,
+    text: {
+        name: "Simple node",
+        title: "One of kind",
+        desc: "A basic example",
+        contact: { 
+            val: "contact me",
+            href: "http://twitter.com/",
+            target: "_self"
+        }
+    }
+}</pre>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										link
+										<br/><span class="muted">{object}</span>
+									</td>
+									<td>
+										<strong>href</strong>
+										<small><span class="muted">{string}</span></small><br/>
+										<code class="muted" title="default"> - </code><br/>
+										<strong>target</strong>
+										<small><span class="muted">{string}</span></small><br/>
+										<code class="muted" title="default"> - </code><br/>
+									</td>
+									<td>
+										By default, each node is created as an absolute positioned <code>&lt;div&gt;</code> element. By defining a <code>link</code> property, a node is rendered as an <code>&lt;a&gt;</code> element instead.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										image
+										<br/><span class="muted">{string}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> - </code>
+									</td>
+									<td>
+										An image can be inserted into a node container. A relative or absolute path to target image needs to be set as <code>image</code> parameter. The <code>&lt;img&gt;</code> is inserted before the text properties.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										innerHTML
+										<br/><span class="muted">{string}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> - </code>
+									</td>
+									<td>
+										A custom HTML structure can be inserted into a node container. A HTML string needs to be specified in order for this to work. <br/>
+										Another usage of this property is to pass a jQuery ID selector. In that case, an element with a given id is found and its copy is used as node structure. Suffix <i>"-copy"</i> is added to the id of the node element.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										childrenDropLevel
+										<br/><span class="muted">{number}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> - </code>
+									</td>
+									<td>
+										If a certain node has children, a <code>childrenDropLevel</code> can be defined on it. That property specifies how many levels deeper than normal should children be positioned.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										pseudo
+										<br/><span class="muted">{boolean}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> - </code>
+									</td>
+									<td>
+										A <code>pseudo</code> property allows the creation of <i>invisible</i> nodes with no content. Such nodes can have children and all the other desired properties, the only thing to keep in mind is that such nodes have NO content.
+									</td>
+								</tr>
+								<tr>
+									<td>
+										connectors
+										<br/><span class="muted">{object}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> inherits from chart <small>config.connectors</small> </code>
+									</td>
+									<td>
+										Although all the nodes inherit the <code>connectors</code> property from the chart config, it can be overridden for a single node by redefining it under node config. <br/>
+										See <a href="#config-connectors" class="offset">chart config</a> <var>connectors</var> for more documentation.
+ 									</td>
+								</tr>
+								<tr>
+									<td>
+										collapsable
+										<br/><span class="muted">{boolean}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> inherits from chart 
+											<small>config.node.collapsable</small> </code>
+									</td>
+									<td>
+										Each node can be meade collapsable. (jQuery required)
+										<br/>
+										See <a href="#config-node" class="offset">chart config</a> <var>node.collapsable</var> for more documentation.
+ 									</td>
+								</tr>
+								<tr>
+									<td>
+										collapsed
+										<br/><span class="muted">{boolean}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> false </code>
+									</td>
+									<td>
+										This option can be set to <code>true</code>, if so, effected node is initially collapsed. That node is also considered as <code>collapsable</code>. (jQuery required)
+ 									</td>
+								</tr>
+								<tr>
+									<td>
+										HTMLclass
+										<br/><span class="muted">{string}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> inherits from chart 
+											<small>config.node.HTMLclass</small> </code>
+									</td>
+									<td>
+										If specified, all the nodes inherit the HTMLclass from <var>config.node.HTMLclass</var>. But with this property, it is possible to give extra classes to individual nodes. <br/>
+										See <a href="#config-node" class="offset">chart config</a> <var>node.HTMLclass</var> for more documentation.
+ 									</td>
+								</tr>
+								<tr>
+									<td>
+										HTMLid
+										<br/><span class="muted">{string}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> - </code>
+									</td>
+									<td>
+										A custom HTML id attribute can be given to each node element by defineing an <code>id</code> property. 
+									</td>
+								</tr>
+								<tr>
+									<td id="orgchart-stackchildren">
+										stackChildren
+										<br/><span class="muted">{boolean}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> - </code>
+									</td>
+									<td>
+										<p class="margin-bottom-zero">
+											<code>stackChildren</code> property can be set to <code>true</code>. If so the children of the target node will be positioned one beneath the other instead of side by side. This propery won't take affect if the node has grandchildren. When set, the appearance is the following:
+											<span class="center margin-top-ten">
+												<img alt="stack childen" class="bordered margin-bottom-zero" src="manual/img/stack-children.png"/>
+											</span>
+										</p>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										drawLineThrough
+										<br/><span class="muted">{boolean}</span>
+									</td>
+									<td>
+										<code class="muted" title="default"> inherits from chart <small>config.node
+											.drawLineThrough</small> </code>
+									</td>
+									<td>
+										The inherited property can be overridden or set by defining this property. <br/>
+										See <a href="#config-node" class="offset">chart config</a> <var>node.drawLineThrough</var> for more documentation.
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<h2 id="orgchart-examples" tabindex="-1"> Examples </h2>
+			<div class="ym-grid linearize-level-1">
+				<div class="ym-g50 ym-gl">
+
+					<div class="ym-grid linearize-level-2">
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/super-simple">
+									<img alt="super simple example" class="center flexible bordered" src="manual/img/super-simple-thumb.png" />
+								</a>
+								<p>An extra simple example. Just to get you started.
+								</p>
+							</div>
+						</div>
+						<div class="ym-g50 ym-gr">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/custom-colored">
+									<img alt="simple colored example" class="center flexible bordered" src="manual/img/simple-colored-thumb.png" />
+								</a>
+								<p>This is a demo displaying how the use of colors can represent each department in the company structure. It is simple and easy to understand. Anyone could easily visualize their departments in this type of chart.
+								</p>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="ym-g50 ym-gr">
+
+					<div class="ym-grid linearize-level-2">
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/no-parent">
+									<img alt="no parent ecample" class="center flexible bordered" src="manual/img/noparent-thumb.png" />
+								</a>
+								<p>Root nodes are optional and can easily be omitted.</p>
+							</div>
+						</div>
+						<div class="ym-g50 ym-gr">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/collapsable">
+									<img alt="collapsable chart example" class="center flexible bordered" src="manual/img/collapsable-thumb.png" />
+								</a>
+								<p>
+									Here is an example that shows how to make an interactive, collapsible chart.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="ym-grid linearize-level-1">
+				<div class="ym-g50 ym-gl">
+
+					<div class="ym-grid linearize-level-2">
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/basic-example">
+									<img alt="simple example" class="center flexible bordered" src="manual/img/simple-thumb.png" />
+								</a>
+								<p>Organizational chart of the company structure along with pictures and basic information about each member.</p>
+							</div>
+						</div>
+						<div class="ym-g50 ym-gr">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/tennis-draw">
+									<img alt="sport results chart" class="center flexible bordered" src="manual/img/tennis-thumb.png" />
+								</a>
+								<p>Tennis results are displayed in a classic tree structure. Tree structure is an adequate method of representation for any type of bracketed events.</p>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="ym-g50 ym-gr">
+
+					<div class="ym-grid linearize-level-2">
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/connectors">
+									<img alt="connectors example" class="center flexible bordered" src="manual/img/connectors-thumb.png" />
+								</a>
+								<p>Using vendor/raphael.js as a SVG drawing library, all types and styles for connectors are possible.</p>
+							</div>
+						</div>
+						<div class="ym-g50 ym-gr">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/simple-scrollbar">
+									<img alt="scrollar example" class="center flexible bordered" src="manual/img/simple-scrollbar-thumb.png" />
+								</a>
+								<p>When having trouble with a big and more complex chart, a good looking scrollbar can be used to access hidden content.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="ym-grid linearize-level-1">
+				<div class="ym-g50 ym-gl">
+
+					<div class="ym-grid linearize-level-2">
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/custom-color-plus-scrollbar">
+									<img alt="custom scrollbar example" class="center flexible bordered" src="manual/img/custom-color-scrollbar-thumb.png" />
+								</a>
+								<p>Root node can be positioned in all four mayor directions. A scrollbar is only displayed where needed.</p>
+							</div>
+						</div>
+						<div class="ym-g50 ym-gr">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/comments">
+									<img alt="seo friendy example" class="center flexible bordered" src="manual/img/comments-thumb.png" />
+								</a>
+								<p>Treant can be SEO friendly. This example shows how a static HTML can be used for node content.</p>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="ym-g50 ym-gr">
+					<div class="ym-grid linearize-level-2">
+						<div class="ym-g50 ym-gl">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/evolution-tree">
+									<img alt="evolution tree example" class="center flexible bordered" src="manual/img/evolution-thumb.png" />
+								</a>
+								<p>This is a very simple and effective representation of an evolution branch. It shows the use of scroller.</p>
+							</div>
+						</div>
+						<div class="ym-g50 ym-gr">
+							<div class="ym-gbox-left">
+								<a class="img" href="examples/timeline">
+									<img alt="timeline example" class="center flexible bordered" src="manual/img/timeline-thumb.png" />
+								</a>
+								<p>An interactive timeline can be made.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<h2 id="orgchart-download" tabindex="-1"> Download </h2>
+			<p>
+				<a href="https://github.com/fperucic/treant-js/archive/master.zip" class="ym-button ym-next ym-success">
+					Download
+				</a>
+				Or you can fork the project from <a href="https://github.com/fperucic/treant-js">Github.</a>
+			</p>
+
+		</div>
+		</div>
+	</div>
+</div>
+</div>
+<footer role="contentinfo">
+	<div class="ym-wrapper">
+		<div class="ym-wbox">
+			<div class="ym-grid linearize-level-2">
+				<div class="ym-g33 ym-gr">
+					<div class="ym-gbox-right">
+						<p>Layout based on <a href="http://www.yaml.de">YAML</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</footer>
+
+
+<!-- jQuery & Plugins -->
+<script src="vendor/jquery.min.js"></script>
+<script src="manual/js/jquery.snippet.min.js"></script>
+<script src="vendor/raphael.js"></script>
+<script src="manual/js/domscript.js"></script>
+</body>
+</html>

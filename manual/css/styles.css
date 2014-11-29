@@ -1,0 +1,95 @@
+
+header h1 { text-indent: -999px;
+	background-image: url('../img/treant_logo.png');
+    background-position: center 0;
+    background-repeat: no-repeat;
+    text-indent: 9999px;
+    width: 484px;
+    margin: 0 auto;
+	height: 127px;
+}
+header a { display: inline-block; margin-bottom: 5px; width: 495px; overflow: hidden; background: none !important; }
+header a:hover h1,
+.info-page header a h1{ background-position: center -128px; background-color: none; }
+header p { color: #55B17A; }
+
+h2[id] { border-bottom: 1px solid #55B17A; }
+pre, code { color: #358E57; }
+.sh_peachpuff .sh_sourceCode .sh_url { color: #55B17A; }
+
+a.img:hover,
+a.img:focus { background: none; }
+a.img:hover img { border-color: #55B17A; }
+
+.info-page #main { height: 300px; padding-top: 50px; }
+
+.quick-examples { padding-bottom: 0; }
+.quick-examples .ym-gbox-left { min-height: 350px; position: relative; padding-bottom: 40px !important; }
+.quick-examples .ym-button.ym-next { margin-bottom: 24px; position: absolute; bottom: 0; }
+.quick-examples .ym-button.ym-next:active { margin-bottom: 23px; top: auto; }
+
+img.simple-example { padding: 0 33px; }
+.muted { color: #8B8F90; }
+.api-documentation h6 { margin-bottom: 5px; }
+.margin-bottom-zero { margin-bottom: 0; }
+.margin-top-ten { margin-top: 10px; }
+.nowrap { white-space: nowrap; }
+
+.bordered { transition: border 0.3s ease-in-out 0s; -webkit-transition: border 0.3s ease-in-out 0s; }
+
+nav#level2 ul { position: relative; }
+nav#level2 .ym-hlist { overflow: visible; }
+nav#level2 .ym-hlist > ul > li { position: relative; }
+
+nav#level2 .ym-hlist > ul > li ul { background-color: #0d1113; }
+nav#level2.fix .ym-hlist > ul > li ul { background-color: #080B0C; }
+
+nav#level2 .ym-hlist > ul > li ul { position: absolute; top: -999px; padding: 3px 4px; left: -4px; border-radius: 0 0 3px 3px; z-index: 10000; }
+nav#level2 .ym-hlist > ul > li ul li { float: none; margin: 0; padding: 0; margin: 2px 0; }
+nav#level2 .ym-hlist > ul > li ul li a:hover { background: rgba(255, 255, 255, 0.1); color: #FFFFFF; border-radius: 0.2em 0.2em 0.2em 0.2em; }
+nav#level2 .ym-hlist > ul > li:hover a + ul,
+nav#level2 .ym-hlist > ul > li a + ul:hover { top: 28px; }
+nav .ym-hlist li.active ul a { background: none; }
+
+/* required LIB STYLES */
+.Treant { position: relative; overflow: hidden; padding: 0 !important; }
+.Treant > .node,
+.Treant > .pseudo { position: absolute; display: block; visibility: hidden; }
+.Treant.loaded .node,
+.Treant.loaded .pseudo { visibility: visible; }
+.Treant > .pseudo { width: 0; height: 0; border: none; padding: 0; }
+.chart { height: 159px; width: 332px; margin: 5px auto; }
+.node { color: #9CB5ED; border: 2px solid #C8C8C8; border-radius: 3px; }
+.node p { font-size: 20px; line-height: 20px; height: 20px; font-weight: bold; padding: 3px; margin: 0; font-family: none; }
+
+.Treant > .node img {	border: none; float: left; }
+
+footer { height: 50px; }
+
+.myModal .form-info { padding: 5px 0 0 15px; }
+.myModal .form-info p { margin: 0; }
+.myModal .add-button { margin-bottom: 15px !important; }
+.myModal .add-button a[data-counter="0"] { box-shadow: none; background: none; opacity: 0.5; cursor: default; }
+.myModal .add-button a[data-counter="0"]:active { top: 0; }
+
+.lt-ie9 .bordered { border: 1px solid #8D8F7C; }
+#level2 select { display: none; border: 1px solid #CCCCCC; color: #333333; font-size: 13px; height: 30px; line-height: 30px; margin: 10px auto; padding: 4px 6px; width: 100%; }
+
+@media (max-width: 960px) {
+	.ym-gbox-right { overflow-x: scroll !important; }
+}
+
+@media (max-width: 600px) {
+	#level2 ul { display: none; }
+	#level2 select { display: block; }
+	header .ym-wbox { padding-bottom: 28px; }
+}
+
+@media (max-width: 510px) {
+	header h1 {
+		height: 86px;
+		width: 300px;
+		background-image: url('../img/treant_logo_small.png');
+	}
+	header a:hover h1 { background-position: center -85.5px; }
+}
