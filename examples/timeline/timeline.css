@@ -1,0 +1,19 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { margin:0; padding:0; }
+
+
+body { background: #fff; }
+
+/* optional Container STYLES */
+.chart { height: 400px; width: 900px; margin: 5px; margin: 5px auto; border: 3px solid #DDD; border-radius: 3px; }
+.node { color: #9CB5ED; border: 2px solid #C8C8C8; border-radius: 3px; background: #fff; transition: background 0.7s, color 0.7s; }
+.node p { font-size: 17px; line-height: 20px; height: 20px; font-weight: bold; padding: 3px; margin: 0; }
+
+.node.main-date { width: 10px; height: 10px; border-radius: 50%; }
+.node.main-date p.node-name { top: -15px; font-size: 15px; position: absolute; opacity: 0; z-index: -1; left: -30px; transition: top 1s, opacity 1s; }
+.node.main-date:hover p.node-name { opacity: 1; top: -25px; }
+
+.Treant .collapse-switch { width: 100%; height: 100%; border: none; }
+.Treant .node.collapsed { background-color: #D7F5FF; color: #827A7A; }
+.Treant .node.collapsed .collapse-switch { background: none; }
+
+.timeline .node-desc { position: absolute; left: -999px; width: 2000px; background: #665B57; height: 3px; padding: 0; z-index: -1; top: 3px; }

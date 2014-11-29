@@ -1,0 +1,39 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { margin:0; padding:0; }
+
+body { background: #fff;  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }
+/* optional Container STYLES */
+.chart { height: 600px; width: 900px; margin: 5px; margin: 15px auto; border: 3px solid #DDD; border-radius: 3px; }
+.comments { width: 427px; margin: 15px auto; }
+.comments ul { margin-left: 35px; list-style: none; }
+.comment {
+    color: #333333;
+    display: inline-block;
+    font-size: 14px;
+    margin-top: 6px;
+    width: 360px;
+}
+
+.comment img {
+    border-radius: 3px 3px 3px 3px;
+    float: left;
+    height: 30px;
+    margin-right: 8px;
+    margin-top: 3px;
+    width: 30px;
+}
+.comment p {
+    color: #42474A;
+    font-size: 14px;
+    line-height: 1.4em;
+    margin-bottom: 0;
+    max-height: 4.2em;
+    overflow: hidden;
+}
+
+.comment .user {
+    color: rgba(30, 55, 70, 0.4);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.Treant .comment { margin: 0; padding: 3px; border: 1px solid #ddd; border-radius: 3px; }

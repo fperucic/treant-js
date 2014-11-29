@@ -1,0 +1,36 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { margin:0; padding:0; }
+table { border-collapse:collapse; border-spacing:0; }
+fieldset,img { border:0; }
+address,caption,cite,code,dfn,em,strong,th,var { font-style:normal; font-weight:normal; }
+caption,th { text-align:left; }
+h1,h2,h3,h4,h5,h6 { font-size:100%; font-weight:normal; }
+q:before,q:after { content:''; }
+abbr,acronym { border:0; }
+
+body { background: #fff;  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }
+/* optional Container STYLES */
+.chart { height: 600px; width: 900px; margin: 5px; margin: 15px auto; border: 3px solid #DDD; border-radius: 3px; }
+
+.tennis-draw {
+    font-size: 10px;
+    width: 100px;
+}
+
+.tennis-draw.winner { height: 38px; }
+.tennis-draw.winner:hover { background: url('trophy.png') right 0 no-repeat; }
+.tennis-draw.winner .node-name { padding-left: 10px; margin-top: 1px; display: block; }
+
+.tennis-draw .node-name { padding: 2px; white-space: pre; color: #00AFF0; }
+.tennis-draw .node-desc { padding: 2px; color: #999; }
+
+.tennis-draw.first-draw .node-title,
+.tennis-draw.first-draw .node-name,
+.tennis-draw.first-draw img { position: absolute; top: -8px; }
+.tennis-draw.first-draw:hover img { width: 20px; top: -12px; }
+
+.tennis-draw.first-draw { width: 165px; height: 20px; }
+.tennis-draw.first-draw img { margin: 3px 4px 0 0; left: 25px; }
+.tennis-draw.first-draw .node-title { margin-top: 3px; }
+.tennis-draw.first-draw .node-name { width: 113px; padding-left: 50px; }
+.tennis-draw.first-draw.bye .node-name { color: #999; }
+

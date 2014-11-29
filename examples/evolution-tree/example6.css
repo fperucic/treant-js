@@ -1,0 +1,25 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { margin:0; padding:0; }
+table { border-collapse:collapse; border-spacing:0; }
+fieldset,img { border:0; }
+address,caption,cite,code,dfn,em,strong,th,var { font-style:normal; font-weight:normal; }
+caption,th { text-align:left; }
+h1,h2,h3,h4,h5,h6 { font-size:100%; font-weight:normal; }
+q:before,q:after { content:''; }
+abbr,acronym { border:0; }
+
+body { background: #fff;  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif; }
+/* optional Container STYLES */
+.chart { height: 600px; width: 900px; margin: 5px; margin: 15px auto; border: 3px solid #DDD; border-radius: 3px; }
+
+.evolution-tree {
+    padding: 2px;
+    width: 40px; height: 40px;
+    border-radius: 3px;
+    font-size: 10px;
+}
+
+.evolution-tree .node-name { text-align: center; position: absolute; width: 88px; left: -50%; }
+.evolution-tree img {  margin-right:  10px; float: none !important; }
+
+.evolution-tree.the-parent { border-radius: 50%; background-color: #000; width: 3px; height: 3px; }
+.evolution-tree.the-parent .node-name { width: auto; margin-top: -7px; text-indent: 12px; font-weight: bold; }
