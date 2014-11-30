@@ -11,8 +11,7 @@ var tree_structure = {
 
         node: {
             HTMLclass: "tennis-draw",
-            drawLineThrough: true,
-            collapsable: true
+            drawLineThrough: true
         },
         connectors: {
             type: "straight",
