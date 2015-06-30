@@ -1,0 +1,1 @@
+java -jar {path}/compiler.jar --compilation_level SIMPLE_OPTIMIZATIONS --warning_level QUIET --externs vendor/jquery.min.js --externs vendor/perfect-scrollbar/perfect-scrollbar.js --externs vendor/raphael.js --language_in ECMASCRIPT5 --js Treant.js --js_output_file Treant.min.js
