@@ -1,7 +1,10 @@
 /*
-* Treant.js
+* Treant-js
 *
 * (c) 2013 Fran Peručić
+* Treant-js may be freely distributed under the MIT license.
+* For all details and documentation:
+* http://fperucic.github.io/treant-js
 *
 * Treant is an open-source JavaScipt library for visualization of tree diagrams.
 * It implements the node positioning algorithm of John Q. Walker II "Positioning nodes for General Trees".
@@ -60,7 +63,6 @@
 
 	/**
 	* ImageLoader constructor.
-	* @constructor
 	* ImageLoader is used for determening if all the images from the Tree are loaded.
 	* 	Node size (width, height) can be correcty determined only when all inner images are loaded
 	*/
@@ -112,7 +114,6 @@
 
 	/**
 	* Class: TreeStore
-	* @singleton
 	* TreeStore is used for holding initialized Tree objects
 	* 	Its purpose is to avoid global variables and enable multiple Trees on the page.
 	*/
@@ -130,17 +131,16 @@
 
 	/**
 	* Tree constructor.
-	* @constructor
 	*/
 	var Tree = function (jsonConfig, treeId) {
 
 		this.id = treeId;
 
 		this.imageLoader = new ImageLoader();
-		this.CONFIG = UTIL.createMerge(Tree.prototype.CONFIG, jsonConfig['chart']);
+		this.CONFIG = UTIL.createMerge(Tree.CONFIG, jsonConfig.chart);
 		this.drawArea = document.getElementById(this.CONFIG.container.substring(1));
 		this.drawArea.className += " Treant";
-		this.nodeDB = new NodeDB(jsonConfig['nodeStructure'], this);
+		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
 
 		// key store for storing reference to node connectors,
 		// key = nodeId where the connector ends
@@ -165,8 +165,8 @@
 				
 				this.positionNodes();
 
-				if (this.CONFIG['animateOnInit']) {
-					setTimeout(function() { root.toggleCollapse(); }, this.CONFIG['animateOnInitDelay']);
+				if (this.CONFIG.animateOnInit) {
+					setTimeout(function() { root.toggleCollapse(); }, this.CONFIG.animateOnInitDelay);
 				}
 
 				if(!this.loaded) {
@@ -552,7 +552,7 @@
 
 			path.animate({
 				path: pathString.charAt(0) === "_" ? pathString.substring(1) : pathString // remove the "_" prefix if it exists
-			}, this.CONFIG['animation']['connectorsSpeed'],  this.CONFIG['animation']['connectorsAnimation'],
+			}, this.CONFIG.animation.connectorsSpeed,  this.CONFIG.animation.connectorsAnimation,
 			function(){
 				if(pathString.charAt(0) === "_") { // animation is hideing the path, hide it at the and of animation
 					path.hide();
@@ -666,7 +666,6 @@
 
 	/**
 	* NodeDB constructor.
-	* @constructor
 	* NodeDB is used for storing the nodes. Each tree has its own NodeDB.
 	*/
 	var NodeDB = function (nodeStructure, tree) {
@@ -679,13 +678,13 @@
 
 			var newNode = self.createNode(node, parentId, tree, null);
 
-			if(node['children']) {
+			if(node.children) {
 
 				newNode.children = [];
 
 				// pseudo node is used for descending children to the next level
-				if(node['childrenDropLevel'] && node['childrenDropLevel'] > 0) {
-					while(node['childrenDropLevel']--) {
+				if(node.childrenDropLevel && node.childrenDropLevel > 0) {
+					while(node.childrenDropLevel--) {
 						// pseudo node needs to inherit the connection style from its parent for continuous connectors
 						var connStyle = UTIL.cloneObj(newNode.connStyle);
 						newNode = self.createNode('pseudo', newNode.id, tree, null);
@@ -694,24 +693,24 @@
 					}
 				}
 
-				var stack = (node['stackChildren'] && !self.hasGrandChildren(node)) ? newNode.id : null;
+				var stack = (node.stackChildren && !self.hasGrandChildren(node)) ? newNode.id : null;
 
 				// svildren are position on separate leves, one beneeth the other
 				if (stack !== null) { newNode.stackChildren = []; }
 
-				for (var i = 0, len = node['children'].length; i < len ; i++) {
+				for (var i = 0, len = node.children.length; i < len ; i++) {
 
 					if (stack !== null) {
-						newNode =  self.createNode(node['children'][i], newNode.id, tree, stack);
+						newNode =  self.createNode(node.children[i], newNode.id, tree, stack);
 						if((i + 1) < len) newNode.children = []; // last node cant have children
 					} else {
-						itterateChildren(node['children'][i], newNode.id);
+						itterateChildren(node.children[i], newNode.id);
 					}
 				}
 			}
 		}
 
-		if (tree.CONFIG['animateOnInit']) nodeStructure['collapsed'] = true;
+		if (tree.CONFIG.animateOnInit) nodeStructure.collapsed = true;
 
 		itterateChildren( nodeStructure, -1); // root node
 
@@ -800,25 +799,25 @@
 		// pseudo node is a node with width=height=0, it is invisible, but necessary for the correct positiong of the tree
 		this.pseudo = nodeStructure === 'pseudo' || nodeStructure['pseudo'];
 
-		this.image = nodeStructure['image'];
+		this.image = nodeStructure.image;
 
-		this.link = UTIL.createMerge( tree.CONFIG.node.link,  nodeStructure['link']);
+		this.link = UTIL.createMerge( tree.CONFIG.node.link,  nodeStructure.link);
 
-		this.connStyle = UTIL.createMerge(tree.CONFIG.connectors, nodeStructure['connectors']);
+		this.connStyle = UTIL.createMerge(tree.CONFIG.connectors, nodeStructure.connectors);
 
-		this.drawLineThrough = nodeStructure['drawLineThrough'] === false ? false : nodeStructure['drawLineThrough'] || tree.CONFIG.node['drawLineThrough'];
+		this.drawLineThrough = nodeStructure.drawLineThrough === false ? false : nodeStructure.drawLineThrough || tree.CONFIG.node.drawLineThrough;
 		
-		this.collapsable = nodeStructure['collapsable'] === false ? false : nodeStructure['collapsable'] || tree.CONFIG.node['collapsable'];
-		this.collapsed = nodeStructure['collapsed'];
+		this.collapsable = nodeStructure.collapsable === false ? false : nodeStructure.collapsable || tree.CONFIG.node.collapsable;
+		this.collapsed = nodeStructure.collapsed;
 
-		this.text = nodeStructure['text'];
+		this.text = nodeStructure.text;
 
 		// '.node' DIV
-		this.nodeInnerHTML	= nodeStructure['innerHTML'];
-		this.nodeHTMLclass	= (tree.CONFIG.node['HTMLclass'] ? tree.CONFIG.node['HTMLclass'] : '') + // globaly defined class for the nodex
-								(nodeStructure['HTMLclass'] ? (' ' + nodeStructure['HTMLclass']) : '');		// + specific node class
+		this.nodeInnerHTML	= nodeStructure.innerHTML;
+		this.nodeHTMLclass	= (tree.CONFIG.node.HTMLclass ? tree.CONFIG.node.HTMLclass : '') + // globaly defined class for the nodex
+								(nodeStructure.HTMLclass ? (' ' + nodeStructure.HTMLclass) : '');		// + specific node class
 
-		this.nodeHTMLid		= nodeStructure['HTMLid'];
+		this.nodeHTMLid		= nodeStructure.HTMLid;
 	};
 
 	TreeNode.prototype = {
@@ -992,7 +991,7 @@
 				
 				setTimeout(function() { // set the flag after the animation
 					tree.inAnimation = false;
-				}, tree.CONFIG['animation']['nodeSpeed'] > tree.CONFIG['animation']['connectorsSpeed'] ? tree.CONFIG['animation']['nodeSpeed'] : tree.CONFIG['animation']['connectorsSpeed'])
+				}, tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed ? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed)
 			}
 		},
 
@@ -1017,7 +1016,7 @@
 				jq_node.css(new_pos);
 				this.positioned = true;
 			} else {
-				jq_node.animate(new_pos, config['animation']['nodeSpeed'], config['animation']['nodeAnimation'], 
+				jq_node.animate(new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation, 
 				function(){
 					this.style.visibility = 'hidden';
 				});
@@ -1049,13 +1048,13 @@
 
 			// if the node was hidden, update width and height
 			if(this.hidden) {
-				new_pos['width'] = this.startW;
-				new_pos['height'] = this.startH;
+				new_pos.width = this.startW;
+				new_pos.height = this.startH;
 			}
 			
 			$(this.nodeDOM).animate(
 				new_pos, 
-				config['animation']['nodeSpeed'], config['animation']['nodeAnimation'], 
+				config.animation.nodeSpeed, config.animation.nodeAnimation, 
 				function() {
 					// $.animate applys "overflow:hidden" to the node, remove it to avoid visual problems
 					this.style.overflow = "";
@@ -1083,7 +1082,7 @@
 		/////////// CREATE NODE //////////////
 		node = this.link.href ? document.createElement('a') : document.createElement('div');
 
-		node.className = (!this.pseudo) ? TreeNode.prototype.CONFIG.nodeHTMLclass : 'pseudo';
+		node.className = (!this.pseudo) ? TreeNode.CONFIG.nodeHTMLclass : 'pseudo';
 		if(this.nodeHTMLclass && !this.pseudo) node.className += ' ' + this.nodeHTMLclass;
 
 		if(this.nodeHTMLid) node.id = this.nodeHTMLid;
@@ -1108,7 +1107,7 @@
 				// TEXT
 				if(this.text) {
 					for(var key in this.text) {
-						if(TreeNode.prototype.CONFIG.textClass[key]) {
+						if(TreeNode.CONFIG.textClass[key]) {
 							var text = document.createElement(this.text[key].href ? 'a' : 'p');
 
 							// meke an <a> element if required
@@ -1117,7 +1116,7 @@
 								if (this.text[key].target) { text.target = this.text[key].target; }
 							}
 
-							text.className = TreeNode.prototype.CONFIG.textClass[key];
+							text.className = TreeNode.CONFIG.textClass[key];
 							text.appendChild(document.createTextNode(
 								this.text[key].val ? this.text[key].val :
 									this.text[key] instanceof Object ? "'val' param missing!" : this.text[key]
@@ -1174,58 +1173,59 @@
 	//		Expose global + default CONFIG params
 	// ###########################################
 
-	Tree.prototype.CONFIG = {
-		'maxDepth': 100,
-		'rootOrientation': 'NORTH', // NORTH || EAST || WEST || SOUTH
-		'nodeAlign': 'CENTER', // CENTER || TOP || BOTTOM
-		'levelSeparation': 30,
-		'siblingSeparation': 30,
-		'subTeeSeparation': 30,
+	
+	Tree.CONFIG = {
+		maxDepth: 100,
+		rootOrientation: 'NORTH', // NORTH || EAST || WEST || SOUTH
+		nodeAlign: 'CENTER', // CENTER || TOP || BOTTOM
+		levelSeparation: 30,
+		siblingSeparation: 30,
+		subTeeSeparation: 30,
 
-		'hideRootNode': false,
+		hideRootNode: false,
 
-		'animateOnInit': false,
-		'animateOnInitDelay': 500,
+		animateOnInit: false,
+		animateOnInitDelay: 500,
 
-		'padding': 15, // the difference is seen only when the scrollbar is shown
-		'scrollbar': "native", // "native" || "fancy" || "None" (PS: "fancy" requires jquery and perfect-scrollbar)
+		padding: 15, // the difference is seen only when the scrollbar is shown
+		scrollbar: 'native', // "native" || "fancy" || "None" (PS: "fancy" requires jquery and perfect-scrollbar)
 
-		'connectors': {
+		connectors: {
 
-			'type': 'curve', // 'curve' || 'step' || 'straight' || 'bCurve'
-			'style': {
-				'stroke': 'black'
+			type: 'curve', // 'curve' || 'step' || 'straight' || 'bCurve'
+			style: {
+				stroke: 'black'
 			},
-			'stackIndent': 15
+			stackIndent: 15
 		},
 
-		'node': { // each node inherits this, it can all be overrifen in node config
+		node: { // each node inherits this, it can all be overrifen in node config
 
 			// HTMLclass: 'node',
 			// drawLineThrough: false,
 			// collapsable: false,
-			'link': {
-				'target': "_self"
+			link: {
+				target: '_self'
 			}
 		},
 
-		'animation': { // each node inherits this, it can all be overrifen in node config
+		animation: { // each node inherits this, it can all be overrifen in node config
 
-			'nodeSpeed': 450,
-			'nodeAnimation': "linear",
-			'connectorsSpeed': 450,
-			'connectorsAnimation': "linear"
+			nodeSpeed: 450,
+			nodeAnimation: 'linear',
+			connectorsSpeed: 450,
+			connectorsAnimation: 'linear'
 		}
 	};
 
-	TreeNode.prototype.CONFIG = {
-		'nodeHTMLclass': 'node',
+	TreeNode.CONFIG = {
+		nodeHTMLclass: 'node',
 
-		'textClass': {
-			'name':	'node-name',
-			'title':	'node-title',
-			'desc':	'node-desc',
-			'contact': 'node-contact'
+		textClass: {
+			name:	'node-name',
+			title:	'node-title',
+			desc:	'node-desc',
+			contact: 'node-contact'
 		}
 	};
 
@@ -1239,8 +1239,8 @@
 			var i = configArray.length, node;
 
 			this.jsonStructure = {
-				'chart': null,
-				'nodeStructure': null
+				chart: null,
+				nodeStructure: null
 			};
 			//fist loop: find config, find root;
 			while(i--) {
@@ -1284,7 +1284,7 @@
 				}
 
 				if (children.length) {
-					parent['children'] = children;
+					parent.children = children;
 				}
 			}
 		},
@@ -1315,7 +1315,6 @@
 
 	/**
 	* Chart constructor.
-	* @constructor
 	*/
 	var Treant = function(jsonConfig, callback) {
 
@@ -1326,5 +1325,5 @@
 	};
 
 	/* expose constructor globaly */ 
-	window['Treant'] = Treant;
+	window.Treant = Treant;
 })();
