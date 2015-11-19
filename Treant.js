@@ -125,7 +125,29 @@
 			return this.store[this.store.length - 1]; // return newly created tree
 		},
 		get: function (treeId) {
-			return this.store[ treeId ];
+			return this.store[treeId];
+		},
+		destroy: function(tree_id){
+			var tree = this.get(tree_id);
+			if (tree) {
+				tree._R.remove();
+				var draw_area = tree.drawArea;
+				while(draw_area.firstChild) {
+					draw_area.removeChild(draw_area.firstChild);
+				}
+				var classes = draw_area.className.split(' '),
+					classes_to_stay = [];
+				for (var i = 0; i < classes.length; i++) {
+					var cls = classes[i];
+					if (cls != 'Treant' && cls != 'Treant-loaded') {
+						classes_to_stay.push(cls);
+					}
+				};
+				draw_area.style.overflowY = '';
+				draw_area.style.overflowX = '';
+				draw_area.className = classes_to_stay.join(' ');
+				this.store[tree_id] = null;
+			}
 		}
 	};
 
@@ -170,7 +192,7 @@
 				}
 
 				if(!this.loaded) {
-					this.drawArea.className += " loaded"; // nodes are hidden until .loaded class is add
+					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is add
 					if (Object.prototype.toString.call(callback) === "[object Function]") { callback(self); }
 					this.loaded = true;
 				}
@@ -466,7 +488,7 @@
 			if(this._R) {
 				this._R.setSize(viewWidth, viewHeight);
 			} else {
-				this._R = this._R || Raphael(this.drawArea, viewWidth, viewHeight);
+				this._R = Raphael(this.drawArea, viewWidth, viewHeight);
 			}
 
 
@@ -1233,7 +1255,7 @@
 	// Makes a JSON chart config out of Array config
 	// #############################################
 
-	var JSOnconfig = {
+	var JSONconfig = {
 		make: function( configArray ) {
 
 			var i = configArray.length, node;
@@ -1318,10 +1340,18 @@
 	*/
 	var Treant = function(jsonConfig, callback) {
 
-		if (jsonConfig instanceof Array) jsonConfig = JSOnconfig.make(jsonConfig);
+		if (jsonConfig instanceof Array) {
+			jsonConfig = JSONconfig.make(jsonConfig);
+		}
 
 		var newTree = TreeStore.createTree(jsonConfig);
 		newTree.positionTree(callback);
+
+		this.tree_id = newTree.id;
+	};
+
+	Treant.prototype.destroy = function() {
+		TreeStore.destroy(this.tree_id);
 	};
 
 	/* expose constructor globaly */ 

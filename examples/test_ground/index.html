@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="../../Treant.css">
 	<link rel="stylesheet" href="index.css">
 	
-	<link rel="stylesheet" href="../../perfect-scrollbar/perfect-scrollbar.css">
+	<link rel="stylesheet" href="../../vendor/perfect-scrollbar/perfect-scrollbar.css">
 	
 </head>
 <body>
@@ -20,9 +20,9 @@
 	<div class="chart" id="OrganiseChart4"></div>
 	<div class="chart" id="OrganiseChart5"></div>
 	
-	<script src="../../jquery.min.js"></script>
-    <script src="../../perfect-scrollbar/jquery.mousewheel.js"></script>
-    <script src="../../perfect-scrollbar/perfect-scrollbar.js"></script>
+	<script src="../../vendor/jquery.min.js"></script>
+    <script src="../../vendor/jquery.mousewheel.js"></script>
+    <script src="../../vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
 	
 	<script src="../../vendor/raphael.js"></script>
 	
@@ -32,7 +32,7 @@
 	<script>
 
 		var UTIL = {
-			inheritAttrs: function(me, from) { // poanta je da nodeovi i tree lako nasljeđuju iz jsonConfig objekta
+			inheritAttrs: function(me, from) {
 
 				for (var attr in from) {
 					if(typeof from[attr] !== 'function') {
@@ -48,8 +48,8 @@
 			},
 
 			createMerge: function(obj1, obj2) {
-				var newObj = {}; // obj1 se mora klonirat jer je to uvijek glavni config od Tree
-				if(obj1) this.inheritAttrs( newObj, this.clone(obj1) ); // obj1 i obj2 mogu uletit kao undefined ako user nije zadao u configu
+				var newObj = {}; 
+				if(obj1) this.inheritAttrs( newObj, this.clone(obj1) ); 
 				if(obj2) this.inheritAttrs( newObj, obj2 );
 				return newObj;
 			},
@@ -66,10 +66,8 @@
 			}
 		};
 
-		// ###########################################
-		//				INICIJALIZACIJA
-		// ###########################################
-
+		var T1 = new Treant(example1);
+		
 		var example2 = UTIL.createMerge(
 			example1, 
 			{
@@ -88,6 +86,7 @@
 				}
 			}
 		);
+		var T2 = new Treant(example2);
 
 		var example3 = UTIL.createMerge(
 			example1,
@@ -107,6 +106,7 @@
 				} 
 			}
 		);
+		var T3 = new Treant(example3);
 
 		var example4 = UTIL.createMerge(
 			example1,
@@ -126,12 +126,9 @@
 				}
 			}
 		);
+		var T4 = new Treant(example4);
 
-		new Treant( example1 );
-		new Treant( example2 );
-		new Treant( example3 );
-		new Treant( example4 );
-		new Treant( ALTERNATIVE );
+		var T5 = new Treant(ALTERNATIVE);
 
 	</script>
 
