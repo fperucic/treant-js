@@ -1030,8 +1030,7 @@
 
 			if (!this.hidden) { new_pos.width = new_pos.height = 0; }
 
-			// store old width + height - padding problem when returning back to old state
-			if(!this.startW || !this.startH) { this.startW = jq_node.width(); this.startH = jq_node.height(); }
+			if(!this.startW || !this.startH) { this.startW = jq_node.outerWidth(); this.startH = jq_node.outerHeight(); }
 
 			// if parent was hidden in initial configuration, position the node behind the parent without animations
 			if(!this.positioned || this.hidden) {
