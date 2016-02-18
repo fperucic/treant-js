@@ -991,7 +991,8 @@
 
 		addSwitchEvent: function(my_switch) {
 			var self = this;
-			UTIL.addEvent(my_switch, 'click', function(){
+			UTIL.addEvent(my_switch, 'click', function(e){
+				e.preventDefault();
 				self.toggleCollapse();
 			});
 		},
