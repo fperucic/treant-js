@@ -539,6 +539,7 @@
 				pathString = hidePoint ? this.getPointPathString(hidePoint):
 							this.getPathString(parent, node, stacked);
 
+
 			if (this.connectionStore[node.id]) {
 				// connector allready exists, update the connector geometry
 				connLine = this.connectionStore[node.id];
@@ -559,13 +560,14 @@
 			}
 		},
 
-		// create the parh which is represanted as a point, used for hideing the connection
+		// create the path which is represanted as a point, used for hiding the connection
 		getPointPathString: function(hp) {
 			// "_" indicates the path will be hidden
 			return ["_M", hp.x, ",", hp.y, 'L', hp.x, ",", hp.y, hp.x, ",", hp.y].join(" ");
 		},
 
 		animatePath: function(path, pathString) {
+
 
 			if (path.hidden && pathString.charAt(0) !== "_") { // path will be shown, so show it
 				path.show();
@@ -576,7 +578,7 @@
 				path: pathString.charAt(0) === "_" ? pathString.substring(1) : pathString // remove the "_" prefix if it exists
 			}, this.CONFIG.animation.connectorsSpeed,  this.CONFIG.animation.connectorsAnimation,
 			function(){
-				if(pathString.charAt(0) === "_") { // animation is hideing the path, hide it at the and of animation
+				if(pathString.charAt(0) === "_") { // animation is hiding the path, hide it at the and of animation
 					path.hide();
 					path.hidden = true;
 				}
