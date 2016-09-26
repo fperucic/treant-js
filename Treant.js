@@ -192,7 +192,7 @@
 				}
 
 				if(!this.loaded) {
-					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is add
+					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is added
 					if (Object.prototype.toString.call(callback) === "[object Function]") { callback(self); }
 					this.loaded = true;
 				}
@@ -459,7 +459,7 @@
 					node.hide(hidePoint);
 
 				} else if(node.positioned) {
-					// node is allready positioned, 
+					// node is already positioned,
 					node.show();
 				} else { // inicijalno stvaranje nodeova, postavi lokaciju
 					node.nodeDOM.style.left = node.X + 'px';
@@ -1135,7 +1135,7 @@
 						if(TreeNode.CONFIG.textClass[key]) {
 							var text = document.createElement(this.text[key].href ? 'a' : 'p');
 
-							// meke an <a> element if required
+							// make an <a> element if required
 							if (this.text[key].href) {
 								text.href = this.text[key].href;
 								if (this.text[key].target) { text.target = this.text[key].target; }
