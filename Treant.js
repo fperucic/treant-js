@@ -159,7 +159,7 @@
 		this.id = treeId;
 
 		this.imageLoader = new ImageLoader();
-		this.CONFIG = UTIL.createMerge(Tree.CONFIG, jsonConfig.chart);
+		this.CONFIG = $.extend( true, {}, Tree.CONFIG, jsonConfig.chart );
 		this.drawArea = document.getElementById(this.CONFIG.container.substring(1));
 		this.drawArea.className += " Treant";
 		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
@@ -1153,7 +1153,8 @@
 					}
 				}
 
-			} else {
+			}
+			else {
 
 				// get some element by ID and clone its structure into a node
 				if (this.nodeInnerHTML.charAt(0) === "#") {
@@ -1172,14 +1173,20 @@
 			}
 
 			// handle collapse switch
-			if (this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId)) {
+			if ( this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId) ) {
 				var my_switch = document.createElement('a');
 				my_switch.className = "collapse-switch";
 				node.appendChild(my_switch);
 				this.addSwitchEvent(my_switch);
-				if (this.collapsed) { node.className += " collapsed"; }
+				if ( this.collapsed ) {
+					node.className += " collapsed";
+				}
+
+				tree.CONFIG.callback.onCreateNodeCollapseSwitch.apply( tree, [this, node, my_switch] );
 			}
 		}
+
+		tree.CONFIG.callback.onCreateNode.apply( tree, [this, node] );
 
 		/////////// APPEND all //////////////
 		drawArea.appendChild(node);
@@ -1243,6 +1250,8 @@
 		},
 
 		callback: {
+			onCreateNode: function() {},
+			onCreateNodeCollapseSwitch: function() {},
 			onCollapseFinished: function () {}
 		}
 	};
