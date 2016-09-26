@@ -16,6 +16,8 @@
 
 ;(function(){
 
+	var $ = null;
+
 	var UTIL = {
 		inheritAttrs: function(me, from) {
 			for (var attr in from) {
@@ -36,6 +38,17 @@
 			return newObj;
 		},
 
+		extend: function() {
+			if ( $ ) {
+				arguments.unshift( true );
+				arguments.unshift( {} );
+				return $.extend.apply( $, arguments );
+			}
+			else {
+				return UTIL.createMerge.apply( this, arguments );
+			}
+		},
+
 		cloneObj: function (obj) {
 			if (Object(obj) !== obj) {
 				return obj;
@@ -46,6 +59,7 @@
 			}
 			return res;
 		},
+
 		addEvent: function(el, eventType, handler) {
 			if (el.addEventListener) { // DOM Level 2 browsers
 				el.addEventListener(eventType, handler, false);
@@ -56,8 +70,34 @@
 			}
 		},
 
+		findEl: function( element, raw ) {
+			if ( $ ) {
+				var $element = $( element );
+				return ( raw ? $element.get( 0 ) : $element );
+			}
+			else {
+				// todo add support for non-id elements
+				return document.getElementById( element.substring( 1 ) );
+			}
+		},
+
 		hasClass: function(element, my_class) {
 			return (" " + element.className + " ").replace(/[\n\t]/g, " ").indexOf(" "+my_class+" ") > -1;
+		},
+
+		toggleClass: function ( element, cls, apply ) {
+			if ( $ ) {
+				$( element ).toggleClass( cls, apply );
+			}
+			else {
+				if ( apply ) {
+					//element.className += " "+cls;
+					element.classList.add( cls );
+				}
+				else {
+					element.classList.remove( cls );
+				}
+			}
 		}
 	};
 
@@ -154,13 +194,13 @@
 	/**
 	* Tree constructor.
 	*/
-	var Tree = function (jsonConfig, treeId) {
+	var Tree = function (jsonConfig, treeId ) {
 
 		this.id = treeId;
 
 		this.imageLoader = new ImageLoader();
-		this.CONFIG = $.extend( true, {}, Tree.CONFIG, jsonConfig.chart );
-		this.drawArea = document.getElementById(this.CONFIG.container.substring(1));
+		this.CONFIG = UTIL.extend( Tree.CONFIG, jsonConfig.chart );
+		this.drawArea = UTIL.findEl( this.CONFIG.container, true );
 		this.drawArea.className += " Treant";
 		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
 
@@ -181,10 +221,10 @@
 					orient = this.CONFIG.rootOrientation;
 
 				this.resetLevelData();
-				
+
 				this.firstWalk(root, 0);
 				this.secondWalk( root, 0, 0, 0 );
-				
+
 				this.positionNodes();
 
 				if (this.CONFIG.animateOnInit) {
@@ -365,7 +405,7 @@
 					else if (orinet == 'SOUTH' || orinet == 'EAST') {
 						node.Y = (yTmp + (levelHeight - nodesizeTmp)); // align "TOP"
 					}
-				
+
 				} else {
 					node.Y = ( align == 'CENTER' ) ? (yTmp + (levelHeight - nodesizeTmp) / 2) :
 							( align == 'TOP' )	? (yTmp + (levelHeight - nodesizeTmp)) :
@@ -467,10 +507,10 @@
 
 					node.positioned = true;
 				}
-				
+
 				if (node.id !== 0 && !(node.parent().id === 0 && this.CONFIG.hideRootNode)) {
 					this.setConnectionToParent(node, hidePoint); // skip the root node
-				} 
+				}
 				else if (!this.CONFIG.hideRootNode && node.drawLineThrough) {
 					// drawlinethrough is performed for for the root node also
 					node.drawLineThroughMe();
@@ -502,9 +542,11 @@
 					this.drawArea.style.overflowY = "auto";
 				}
 
-			} else if (this.CONFIG.scrollbar == 'fancy') {
+			}
+			// Fancy scrollbar relies heavily on jQuery, so guarding with if ( $ )
+			else if ( $ && this.CONFIG.scrollbar == 'fancy') {
 
-				var jq_drawArea = $(this.drawArea);
+				var jq_drawArea = $( this.drawArea );
 				if (jq_drawArea.hasClass('ps-container')) { // znaci da je 'fancy' vec inicijaliziran, treba updateat
 
 					jq_drawArea.find('.Treant').css({
@@ -584,7 +626,7 @@
 				}
 
 			});
-			
+
 		},
 
 		getPathString: function(from_node, to_node, stacked) {
@@ -749,7 +791,7 @@
 				this.get(i).createGeometry(tree);
 			}
 		},
-		
+
 		get: function (nodeId) {
 			return this.db[nodeId]; // get node by ID
 		},
@@ -791,7 +833,7 @@
 				if (minTest < MinMax.min) {
 					MinMax.min = minTest;
 				}
-			
+
 				this.getMinMaxCoord(dim, node, MinMax);
 			}
 			return MinMax;
@@ -830,7 +872,7 @@
 		this.connStyle = UTIL.createMerge(tree.CONFIG.connectors, nodeStructure.connectors);
 
 		this.drawLineThrough = nodeStructure.drawLineThrough === false ? false : nodeStructure.drawLineThrough || tree.CONFIG.node.drawLineThrough;
-		
+
 		this.collapsable = nodeStructure.collapsable === false ? false : nodeStructure.collapsable || tree.CONFIG.node.collapsable;
 		this.collapsed = nodeStructure.collapsed;
 
@@ -973,11 +1015,11 @@
 		},
 
 		drawLineThroughMe: function(hidePoint) { // hidepoint se proslijedjuje ako je node sakriven zbog collapsed
-			
+
 			var pathString = hidePoint ? this.Tree().getPointPathString(hidePoint) : this.pathStringThrough();
 
 			this.lineThroughMe = this.lineThroughMe || this.Tree()._R.path(pathString);
-			
+
 			var line_style = UTIL.cloneObj(this.connStyle.style);
 
 			delete line_style['arrow-start'];
@@ -1003,21 +1045,21 @@
 			var tree = this.Tree();
 
 			if (! tree.inAnimation) {
-			
+
 				tree.inAnimation = true;
 
 				this.collapsed = !this.collapsed; // toggle the collapse at each click
-				$( this.nodeDOM ).toggleClass( 'collapsed', this.collapsed );
+				UTIL.toggleClass( this.nodeDOM, 'collapsed', this.collapsed );
 
 				tree.positionTree();
-				
+
 				setTimeout(
 					function() { // set the flag after the animation
 						tree.inAnimation = false;
 						tree.CONFIG.callback.onCollapseFinished.apply( tree, [] );
 					},
 					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed
-				)
+				);
 			}
 		},
 
@@ -1041,12 +1083,14 @@
 				jq_node.css(new_pos);
 				this.positioned = true;
 			} else {
-				jq_node.animate(new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation, 
-				function(){
-					this.style.visibility = 'hidden';
-				});
-			}			
-			
+				jq_node.animate(
+					new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
+					function(){
+						this.style.visibility = 'hidden';
+					}
+				);
+			}
+
 			// animate the line through node if the line exists
 			if(this.lineThroughMe) {
 				var new_path = tree.getPointPathString(collapse_to_point);
@@ -1076,12 +1120,12 @@
 				new_pos.width = this.startW;
 				new_pos.height = this.startH;
 			}
-			
+
 			$(this.nodeDOM).animate(
-				new_pos, 
-				config.animation.nodeSpeed, config.animation.nodeAnimation, 
+				new_pos,
+				config.animation.nodeSpeed, config.animation.nodeAnimation,
 				function() {
-					// $.animate applys "overflow:hidden" to the node, remove it to avoid visual problems
+					// $.animate applies "overflow:hidden" to the node, remove it to avoid visual problems
 					this.style.overflow = "";
 				}
 			);
@@ -1205,7 +1249,7 @@
 	//		Expose global + default CONFIG params
 	// ###########################################
 
-	
+
 	Tree.CONFIG = {
 		maxDepth: 100,
 		rootOrientation: 'NORTH', // NORTH || EAST || WEST || SOUTH
@@ -1354,10 +1398,15 @@
 	/**
 	* Chart constructor.
 	*/
-	var Treant = function(jsonConfig, callback) {
+	var Treant = function(jsonConfig, callback, jQuery) {
 
 		if (jsonConfig instanceof Array) {
 			jsonConfig = JSONconfig.make(jsonConfig);
+		}
+
+		// optional
+		if ( jQuery ) {
+			$ = jQuery;
 		}
 
 		var newTree = TreeStore.createTree(jsonConfig);
@@ -1370,6 +1419,6 @@
 		TreeStore.destroy(this.tree_id);
 	};
 
-	/* expose constructor globally */
+	/* expose constructor globaly */
 	window.Treant = Treant;
 })();
