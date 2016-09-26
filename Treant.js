@@ -142,7 +142,7 @@
 					if (cls != 'Treant' && cls != 'Treant-loaded') {
 						classes_to_stay.push(cls);
 					}
-				};
+				}
 				draw_area.style.overflowY = '';
 				draw_area.style.overflowX = '';
 				draw_area.className = classes_to_stay.join(' ');
@@ -494,11 +494,11 @@
 
 			if(this.CONFIG.scrollbar == 'native') {
 
-				if(this.drawArea.clientWidth < treeWidth) { // is owerflow-x necessary
+				if(this.drawArea.clientWidth < treeWidth) { // is overflow-x necessary
 					this.drawArea.style.overflowX = "auto";
 				}
 
-				if(this.drawArea.clientHeight < treeHeight) { // is owerflow-y necessary
+				if(this.drawArea.clientHeight < treeHeight) { // is overflow-y necessary
 					this.drawArea.style.overflowY = "auto";
 				}
 
@@ -920,7 +920,7 @@
 			return parent.collapsedParent();
 		},
 
-		leftMost: function ( level, depth ) { // returns the leftmost child at specific level, (initaial level = 0)
+		leftMost: function ( level, depth ) { // returns the leftmost child at specific level, (initial level = 0)
 
 			if( level >= depth ) return this;
 			if( this.childrenCount() === 0 ) return;
@@ -1006,12 +1006,9 @@
 			
 				tree.inAnimation = true;
 
-				this.collapsed = !this.collapsed; // toglle the collapse at each click
-				if (this.collapsed) {
-					$(this.nodeDOM).addClass('collapsed');
-				} else {
-					$(this.nodeDOM).removeClass('collapsed');
-				}
+				this.collapsed = !this.collapsed; // toggle the collapse at each click
+				$( this.nodeDOM ).toggleClass( 'collapsed', this.collapsed );
+
 				tree.positionTree();
 				
 				setTimeout(function() { // set the flag after the animation
@@ -1101,7 +1098,7 @@
 		}
 
 		var drawArea = tree.drawArea,
-			image, i,
+			image,
 
 		/////////// CREATE NODE //////////////
 		node = this.link.href ? document.createElement('a') : document.createElement('div');
@@ -1286,7 +1283,7 @@
 		},
 
 		findChildren: function(nodes) {
-			var parents = [0]; // start witha a root node
+			var parents = [0]; // start with a a root node
 
 			while(parents.length) {
 				var parentId = parents.pop(),
@@ -1356,6 +1353,6 @@
 		TreeStore.destroy(this.tree_id);
 	};
 
-	/* expose constructor globaly */ 
+	/* expose constructor globally */
 	window.Treant = Treant;
 })();
