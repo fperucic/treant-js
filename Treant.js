@@ -1011,9 +1011,13 @@
 
 				tree.positionTree();
 				
-				setTimeout(function() { // set the flag after the animation
-					tree.inAnimation = false;
-				}, tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed ? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed)
+				setTimeout(
+					function() { // set the flag after the animation
+						tree.inAnimation = false;
+						tree.CONFIG.callback.onCollapseFinished.apply( tree, [] );
+					},
+					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed
+				)
 			}
 		},
 
@@ -1220,7 +1224,7 @@
 			stackIndent: 15
 		},
 
-		node: { // each node inherits this, it can all be overrifen in node config
+		node: { // each node inherits this, it can all be overridden in node config
 
 			// HTMLclass: 'node',
 			// drawLineThrough: false,
@@ -1230,12 +1234,16 @@
 			}
 		},
 
-		animation: { // each node inherits this, it can all be overrifen in node config
+		animation: { // each node inherits this, it can all be overridden in node config
 
 			nodeSpeed: 450,
 			nodeAnimation: 'linear',
 			connectorsSpeed: 450,
 			connectorsAnimation: 'linear'
+		},
+
+		callback: {
+			onCollapseFinished: function () {}
 		}
 	};
 
