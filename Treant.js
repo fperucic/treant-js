@@ -71,6 +71,21 @@
 
 		hasClass: function(element, my_class) {
 			return (" " + element.className + " ").replace(/[\n\t]/g, " ").indexOf(" "+my_class+" ") > -1;
+		},
+
+		toggleClass: function ( element, cls, apply ) {
+			if ( $ ) {
+				$( element ).toggleClass( cls, apply );
+			}
+			else {
+				if ( apply ) {
+					//element.className += " "+cls;
+					element.classList.add( cls );
+				}
+				else {
+					element.classList.remove( cls );
+				}
+			}
 		}
 	};
 
@@ -515,9 +530,11 @@
 					this.drawArea.style.overflowY = "auto";
 				}
 
-			} else if (this.CONFIG.scrollbar == 'fancy') {
+			}
+			// Fancy scrollbar relies heavily on jQuery, so guarding with if ( $ )
+			else if ( $ && this.CONFIG.scrollbar == 'fancy') {
 
-				var jq_drawArea = $(this.drawArea);
+				var jq_drawArea = $( this.drawArea );
 				if (jq_drawArea.hasClass('ps-container')) { // znaci da je 'fancy' vec inicijaliziran, treba updateat
 
 					jq_drawArea.find('.Treant').css({
@@ -1020,11 +1037,8 @@
 				tree.inAnimation = true;
 
 				this.collapsed = !this.collapsed; // toglle the collapse at each click
-				if (this.collapsed) {
-					$(this.nodeDOM).addClass('collapsed');
-				} else {
-					$(this.nodeDOM).removeClass('collapsed');
-				}
+				UTIL.toggleClass( this.nodeDOM, 'collapsed', this.collapsed );
+
 				tree.positionTree();
 
 				setTimeout(function() { // set the flag after the animation
@@ -1053,10 +1067,12 @@
 				jq_node.css(new_pos);
 				this.positioned = true;
 			} else {
-				jq_node.animate(new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
-				function(){
-					this.style.visibility = 'hidden';
-				});
+				jq_node.animate(
+					new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
+					function(){
+						this.style.visibility = 'hidden';
+					}
+				);
 			}
 
 			// animate the line through node if the line exists
@@ -1093,7 +1109,7 @@
 				new_pos,
 				config.animation.nodeSpeed, config.animation.nodeAnimation,
 				function() {
-					// $.animate applys "overflow:hidden" to the node, remove it to avoid visual problems
+					// $.animate applies "overflow:hidden" to the node, remove it to avoid visual problems
 					this.style.overflow = "";
 				}
 			);
