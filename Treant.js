@@ -154,13 +154,15 @@
 	/**
 	* Tree constructor.
 	*/
-	var Tree = function (jsonConfig, treeId) {
+	var Tree = function (jsonConfig, treeId ) {
 
 		this.id = treeId;
 
 		this.imageLoader = new ImageLoader();
-		this.CONFIG = $.extend( true, {}, Tree.CONFIG, jsonConfig.chart );
-		this.drawArea = document.getElementById(this.CONFIG.container.substring(1));
+		//this.CONFIG = $.extend( true, {}, Tree.CONFIG, jsonConfig.chart );
+		//this.drawArea = document.getElementById(this.CONFIG.container.substring(1));
+		this.CONFIG = UTIL.createMerge(Tree.CONFIG, jsonConfig.chart);
+		this.drawArea = $(this.CONFIG.container).get(0);
 		this.drawArea.className += " Treant";
 		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
 
@@ -181,10 +183,10 @@
 					orient = this.CONFIG.rootOrientation;
 
 				this.resetLevelData();
-				
+
 				this.firstWalk(root, 0);
 				this.secondWalk( root, 0, 0, 0 );
-				
+
 				this.positionNodes();
 
 				if (this.CONFIG.animateOnInit) {
@@ -365,7 +367,7 @@
 					else if (orinet == 'SOUTH' || orinet == 'EAST') {
 						node.Y = (yTmp + (levelHeight - nodesizeTmp)); // align "TOP"
 					}
-				
+
 				} else {
 					node.Y = ( align == 'CENTER' ) ? (yTmp + (levelHeight - nodesizeTmp) / 2) :
 							( align == 'TOP' )	? (yTmp + (levelHeight - nodesizeTmp)) :
@@ -467,10 +469,10 @@
 
 					node.positioned = true;
 				}
-				
+
 				if (node.id !== 0 && !(node.parent().id === 0 && this.CONFIG.hideRootNode)) {
 					this.setConnectionToParent(node, hidePoint); // skip the root node
-				} 
+				}
 				else if (!this.CONFIG.hideRootNode && node.drawLineThrough) {
 					// drawlinethrough is performed for for the root node also
 					node.drawLineThroughMe();
@@ -584,7 +586,7 @@
 				}
 
 			});
-			
+
 		},
 
 		getPathString: function(from_node, to_node, stacked) {
@@ -749,7 +751,7 @@
 				this.get(i).createGeometry(tree);
 			}
 		},
-		
+
 		get: function (nodeId) {
 			return this.db[nodeId]; // get node by ID
 		},
@@ -791,7 +793,7 @@
 				if (minTest < MinMax.min) {
 					MinMax.min = minTest;
 				}
-			
+
 				this.getMinMaxCoord(dim, node, MinMax);
 			}
 			return MinMax;
@@ -830,7 +832,7 @@
 		this.connStyle = UTIL.createMerge(tree.CONFIG.connectors, nodeStructure.connectors);
 
 		this.drawLineThrough = nodeStructure.drawLineThrough === false ? false : nodeStructure.drawLineThrough || tree.CONFIG.node.drawLineThrough;
-		
+
 		this.collapsable = nodeStructure.collapsable === false ? false : nodeStructure.collapsable || tree.CONFIG.node.collapsable;
 		this.collapsed = nodeStructure.collapsed;
 
@@ -973,11 +975,11 @@
 		},
 
 		drawLineThroughMe: function(hidePoint) { // hidepoint se proslijedjuje ako je node sakriven zbog collapsed
-			
+
 			var pathString = hidePoint ? this.Tree().getPointPathString(hidePoint) : this.pathStringThrough();
 
 			this.lineThroughMe = this.lineThroughMe || this.Tree()._R.path(pathString);
-			
+
 			var line_style = UTIL.cloneObj(this.connStyle.style);
 
 			delete line_style['arrow-start'];
@@ -1003,21 +1005,21 @@
 			var tree = this.Tree();
 
 			if (! tree.inAnimation) {
-			
+
 				tree.inAnimation = true;
 
 				this.collapsed = !this.collapsed; // toggle the collapse at each click
 				$( this.nodeDOM ).toggleClass( 'collapsed', this.collapsed );
 
 				tree.positionTree();
-				
+
 				setTimeout(
 					function() { // set the flag after the animation
 						tree.inAnimation = false;
 						tree.CONFIG.callback.onCollapseFinished.apply( tree, [] );
 					},
 					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed
-				)
+				);
 			}
 		},
 
@@ -1041,12 +1043,12 @@
 				jq_node.css(new_pos);
 				this.positioned = true;
 			} else {
-				jq_node.animate(new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation, 
+				jq_node.animate(new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
 				function(){
 					this.style.visibility = 'hidden';
 				});
-			}			
-			
+			}
+
 			// animate the line through node if the line exists
 			if(this.lineThroughMe) {
 				var new_path = tree.getPointPathString(collapse_to_point);
@@ -1076,10 +1078,10 @@
 				new_pos.width = this.startW;
 				new_pos.height = this.startH;
 			}
-			
+
 			$(this.nodeDOM).animate(
-				new_pos, 
-				config.animation.nodeSpeed, config.animation.nodeAnimation, 
+				new_pos,
+				config.animation.nodeSpeed, config.animation.nodeAnimation,
 				function() {
 					// $.animate applys "overflow:hidden" to the node, remove it to avoid visual problems
 					this.style.overflow = "";
@@ -1205,7 +1207,7 @@
 	//		Expose global + default CONFIG params
 	// ###########################################
 
-	
+
 	Tree.CONFIG = {
 		maxDepth: 100,
 		rootOrientation: 'NORTH', // NORTH || EAST || WEST || SOUTH
