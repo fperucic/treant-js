@@ -154,13 +154,16 @@
 	/**
 	* Tree constructor.
 	*/
-	var Tree = function (jsonConfig, treeId ) {
+	var Tree = function (jsonConfig, treeId, jQuery ) {
+
+		// optional
+		this.$ = jQuery;
 
 		this.id = treeId;
 
 		this.imageLoader = new ImageLoader();
 		this.CONFIG = UTIL.createMerge(Tree.CONFIG, jsonConfig.chart);
-		this.drawArea = $(this.CONFIG.container).get(0);
+		this.drawArea = this.findEl( this.CONFIG.container, true );
 		this.drawArea.className += " Treant";
 		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
 
@@ -170,6 +173,17 @@
 	};
 
 	Tree.prototype = {
+
+		findEl: function( element, raw ) {
+			if ( this.$ ) {
+				var $element =  this.$( element );
+				return ( raw? $element.get(0): $element );
+			}
+			else {
+				// todo add support for non-id elements
+				return document.getElementById( element.substring( 1 ) );
+			}
+		},
 
 		positionTree: function(callback) {
 
