@@ -160,7 +160,7 @@
 
 		this.imageLoader = new ImageLoader();
 		this.CONFIG = UTIL.createMerge(Tree.CONFIG, jsonConfig.chart);
-		this.drawArea = document.getElementById(this.CONFIG.container.substring(1));
+		this.drawArea = $(this.CONFIG.container);
 		this.drawArea.className += " Treant";
 		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
 
