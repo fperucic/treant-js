@@ -16,6 +16,8 @@
 
 ;(function(){
 
+	var $ = null;
+
 	var UTIL = {
 		inheritAttrs: function(me, from) {
 			for (var attr in from) {
@@ -53,6 +55,17 @@
 				el.attachEvent('on' + eventType, handler);
 			} else { // ancient browsers
 				el['on' + eventType] = handler;
+			}
+		},
+
+		findEl: function( element, raw ) {
+			if ( $ ) {
+				var $element = $( element );
+				return ( raw ? $element.get( 0 ) : $element );
+			}
+			else {
+				// todo add support for non-id elements
+				return document.getElementById( element.substring( 1 ) );
 			}
 		},
 
@@ -154,16 +167,13 @@
 	/**
 	* Tree constructor.
 	*/
-	var Tree = function (jsonConfig, treeId, jQuery ) {
-
-		// optional
-		this.$ = jQuery;
+	var Tree = function (jsonConfig, treeId ) {
 
 		this.id = treeId;
 
 		this.imageLoader = new ImageLoader();
 		this.CONFIG = UTIL.createMerge(Tree.CONFIG, jsonConfig.chart);
-		this.drawArea = this.findEl( this.CONFIG.container, true );
+		this.drawArea = UTIL.findEl( this.CONFIG.container, true );
 		this.drawArea.className += " Treant";
 		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
 
@@ -173,17 +183,6 @@
 	};
 
 	Tree.prototype = {
-
-		findEl: function( element, raw ) {
-			if ( this.$ ) {
-				var $element =  this.$( element );
-				return ( raw? $element.get(0): $element );
-			}
-			else {
-				// todo add support for non-id elements
-				return document.getElementById( element.substring( 1 ) );
-			}
-		},
 
 		positionTree: function(callback) {
 
@@ -1354,10 +1353,15 @@
 	/**
 	* Chart constructor.
 	*/
-	var Treant = function(jsonConfig, callback) {
+	var Treant = function(jsonConfig, callback, jQuery) {
 
 		if (jsonConfig instanceof Array) {
 			jsonConfig = JSONconfig.make(jsonConfig);
+		}
+
+		// optional
+		if ( jQuery ) {
+			$ = jQuery;
 		}
 
 		var newTree = TreeStore.createTree(jsonConfig);
