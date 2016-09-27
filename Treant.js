@@ -40,8 +40,7 @@
 
 		extend: function() {
 			if ( $ ) {
-				arguments.unshift( true );
-				arguments.unshift( {} );
+				Array.prototype.unshift.apply( arguments, [true, {}] );
 				return $.extend.apply( $, arguments );
 			}
 			else {
