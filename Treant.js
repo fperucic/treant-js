@@ -80,6 +80,24 @@
 			}
 		},
 
+		getOuterHeight: function( element ) {
+			if ( $ ) {
+				return $( element ).outerHeight();
+			}
+			else {
+				return element.clientHeight;
+			}
+		},
+
+		getOuterWidth: function( element ) {
+			if ( $ ) {
+				return $( element ).outerWidth();
+			}
+			else {
+				return element.clientWidth;
+			}
+		},
+
 		hasClass: function(element, my_class) {
 			return (" " + element.className + " ").replace(/[\n\t]/g, " ").indexOf(" "+my_class+" ") > -1;
 		},
@@ -1078,29 +1096,49 @@
 		hide: function(collapse_to_point) {
 			this.nodeDOM.style.overflow = "hidden";
 
-			var jq_node = $(this.nodeDOM), tree = this.Tree(),
+			var tree = this.Tree(),
 				config = tree.CONFIG,
 				new_pos = {
 					left: collapse_to_point.x,
 					top: collapse_to_point.y
 				};
 
-			if (!this.hidden) { new_pos.width = new_pos.height = 0; }
+			if ( !this.hidden ) {
+				new_pos.width = new_pos.height = 0;
+			}
 
-			if(!this.startW || !this.startH) { this.startW = jq_node.outerWidth(); this.startH = jq_node.outerHeight(); }
+			if ( !this.startW || !this.startH ) {
+				this.startW = UTIL.getOuterWidth( this.nodeDOM );
+				this.startH = UTIL.getOuterHeight( this.nodeDOM );
+			}
 
 			// if parent was hidden in initial configuration, position the node behind the parent without animations
-			if(!this.positioned || this.hidden) {
+			if ( !this.positioned || this.hidden ) {
 				this.nodeDOM.style.visibility = 'hidden';
-				jq_node.css(new_pos);
+				if ( $ ) {
+					$( this.nodeDOM ).css( new_pos );
+				}
+				else {
+					this.nodeDOM.style.left = new_pos.left + 'px';
+					this.nodeDOM.style.top = new_pos.top + 'px';
+				}
 				this.positioned = true;
-			} else {
-				jq_node.animate(
-					new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
-					function(){
-						this.style.visibility = 'hidden';
-					}
-				);
+			}
+			else {
+				if ( $ ) {
+					$( this.nodeDOM ).animate(
+						new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
+						function () {
+							this.style.visibility = 'hidden';
+						}
+					);
+				}
+				// animation not possible without jQuery
+				else {
+					this.nodeDOM.style.left = new_pos.left + 'px';
+					this.nodeDOM.style.top = new_pos.top + 'px';
+					this.nodeDOM.style.visibility = 'hidden';
+				}
 			}
 
 			// animate the line through node if the line exists
@@ -1133,14 +1171,25 @@
 				new_pos.height = this.startH;
 			}
 
-			$(this.nodeDOM).animate(
-				new_pos,
-				config.animation.nodeSpeed, config.animation.nodeAnimation,
-				function() {
-					// $.animate applies "overflow:hidden" to the node, remove it to avoid visual problems
-					this.style.overflow = "";
+			if ( $ ) {
+				$( this.nodeDOM ).animate(
+					new_pos,
+					config.animation.nodeSpeed, config.animation.nodeAnimation,
+					function () {
+						// $.animate applies "overflow:hidden" to the node, remove it to avoid visual problems
+						this.style.overflow = "";
+					}
+				);
+			}
+			else {
+				if ( this.hidden ) {
+					this.nodeDOM.style.height = new_pos.height + 'px';
+					this.nodeDOM.style.width = new_pos.width + 'px';
 				}
-			);
+				this.nodeDOM.style.left = new_pos.left + 'px';
+				this.nodeDOM.style.top = new_pos.top + 'px';
+				this.nodeDOM.style.overflow = '';
+			}
 
 			if(this.lineThroughMe) {
 				tree.animatePath(this.lineThroughMe, this.pathStringThrough());
