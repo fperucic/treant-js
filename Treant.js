@@ -16,6 +16,8 @@
 
 ;(function(){
 
+	var $ = null;
+
 	var UTIL = {
 		inheritAttrs: function(me, from) {
 			for (var attr in from) {
@@ -36,6 +38,16 @@
 			return newObj;
 		},
 
+		extend: function() {
+			if ( $ ) {
+				Array.prototype.unshift.apply( arguments, [true, {}] );
+				return $.extend.apply( $, arguments );
+			}
+			else {
+				return UTIL.createMerge.apply( this, arguments );
+			}
+		},
+
 		cloneObj: function (obj) {
 			if (Object(obj) !== obj) {
 				return obj;
@@ -46,6 +58,7 @@
 			}
 			return res;
 		},
+
 		addEvent: function(el, eventType, handler) {
 			if (el.addEventListener) { // DOM Level 2 browsers
 				el.addEventListener(eventType, handler, false);
@@ -56,8 +69,34 @@
 			}
 		},
 
+		findEl: function( element, raw ) {
+			if ( $ ) {
+				var $element = $( element );
+				return ( raw ? $element.get( 0 ) : $element );
+			}
+			else {
+				// todo add support for non-id elements
+				return document.getElementById( element.substring( 1 ) );
+			}
+		},
+
 		hasClass: function(element, my_class) {
 			return (" " + element.className + " ").replace(/[\n\t]/g, " ").indexOf(" "+my_class+" ") > -1;
+		},
+
+		toggleClass: function ( element, cls, apply ) {
+			if ( $ ) {
+				$( element ).toggleClass( cls, apply );
+			}
+			else {
+				if ( apply ) {
+					//element.className += " "+cls;
+					element.classList.add( cls );
+				}
+				else {
+					element.classList.remove( cls );
+				}
+			}
 		}
 	};
 
@@ -142,7 +181,7 @@
 					if (cls != 'Treant' && cls != 'Treant-loaded') {
 						classes_to_stay.push(cls);
 					}
-				};
+				}
 				draw_area.style.overflowY = '';
 				draw_area.style.overflowX = '';
 				draw_area.className = classes_to_stay.join(' ');
@@ -159,8 +198,8 @@
 		this.id = treeId;
 
 		this.imageLoader = new ImageLoader();
-		this.CONFIG = UTIL.createMerge(Tree.CONFIG, jsonConfig.chart);
-		this.drawArea = $(this.CONFIG.container).get(0);
+		this.CONFIG = UTIL.extend( Tree.CONFIG, jsonConfig.chart );
+		this.drawArea = UTIL.findEl( this.CONFIG.container, true );
 		this.drawArea.className += " Treant";
 		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
 
@@ -192,7 +231,7 @@
 				}
 
 				if(!this.loaded) {
-					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is add
+					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is added
 					if (Object.prototype.toString.call(callback) === "[object Function]") { callback(self); }
 					this.loaded = true;
 				}
@@ -459,7 +498,7 @@
 					node.hide(hidePoint);
 
 				} else if(node.positioned) {
-					// node is allready positioned, 
+					// node is already positioned,
 					node.show();
 				} else { // inicijalno stvaranje nodeova, postavi lokaciju
 					node.nodeDOM.style.left = node.X + 'px';
@@ -494,17 +533,19 @@
 
 			if(this.CONFIG.scrollbar == 'native') {
 
-				if(this.drawArea.clientWidth < treeWidth) { // is owerflow-x necessary
+				if(this.drawArea.clientWidth < treeWidth) { // is overflow-x necessary
 					this.drawArea.style.overflowX = "auto";
 				}
 
-				if(this.drawArea.clientHeight < treeHeight) { // is owerflow-y necessary
+				if(this.drawArea.clientHeight < treeHeight) { // is overflow-y necessary
 					this.drawArea.style.overflowY = "auto";
 				}
 
-			} else if (this.CONFIG.scrollbar == 'fancy') {
+			}
+			// Fancy scrollbar relies heavily on jQuery, so guarding with if ( $ )
+			else if ( $ && this.CONFIG.scrollbar == 'fancy') {
 
-				var jq_drawArea = $(this.drawArea);
+				var jq_drawArea = $( this.drawArea );
 				if (jq_drawArea.hasClass('ps-container')) { // znaci da je 'fancy' vec inicijaliziran, treba updateat
 
 					jq_drawArea.find('.Treant').css({
@@ -920,7 +961,7 @@
 			return parent.collapsedParent();
 		},
 
-		leftMost: function ( level, depth ) { // returns the leftmost child at specific level, (initaial level = 0)
+		leftMost: function ( level, depth ) { // returns the leftmost child at specific level, (initial level = 0)
 
 			if( level >= depth ) return this;
 			if( this.childrenCount() === 0 ) return;
@@ -1006,17 +1047,18 @@
 
 				tree.inAnimation = true;
 
-				this.collapsed = !this.collapsed; // toglle the collapse at each click
-				if (this.collapsed) {
-					$(this.nodeDOM).addClass('collapsed');
-				} else {
-					$(this.nodeDOM).removeClass('collapsed');
-				}
+				this.collapsed = !this.collapsed; // toggle the collapse at each click
+				UTIL.toggleClass( this.nodeDOM, 'collapsed', this.collapsed );
+
 				tree.positionTree();
 
-				setTimeout(function() { // set the flag after the animation
-					tree.inAnimation = false;
-				}, tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed ? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed)
+				setTimeout(
+					function() { // set the flag after the animation
+						tree.inAnimation = false;
+						tree.CONFIG.callback.onCollapseFinished.apply( tree, [] );
+					},
+					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed
+				);
 			}
 		},
 
@@ -1040,10 +1082,12 @@
 				jq_node.css(new_pos);
 				this.positioned = true;
 			} else {
-				jq_node.animate(new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
-				function(){
-					this.style.visibility = 'hidden';
-				});
+				jq_node.animate(
+					new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
+					function(){
+						this.style.visibility = 'hidden';
+					}
+				);
 			}
 
 			// animate the line through node if the line exists
@@ -1080,7 +1124,7 @@
 				new_pos,
 				config.animation.nodeSpeed, config.animation.nodeAnimation,
 				function() {
-					// $.animate applys "overflow:hidden" to the node, remove it to avoid visual problems
+					// $.animate applies "overflow:hidden" to the node, remove it to avoid visual problems
 					this.style.overflow = "";
 				}
 			);
@@ -1101,7 +1145,7 @@
 		}
 
 		var drawArea = tree.drawArea,
-			image, i,
+			image,
 
 		/////////// CREATE NODE //////////////
 		node = this.link.href ? document.createElement('a') : document.createElement('div');
@@ -1134,7 +1178,7 @@
 						if(TreeNode.CONFIG.textClass[key]) {
 							var text = document.createElement(this.text[key].href ? 'a' : 'p');
 
-							// meke an <a> element if required
+							// make an <a> element if required
 							if (this.text[key].href) {
 								text.href = this.text[key].href;
 								if (this.text[key].target) { text.target = this.text[key].target; }
@@ -1152,7 +1196,8 @@
 					}
 				}
 
-			} else {
+			}
+			else {
 
 				// get some element by ID and clone its structure into a node
 				if (this.nodeInnerHTML.charAt(0) === "#") {
@@ -1171,14 +1216,20 @@
 			}
 
 			// handle collapse switch
-			if (this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId)) {
+			if ( this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId) ) {
 				var my_switch = document.createElement('a');
 				my_switch.className = "collapse-switch";
 				node.appendChild(my_switch);
 				this.addSwitchEvent(my_switch);
-				if (this.collapsed) { node.className += " collapsed"; }
+				if ( this.collapsed ) {
+					node.className += " collapsed";
+				}
+
+				tree.CONFIG.callback.onCreateNodeCollapseSwitch.apply( tree, [this, node, my_switch] );
 			}
 		}
+
+		tree.CONFIG.callback.onCreateNode.apply( tree, [this, node] );
 
 		/////////// APPEND all //////////////
 		drawArea.appendChild(node);
@@ -1223,7 +1274,7 @@
 			stackIndent: 15
 		},
 
-		node: { // each node inherits this, it can all be overrifen in node config
+		node: { // each node inherits this, it can all be overridden in node config
 
 			// HTMLclass: 'node',
 			// drawLineThrough: false,
@@ -1233,12 +1284,18 @@
 			}
 		},
 
-		animation: { // each node inherits this, it can all be overrifen in node config
+		animation: { // each node inherits this, it can all be overridden in node config
 
 			nodeSpeed: 450,
 			nodeAnimation: 'linear',
 			connectorsSpeed: 450,
 			connectorsAnimation: 'linear'
+		},
+
+		callback: {
+			onCreateNode: function() {},
+			onCreateNodeCollapseSwitch: function() {},
+			onCollapseFinished: function () {}
 		}
 	};
 
@@ -1286,7 +1343,7 @@
 		},
 
 		findChildren: function(nodes) {
-			var parents = [0]; // start witha a root node
+			var parents = [0]; // start with a a root node
 
 			while(parents.length) {
 				var parentId = parents.pop(),
@@ -1340,10 +1397,15 @@
 	/**
 	* Chart constructor.
 	*/
-	var Treant = function(jsonConfig, callback) {
+	var Treant = function(jsonConfig, callback, jQuery) {
 
 		if (jsonConfig instanceof Array) {
 			jsonConfig = JSONconfig.make(jsonConfig);
+		}
+
+		// optional
+		if ( jQuery ) {
+			$ = jQuery;
 		}
 
 		var newTree = TreeStore.createTree(jsonConfig);
