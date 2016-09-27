@@ -519,7 +519,12 @@
 
 				node = this.nodeDB.get(i);
 
-				if(node.id === 0 && this.CONFIG.hideRootNode) continue;
+				self.CONFIG.callback.onBeforePositionNode.apply( self, [node, i, containerCenter, treeCenter] );
+
+				if ( node.id === 0 && this.CONFIG.hideRootNode ) {
+					self.CONFIG.callback.onAfterPositionNode.apply( self, [node, i, containerCenter, treeCenter] );
+					continue;
+				}
 
 				// if the tree is smaller than the draw area, then center the tree within drawing area
 				node.X += negOffsetX + ((treeWidth < this.drawArea.clientWidth) ? deltaX : this.CONFIG.padding);
@@ -550,8 +555,9 @@
 					// drawlinethrough is performed for for the root node also
 					node.drawLineThroughMe();
 				}
-			}
 
+				self.CONFIG.callback.onAfterPositionNode.apply( self, [node, i, containerCenter, treeCenter] );
+			}
 		},
 
 		// create Raphael instance, set scrollbars if necessary
@@ -1364,6 +1370,8 @@
 		callback: {
 			onCreateNode: function() {},
 			onCreateNodeCollapseSwitch: function() {},
+			onAfterPositionNode: function() {},
+			onBeforePositionNode: function() {},
 			onCollapseFinished: function () {}
 		}
 	};
