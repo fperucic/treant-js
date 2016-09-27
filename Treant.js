@@ -97,6 +97,16 @@
 					element.classList.remove( cls );
 				}
 			}
+		},
+
+		setDimensions: function( element, width, height ) {
+			if ( $ ) {
+				$( element ).width( width ).height( height );
+			}
+			else {
+				element.style.width = width+'px';
+				element.style.height = height+'px';
+			}
 		}
 	};
 
@@ -461,8 +471,11 @@
 				treeCenter = {
 					x: treeSize.x.max - treeWidth/2,
 					y: treeSize.y.max - treeHeight/2
-				},
+				};
 
+			this.handleOverflow(treeWidth, treeHeight);
+
+			var
 				containerCenter = {
 					x: self.drawArea.clientWidth/2,
 					y: self.drawArea.clientHeight/2
@@ -475,8 +488,6 @@
 				negOffsetX = ((treeSize.x.min + deltaX) <= 0) ? Math.abs(treeSize.x.min) : 0,
 				negOffsetY = ((treeSize.y.min + deltaY) <= 0) ? Math.abs(treeSize.y.min) : 0,
 				i, len, node;
-
-			this.handleOverflow(treeWidth, treeHeight);
 
 			// position all the nodes
 			for(i =0, len = this.nodeDB.db.length; i < len; i++) {
@@ -524,14 +535,16 @@
 			var viewWidth = (treeWidth < this.drawArea.clientWidth) ? this.drawArea.clientWidth : treeWidth + this.CONFIG.padding*2,
 				viewHeight = (treeHeight < this.drawArea.clientHeight) ? this.drawArea.clientHeight : treeHeight + this.CONFIG.padding*2;
 
-			if(this._R) {
+			if (this._R) {
 				this._R.setSize(viewWidth, viewHeight);
 			} else {
 				this._R = Raphael(this.drawArea, viewWidth, viewHeight);
 			}
 
-
-			if(this.CONFIG.scrollbar == 'native') {
+			if ( this.CONFIG.scrollbar == 'resize') {
+				UTIL.setDimensions( this.drawArea, viewWidth, viewHeight );
+			}
+			else if ( $ == undefined || this.CONFIG.scrollbar == 'native' ) {
 
 				if(this.drawArea.clientWidth < treeWidth) { // is overflow-x necessary
 					this.drawArea.style.overflowX = "auto";
@@ -543,7 +556,7 @@
 
 			}
 			// Fancy scrollbar relies heavily on jQuery, so guarding with if ( $ )
-			else if ( $ && this.CONFIG.scrollbar == 'fancy') {
+			else if ( this.CONFIG.scrollbar == 'fancy') {
 
 				var jq_drawArea = $( this.drawArea );
 				if (jq_drawArea.hasClass('ps-container')) { // znaci da je 'fancy' vec inicijaliziran, treba updateat
@@ -739,7 +752,7 @@
 
 		var self = this;
 
-		function itterateChildren(node, parentId) {
+		function iterateChildren(node, parentId) {
 
 			var newNode = self.createNode(node, parentId, tree, null);
 
@@ -769,7 +782,7 @@
 						newNode =  self.createNode(node.children[i], newNode.id, tree, stack);
 						if((i + 1) < len) newNode.children = []; // last node cant have children
 					} else {
-						itterateChildren(node.children[i], newNode.id);
+						iterateChildren(node.children[i], newNode.id);
 					}
 				}
 			}
@@ -777,7 +790,7 @@
 
 		if (tree.CONFIG.animateOnInit) nodeStructure.collapsed = true;
 
-		itterateChildren( nodeStructure, -1); // root node
+		iterateChildren( nodeStructure, -1); // root node
 
 		this.createGeometries(tree);
 	};
@@ -861,7 +874,7 @@
 
 		this.stackParentId = stackParentId;
 
-		// pseudo node is a node with width=height=0, it is invisible, but necessary for the correct positiong of the tree
+		// pseudo node is a node with width=height=0, it is invisible, but necessary for the correct positioning of the tree
 		this.pseudo = nodeStructure === 'pseudo' || nodeStructure['pseudo'];
 
 		this.image = nodeStructure.image;
@@ -898,7 +911,7 @@
 		size: function() { // returns the width of the node
 			var orient = this.Tree().CONFIG.rootOrientation;
 
-			if(this.pseudo) return - this.Tree().CONFIG.subTeeSeparation; // prevents of separateing the subtrees
+			if(this.pseudo) return - this.Tree().CONFIG.subTeeSeparation; // prevents separating the subtrees
 
 			if (orient == 'NORTH' || orient == 'SOUTH')
 				return this.width;
