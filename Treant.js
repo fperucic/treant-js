@@ -16,6 +16,8 @@
 
 ;(function(){
 
+	var $ = null;
+
 	var UTIL = {
 		inheritAttrs: function(me, from) {
 			for (var attr in from) {
@@ -36,6 +38,16 @@
 			return newObj;
 		},
 
+		extend: function() {
+			if ( $ ) {
+				Array.prototype.unshift.apply( arguments, [true, {}] );
+				return $.extend.apply( $, arguments );
+			}
+			else {
+				return UTIL.createMerge.apply( this, arguments );
+			}
+		},
+
 		cloneObj: function (obj) {
 			if (Object(obj) !== obj) {
 				return obj;
@@ -46,6 +58,7 @@
 			}
 			return res;
 		},
+
 		addEvent: function(el, eventType, handler) {
 			if (el.addEventListener) { // DOM Level 2 browsers
 				el.addEventListener(eventType, handler, false);
@@ -56,8 +69,62 @@
 			}
 		},
 
+		findEl: function( element, raw ) {
+			if ( $ ) {
+				var $element = $( element );
+				return ( raw ? $element.get( 0 ) : $element );
+			}
+			else {
+				// todo add support for non-id elements
+				return document.getElementById( element.substring( 1 ) );
+			}
+		},
+
+		getOuterHeight: function( element ) {
+			if ( $ ) {
+				return $( element ).outerHeight();
+			}
+			else {
+				return element.clientHeight;
+			}
+		},
+
+		getOuterWidth: function( element ) {
+			if ( $ ) {
+				return $( element ).outerWidth();
+			}
+			else {
+				return element.clientWidth;
+			}
+		},
+
 		hasClass: function(element, my_class) {
 			return (" " + element.className + " ").replace(/[\n\t]/g, " ").indexOf(" "+my_class+" ") > -1;
+		},
+
+		toggleClass: function ( element, cls, apply ) {
+			if ( $ ) {
+				$( element ).toggleClass( cls, apply );
+			}
+			else {
+				if ( apply ) {
+					//element.className += " "+cls;
+					element.classList.add( cls );
+				}
+				else {
+					element.classList.remove( cls );
+				}
+			}
+		},
+
+		setDimensions: function( element, width, height ) {
+			if ( $ ) {
+				$( element ).width( width ).height( height );
+			}
+			else {
+				element.style.width = width+'px';
+				element.style.height = height+'px';
+			}
 		}
 	};
 
@@ -142,7 +209,7 @@
 					if (cls != 'Treant' && cls != 'Treant-loaded') {
 						classes_to_stay.push(cls);
 					}
-				};
+				}
 				draw_area.style.overflowY = '';
 				draw_area.style.overflowX = '';
 				draw_area.className = classes_to_stay.join(' ');
@@ -159,8 +226,8 @@
 		this.id = treeId;
 
 		this.imageLoader = new ImageLoader();
-		this.CONFIG = UTIL.createMerge(Tree.CONFIG, jsonConfig.chart);
-		this.drawArea = $(this.CONFIG.container).get(0);
+		this.CONFIG = UTIL.extend( Tree.CONFIG, jsonConfig.chart );
+		this.drawArea = UTIL.findEl( this.CONFIG.container, true );
 		this.drawArea.className += " Treant";
 		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
 
@@ -192,7 +259,7 @@
 				}
 
 				if(!this.loaded) {
-					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is add
+					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is added
 					if (Object.prototype.toString.call(callback) === "[object Function]") { callback(self); }
 					this.loaded = true;
 				}
@@ -422,8 +489,11 @@
 				treeCenter = {
 					x: treeSize.x.max - treeWidth/2,
 					y: treeSize.y.max - treeHeight/2
-				},
+				};
 
+			this.handleOverflow(treeWidth, treeHeight);
+
+			var
 				containerCenter = {
 					x: self.drawArea.clientWidth/2,
 					y: self.drawArea.clientHeight/2
@@ -436,8 +506,6 @@
 				negOffsetX = ((treeSize.x.min + deltaX) <= 0) ? Math.abs(treeSize.x.min) : 0,
 				negOffsetY = ((treeSize.y.min + deltaY) <= 0) ? Math.abs(treeSize.y.min) : 0,
 				i, len, node;
-
-			this.handleOverflow(treeWidth, treeHeight);
 
 			// position all the nodes
 			for(i =0, len = this.nodeDB.db.length; i < len; i++) {
@@ -459,7 +527,7 @@
 					node.hide(hidePoint);
 
 				} else if(node.positioned) {
-					// node is allready positioned, 
+					// node is already positioned,
 					node.show();
 				} else { // inicijalno stvaranje nodeova, postavi lokaciju
 					node.nodeDOM.style.left = node.X + 'px';
@@ -485,26 +553,30 @@
 			var viewWidth = (treeWidth < this.drawArea.clientWidth) ? this.drawArea.clientWidth : treeWidth + this.CONFIG.padding*2,
 				viewHeight = (treeHeight < this.drawArea.clientHeight) ? this.drawArea.clientHeight : treeHeight + this.CONFIG.padding*2;
 
-			if(this._R) {
+			if (this._R) {
 				this._R.setSize(viewWidth, viewHeight);
 			} else {
 				this._R = Raphael(this.drawArea, viewWidth, viewHeight);
 			}
 
+			if ( this.CONFIG.scrollbar == 'resize') {
+				UTIL.setDimensions( this.drawArea, viewWidth, viewHeight );
+			}
+			else if ( $ == undefined || this.CONFIG.scrollbar == 'native' ) {
 
-			if(this.CONFIG.scrollbar == 'native') {
-
-				if(this.drawArea.clientWidth < treeWidth) { // is owerflow-x necessary
+				if(this.drawArea.clientWidth < treeWidth) { // is overflow-x necessary
 					this.drawArea.style.overflowX = "auto";
 				}
 
-				if(this.drawArea.clientHeight < treeHeight) { // is owerflow-y necessary
+				if(this.drawArea.clientHeight < treeHeight) { // is overflow-y necessary
 					this.drawArea.style.overflowY = "auto";
 				}
 
-			} else if (this.CONFIG.scrollbar == 'fancy') {
+			}
+			// Fancy scrollbar relies heavily on jQuery, so guarding with if ( $ )
+			else if ( this.CONFIG.scrollbar == 'fancy') {
 
-				var jq_drawArea = $(this.drawArea);
+				var jq_drawArea = $( this.drawArea );
 				if (jq_drawArea.hasClass('ps-container')) { // znaci da je 'fancy' vec inicijaliziran, treba updateat
 
 					jq_drawArea.find('.Treant').css({
@@ -698,7 +770,7 @@
 
 		var self = this;
 
-		function itterateChildren(node, parentId) {
+		function iterateChildren(node, parentId) {
 
 			var newNode = self.createNode(node, parentId, tree, null);
 
@@ -728,7 +800,7 @@
 						newNode =  self.createNode(node.children[i], newNode.id, tree, stack);
 						if((i + 1) < len) newNode.children = []; // last node cant have children
 					} else {
-						itterateChildren(node.children[i], newNode.id);
+						iterateChildren(node.children[i], newNode.id);
 					}
 				}
 			}
@@ -736,7 +808,7 @@
 
 		if (tree.CONFIG.animateOnInit) nodeStructure.collapsed = true;
 
-		itterateChildren( nodeStructure, -1); // root node
+		iterateChildren( nodeStructure, -1); // root node
 
 		this.createGeometries(tree);
 	};
@@ -820,7 +892,7 @@
 
 		this.stackParentId = stackParentId;
 
-		// pseudo node is a node with width=height=0, it is invisible, but necessary for the correct positiong of the tree
+		// pseudo node is a node with width=height=0, it is invisible, but necessary for the correct positioning of the tree
 		this.pseudo = nodeStructure === 'pseudo' || nodeStructure['pseudo'];
 
 		this.image = nodeStructure.image;
@@ -857,7 +929,7 @@
 		size: function() { // returns the width of the node
 			var orient = this.Tree().CONFIG.rootOrientation;
 
-			if(this.pseudo) return - this.Tree().CONFIG.subTeeSeparation; // prevents of separateing the subtrees
+			if(this.pseudo) return - this.Tree().CONFIG.subTeeSeparation; // prevents separating the subtrees
 
 			if (orient == 'NORTH' || orient == 'SOUTH')
 				return this.width;
@@ -920,7 +992,7 @@
 			return parent.collapsedParent();
 		},
 
-		leftMost: function ( level, depth ) { // returns the leftmost child at specific level, (initaial level = 0)
+		leftMost: function ( level, depth ) { // returns the leftmost child at specific level, (initial level = 0)
 
 			if( level >= depth ) return this;
 			if( this.childrenCount() === 0 ) return;
@@ -1006,44 +1078,67 @@
 
 				tree.inAnimation = true;
 
-				this.collapsed = !this.collapsed; // toglle the collapse at each click
-				if (this.collapsed) {
-					$(this.nodeDOM).addClass('collapsed');
-				} else {
-					$(this.nodeDOM).removeClass('collapsed');
-				}
+				this.collapsed = !this.collapsed; // toggle the collapse at each click
+				UTIL.toggleClass( this.nodeDOM, 'collapsed', this.collapsed );
+
 				tree.positionTree();
 
-				setTimeout(function() { // set the flag after the animation
-					tree.inAnimation = false;
-				}, tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed ? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed)
+				setTimeout(
+					function() { // set the flag after the animation
+						tree.inAnimation = false;
+						tree.CONFIG.callback.onCollapseFinished.apply( tree, [] );
+					},
+					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed
+				);
 			}
 		},
 
 		hide: function(collapse_to_point) {
 			this.nodeDOM.style.overflow = "hidden";
 
-			var jq_node = $(this.nodeDOM), tree = this.Tree(),
+			var tree = this.Tree(),
 				config = tree.CONFIG,
 				new_pos = {
 					left: collapse_to_point.x,
 					top: collapse_to_point.y
 				};
 
-			if (!this.hidden) { new_pos.width = new_pos.height = 0; }
+			if ( !this.hidden ) {
+				new_pos.width = new_pos.height = 0;
+			}
 
-			if(!this.startW || !this.startH) { this.startW = jq_node.outerWidth(); this.startH = jq_node.outerHeight(); }
+			if ( !this.startW || !this.startH ) {
+				this.startW = UTIL.getOuterWidth( this.nodeDOM );
+				this.startH = UTIL.getOuterHeight( this.nodeDOM );
+			}
 
 			// if parent was hidden in initial configuration, position the node behind the parent without animations
-			if(!this.positioned || this.hidden) {
+			if ( !this.positioned || this.hidden ) {
 				this.nodeDOM.style.visibility = 'hidden';
-				jq_node.css(new_pos);
+				if ( $ ) {
+					$( this.nodeDOM ).css( new_pos );
+				}
+				else {
+					this.nodeDOM.style.left = new_pos.left + 'px';
+					this.nodeDOM.style.top = new_pos.top + 'px';
+				}
 				this.positioned = true;
-			} else {
-				jq_node.animate(new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
-				function(){
-					this.style.visibility = 'hidden';
-				});
+			}
+			else {
+				if ( $ ) {
+					$( this.nodeDOM ).animate(
+						new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
+						function () {
+							this.style.visibility = 'hidden';
+						}
+					);
+				}
+				// animation not possible without jQuery
+				else {
+					this.nodeDOM.style.left = new_pos.left + 'px';
+					this.nodeDOM.style.top = new_pos.top + 'px';
+					this.nodeDOM.style.visibility = 'hidden';
+				}
 			}
 
 			// animate the line through node if the line exists
@@ -1076,14 +1171,25 @@
 				new_pos.height = this.startH;
 			}
 
-			$(this.nodeDOM).animate(
-				new_pos,
-				config.animation.nodeSpeed, config.animation.nodeAnimation,
-				function() {
-					// $.animate applys "overflow:hidden" to the node, remove it to avoid visual problems
-					this.style.overflow = "";
+			if ( $ ) {
+				$( this.nodeDOM ).animate(
+					new_pos,
+					config.animation.nodeSpeed, config.animation.nodeAnimation,
+					function () {
+						// $.animate applies "overflow:hidden" to the node, remove it to avoid visual problems
+						this.style.overflow = "";
+					}
+				);
+			}
+			else {
+				if ( this.hidden ) {
+					this.nodeDOM.style.height = new_pos.height + 'px';
+					this.nodeDOM.style.width = new_pos.width + 'px';
 				}
-			);
+				this.nodeDOM.style.left = new_pos.left + 'px';
+				this.nodeDOM.style.top = new_pos.top + 'px';
+				this.nodeDOM.style.overflow = '';
+			}
 
 			if(this.lineThroughMe) {
 				tree.animatePath(this.lineThroughMe, this.pathStringThrough());
@@ -1101,7 +1207,7 @@
 		}
 
 		var drawArea = tree.drawArea,
-			image, i,
+			image,
 
 		/////////// CREATE NODE //////////////
 		node = this.link.href ? document.createElement('a') : document.createElement('div');
@@ -1134,7 +1240,7 @@
 						if(TreeNode.CONFIG.textClass[key]) {
 							var text = document.createElement(this.text[key].href ? 'a' : 'p');
 
-							// meke an <a> element if required
+							// make an <a> element if required
 							if (this.text[key].href) {
 								text.href = this.text[key].href;
 								if (this.text[key].target) { text.target = this.text[key].target; }
@@ -1152,7 +1258,8 @@
 					}
 				}
 
-			} else {
+			}
+			else {
 
 				// get some element by ID and clone its structure into a node
 				if (this.nodeInnerHTML.charAt(0) === "#") {
@@ -1171,14 +1278,20 @@
 			}
 
 			// handle collapse switch
-			if (this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId)) {
+			if ( this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId) ) {
 				var my_switch = document.createElement('a');
 				my_switch.className = "collapse-switch";
 				node.appendChild(my_switch);
 				this.addSwitchEvent(my_switch);
-				if (this.collapsed) { node.className += " collapsed"; }
+				if ( this.collapsed ) {
+					node.className += " collapsed";
+				}
+
+				tree.CONFIG.callback.onCreateNodeCollapseSwitch.apply( tree, [this, node, my_switch] );
 			}
 		}
+
+		tree.CONFIG.callback.onCreateNode.apply( tree, [this, node] );
 
 		/////////// APPEND all //////////////
 		drawArea.appendChild(node);
@@ -1223,7 +1336,7 @@
 			stackIndent: 15
 		},
 
-		node: { // each node inherits this, it can all be overrifen in node config
+		node: { // each node inherits this, it can all be overridden in node config
 
 			// HTMLclass: 'node',
 			// drawLineThrough: false,
@@ -1233,12 +1346,18 @@
 			}
 		},
 
-		animation: { // each node inherits this, it can all be overrifen in node config
+		animation: { // each node inherits this, it can all be overridden in node config
 
 			nodeSpeed: 450,
 			nodeAnimation: 'linear',
 			connectorsSpeed: 450,
 			connectorsAnimation: 'linear'
+		},
+
+		callback: {
+			onCreateNode: function() {},
+			onCreateNodeCollapseSwitch: function() {},
+			onCollapseFinished: function () {}
 		}
 	};
 
@@ -1286,7 +1405,7 @@
 		},
 
 		findChildren: function(nodes) {
-			var parents = [0]; // start witha a root node
+			var parents = [0]; // start with a a root node
 
 			while(parents.length) {
 				var parentId = parents.pop(),
@@ -1340,10 +1459,15 @@
 	/**
 	* Chart constructor.
 	*/
-	var Treant = function(jsonConfig, callback) {
+	var Treant = function(jsonConfig, callback, jQuery) {
 
 		if (jsonConfig instanceof Array) {
 			jsonConfig = JSONconfig.make(jsonConfig);
+		}
+
+		// optional
+		if ( jQuery ) {
+			$ = jQuery;
 		}
 
 		var newTree = TreeStore.createTree(jsonConfig);
