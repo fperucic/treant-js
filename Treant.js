@@ -21,10 +21,11 @@
 	var UTIL = {
 		inheritAttrs: function(me, from) {
 			for (var attr in from) {
-				if(typeof from[attr] !== 'function') {
-					if(me[attr] instanceof Object && from[attr] instanceof Object) {
-						this.inheritAttrs(me[attr], from[attr]);
-					} else {
+				if ( from.hasOwnProperty( attr ) ) {
+					if ( ( me[attr] instanceof Object && from[attr] instanceof Object ) && (typeof from[attr] !== 'function') ) {
+						this.inheritAttrs( me[attr], from[attr] );
+					}
+					else {
 						me[attr] = from[attr];
 					}
 				}
@@ -33,8 +34,12 @@
 
 		createMerge: function(obj1, obj2) {
 			var newObj = {};
-			if(obj1) this.inheritAttrs(newObj, this.cloneObj(obj1));
-			if(obj2) this.inheritAttrs(newObj, obj2);
+			if(obj1) {
+				this.inheritAttrs(newObj, this.cloneObj(obj1));
+			}
+			if(obj2) {
+				this.inheritAttrs(newObj, obj2);
+			}
 			return newObj;
 		},
 
@@ -49,12 +54,14 @@
 		},
 
 		cloneObj: function (obj) {
-			if (Object(obj) !== obj) {
+			if ( Object(obj) !== obj ) {
 				return obj;
 			}
 			var res = new obj.constructor();
-			for (var key in obj) if (obj["hasOwnProperty"](key)) {
-				res[key] = this.cloneObj(obj[key]);
+			for (var key in obj) {
+				if ( obj.hasOwnProperty(key) ) {
+					res[key] = this.cloneObj(obj[key]);
+				}
 			}
 			return res;
 		},
