@@ -16,6 +16,8 @@
 
 ;(function(){
 
+	var $ = null;
+
 	var UTIL = {
 		inheritAttrs: function(me, from) {
 			for (var attr in from) {
@@ -36,6 +38,16 @@
 			return newObj;
 		},
 
+		extend: function() {
+			if ( $ ) {
+				Array.prototype.unshift.apply( arguments, [true, {}] );
+				return $.extend.apply( $, arguments );
+			}
+			else {
+				return UTIL.createMerge.apply( this, arguments );
+			}
+		},
+
 		cloneObj: function (obj) {
 			if (Object(obj) !== obj) {
 				return obj;
@@ -46,6 +58,7 @@
 			}
 			return res;
 		},
+
 		addEvent: function(el, eventType, handler) {
 			if (el.addEventListener) { // DOM Level 2 browsers
 				el.addEventListener(eventType, handler, false);
@@ -56,8 +69,34 @@
 			}
 		},
 
+		findEl: function( element, raw ) {
+			if ( $ ) {
+				var $element = $( element );
+				return ( raw ? $element.get( 0 ) : $element );
+			}
+			else {
+				// todo add support for non-id elements
+				return document.getElementById( element.substring( 1 ) );
+			}
+		},
+
 		hasClass: function(element, my_class) {
 			return (" " + element.className + " ").replace(/[\n\t]/g, " ").indexOf(" "+my_class+" ") > -1;
+		},
+
+		toggleClass: function ( element, cls, apply ) {
+			if ( $ ) {
+				$( element ).toggleClass( cls, apply );
+			}
+			else {
+				if ( apply ) {
+					//element.className += " "+cls;
+					element.classList.add( cls );
+				}
+				else {
+					element.classList.remove( cls );
+				}
+			}
 		}
 	};
 
@@ -159,10 +198,8 @@
 		this.id = treeId;
 
 		this.imageLoader = new ImageLoader();
-		//this.CONFIG = $.extend( true, {}, Tree.CONFIG, jsonConfig.chart );
-		//this.drawArea = document.getElementById(this.CONFIG.container.substring(1));
-		this.CONFIG = UTIL.createMerge(Tree.CONFIG, jsonConfig.chart);
-		this.drawArea = $(this.CONFIG.container).get(0);
+		this.CONFIG = UTIL.extend( Tree.CONFIG, jsonConfig.chart );
+		this.drawArea = UTIL.findEl( this.CONFIG.container, true );
 		this.drawArea.className += " Treant";
 		this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
 
@@ -504,9 +541,11 @@
 					this.drawArea.style.overflowY = "auto";
 				}
 
-			} else if (this.CONFIG.scrollbar == 'fancy') {
+			}
+			// Fancy scrollbar relies heavily on jQuery, so guarding with if ( $ )
+			else if ( $ && this.CONFIG.scrollbar == 'fancy') {
 
-				var jq_drawArea = $(this.drawArea);
+				var jq_drawArea = $( this.drawArea );
 				if (jq_drawArea.hasClass('ps-container')) { // znaci da je 'fancy' vec inicijaliziran, treba updateat
 
 					jq_drawArea.find('.Treant').css({
@@ -1009,7 +1048,7 @@
 				tree.inAnimation = true;
 
 				this.collapsed = !this.collapsed; // toggle the collapse at each click
-				$( this.nodeDOM ).toggleClass( 'collapsed', this.collapsed );
+				UTIL.toggleClass( this.nodeDOM, 'collapsed', this.collapsed );
 
 				tree.positionTree();
 
@@ -1043,10 +1082,12 @@
 				jq_node.css(new_pos);
 				this.positioned = true;
 			} else {
-				jq_node.animate(new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
-				function(){
-					this.style.visibility = 'hidden';
-				});
+				jq_node.animate(
+					new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
+					function(){
+						this.style.visibility = 'hidden';
+					}
+				);
 			}
 
 			// animate the line through node if the line exists
@@ -1083,7 +1124,7 @@
 				new_pos,
 				config.animation.nodeSpeed, config.animation.nodeAnimation,
 				function() {
-					// $.animate applys "overflow:hidden" to the node, remove it to avoid visual problems
+					// $.animate applies "overflow:hidden" to the node, remove it to avoid visual problems
 					this.style.overflow = "";
 				}
 			);
@@ -1356,10 +1397,15 @@
 	/**
 	* Chart constructor.
 	*/
-	var Treant = function(jsonConfig, callback) {
+	var Treant = function(jsonConfig, callback, jQuery) {
 
 		if (jsonConfig instanceof Array) {
 			jsonConfig = JSONconfig.make(jsonConfig);
+		}
+
+		// optional
+		if ( jQuery ) {
+			$ = jQuery;
 		}
 
 		var newTree = TreeStore.createTree(jsonConfig);
@@ -1372,6 +1418,6 @@
 		TreeStore.destroy(this.tree_id);
 	};
 
-	/* expose constructor globally */
+	/* expose constructor globaly */
 	window.Treant = Treant;
 })();
