@@ -130,8 +130,8 @@
 
 	/**
 	* ImageLoader constructor.
-	* ImageLoader is used for determening if all the images from the Tree are loaded.
-	* 	Node size (width, height) can be correcty determined only when all inner images are loaded
+	* ImageLoader is used for determining if all the images from the Tree are loaded.
+	* 	Node size (width, height) can be correctly determined only when all inner images are loaded
 	*/
 	var ImageLoader = function() {
 		this.loading = [];
@@ -155,10 +155,8 @@
 		},
 
 		create: function (node, image) {
+			var self = this, source = image.src;
 
-			var self = this,
-				source = image.src;
-			this.loading.push(source);
 
 			function imgTrigger() {
 				self.removeAll(source);
@@ -166,13 +164,22 @@
 				node.height = node.nodeDOM.offsetHeight;
 			}
 
-			if (image.complete) { return imgTrigger(); }
+			if ( image.src.indexOf( 'data:' ) !== 0 ) {
+				this.loading.push( source );
 
-			UTIL.addEvent(image, 'load', imgTrigger);
-			UTIL.addEvent(image, 'error', imgTrigger); // handle broken url-s
+				if ( image.complete ) {
+					return imgTrigger();
+				}
 
-			// load event is not fired for cached images, force the load event
-			image.src += "?" + new Date().getTime();
+				UTIL.addEvent( image, 'load', imgTrigger );
+				UTIL.addEvent( image, 'error', imgTrigger ); // handle broken url-s
+
+				// load event is not fired for cached images, force the load event
+				image.src += "?" + new Date().getTime();
+			}
+			else {
+				imgTrigger();
+			}
 		},
 		isNotLoading: function() {
 			return this.loading.length === 0;
