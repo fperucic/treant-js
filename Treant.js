@@ -92,7 +92,11 @@
 				return $( element ).outerHeight();
 			}
 			else {
-				return element.clientHeight;
+				return element.clientHeight
+					+ UTIL.getStyle( element, 'border-top-width', true )
+					+ UTIL.getStyle( element, 'border-bottom-width', true )
+					+ UTIL.getStyle( element, 'padding-top', true )
+					+ UTIL.getStyle( element, 'padding-bottom', true );
 			}
 		},
 
@@ -101,8 +105,29 @@
 				return $( element ).outerWidth();
 			}
 			else {
-				return element.clientWidth;
+				return element.clientWidth
+					+ UTIL.getStyle( element, 'border-left-width', true )
+					+ UTIL.getStyle( element, 'border-right-width', true )
+					+ UTIL.getStyle( element, 'padding-left', true )
+					+ UTIL.getStyle( element, 'padding-right', true );
 			}
+		},
+
+		getStyle: function( element, strCssRule, asInt ) {
+			var strValue = "";
+			if ( document.defaultView && document.defaultView.getComputedStyle ) {
+				strValue = document.defaultView.getComputedStyle( element, '' ).getPropertyValue( strCssRule );
+			}
+			else if( element.currentStyle ) {
+				strCssRule = strCssRule.replace(/\-(\w)/g,
+					function (strMatch, p1){
+						return p1.toUpperCase();
+					}
+				);
+				strValue = element.currentStyle[strCssRule];
+			}
+			//Number(elem.style.width.replace(/[^\d\.\-]/g, ''));
+			return ( asInt? parseFloat( strValue ): strValue );
 		},
 
 		hasClass: function(element, my_class) {
@@ -1121,8 +1146,12 @@
 			}
 
 			if ( !this.startW || !this.startH ) {
+				// at this point we are seeing the decreased size
 				this.startW = UTIL.getOuterWidth( this.nodeDOM );
 				this.startH = UTIL.getOuterHeight( this.nodeDOM );
+
+				console.log( this );
+				console.log(this.startW +' ' + this.startH);
 			}
 
 			// if parent was hidden in initial configuration, position the node behind the parent without animations
