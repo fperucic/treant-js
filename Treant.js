@@ -88,28 +88,42 @@
 		},
 
 		getOuterHeight: function( element ) {
-			if ( $ ) {
-				return $( element ).outerHeight();
+			var nRoundingCompensation = 1;
+			if ( typeof element.getBoundingClientRect == 'function' ) {
+				return element.getBoundingClientRect().height;
+			}
+			else if ( $ ) {
+				return Math.ceil( $( element ).outerHeight() ) + nRoundingCompensation;
 			}
 			else {
-				return element.clientHeight
+				return Math.ceil(
+					element.clientHeight
 					+ UTIL.getStyle( element, 'border-top-width', true )
 					+ UTIL.getStyle( element, 'border-bottom-width', true )
 					+ UTIL.getStyle( element, 'padding-top', true )
-					+ UTIL.getStyle( element, 'padding-bottom', true );
+					+ UTIL.getStyle( element, 'padding-bottom', true )
+					+ nRoundingCompensation
+				);
 			}
 		},
 
 		getOuterWidth: function( element ) {
-			if ( $ ) {
-				return $( element ).outerWidth();
+			var nRoundingCompensation = 1;
+			if ( typeof element.getBoundingClientRect == 'function' ) {
+				return element.getBoundingClientRect().width;
+			}
+			else if ( $ ) {
+				return Math.ceil( $( element ).outerWidth() ) + nRoundingCompensation;
 			}
 			else {
-				return element.clientWidth
+				return Math.ceil(
+					element.clientWidth
 					+ UTIL.getStyle( element, 'border-left-width', true )
 					+ UTIL.getStyle( element, 'border-right-width', true )
 					+ UTIL.getStyle( element, 'padding-left', true )
-					+ UTIL.getStyle( element, 'padding-right', true );
+					+ UTIL.getStyle( element, 'padding-right', true )
+					+ nRoundingCompensation
+				);
 			}
 		},
 
@@ -567,18 +581,19 @@
 				var collapsedParent = node.collapsedParent(),
 					hidePoint = null;
 
-				if(collapsedParent) {
+				if (collapsedParent) {
 					// position the node behind the connector point of the parent, so future animations can be visible
 					hidePoint = collapsedParent.connectorPoint( true );
 					node.hide(hidePoint);
 
-				} else if(node.positioned) {
+				}
+				else if (node.positioned) {
 					// node is already positioned,
 					node.show();
-				} else { // inicijalno stvaranje nodeova, postavi lokaciju
+				}
+				else { // inicijalno stvaranje nodeova, postavi lokaciju
 					node.nodeDOM.style.left = node.X + 'px';
 					node.nodeDOM.style.top = node.Y + 'px';
-
 					node.positioned = true;
 				}
 
@@ -618,7 +633,6 @@
 				if(this.drawArea.clientHeight < treeHeight) { // is overflow-y necessary
 					this.drawArea.style.overflowY = "auto";
 				}
-
 			}
 			// Fancy scrollbar relies heavily on jQuery, so guarding with if ( $ )
 			else if ( this.CONFIG.scrollbar == 'fancy') {
@@ -647,10 +661,10 @@
 				}
 			} // else this.CONFIG.scrollbar == 'None'
 
+			return this;
 		},
 
 		setConnectionToParent: function(node, hidePoint) {
-
 			var stacked = node.stackParentId,
 				connLine,
 				parent = stacked ? this.nodeDB.get(stacked) : node.parent(),
@@ -658,56 +672,61 @@
 				pathString = hidePoint ? this.getPointPathString(hidePoint):
 							this.getPathString(parent, node, stacked);
 
-
 			if (this.connectionStore[node.id]) {
 				// connector allready exists, update the connector geometry
 				connLine = this.connectionStore[node.id];
 				this.animatePath(connLine, pathString);
-
-			} else {
-
+			}
+			else {
 				connLine = this._R.path( pathString );
 				this.connectionStore[node.id] = connLine;
 
 				// don't show connector arrows por pseudo nodes
-				if(node.pseudo) { delete parent.connStyle.style['arrow-end']; }
-				if(parent.pseudo) { delete parent.connStyle.style['arrow-start']; }
+				if (node.pseudo) {
+					delete parent.connStyle.style['arrow-end'];
+				}
+				if (parent.pseudo) {
+					delete parent.connStyle.style['arrow-start'];
+				}
 
 				connLine.attr(parent.connStyle.style);
 
-				if(node.drawLineThrough || node.pseudo) { node.drawLineThroughMe(hidePoint); }
+				if (node.drawLineThrough || node.pseudo) {
+					node.drawLineThroughMe(hidePoint);
+				}
 			}
+			return this;
 		},
 
-		// create the path which is represanted as a point, used for hiding the connection
+		// create the path which is represented as a point, used for hiding the connection
 		getPointPathString: function(hp) {
 			// "_" indicates the path will be hidden
 			return ["_M", hp.x, ",", hp.y, 'L', hp.x, ",", hp.y, hp.x, ",", hp.y].join(" ");
 		},
 
 		animatePath: function(path, pathString) {
-
-
 			if (path.hidden && pathString.charAt(0) !== "_") { // path will be shown, so show it
 				path.show();
 				path.hidden = false;
 			}
 
-			path.animate({
-				path: pathString.charAt(0) === "_" ? pathString.substring(1) : pathString // remove the "_" prefix if it exists
-			}, this.CONFIG.animation.connectorsSpeed,  this.CONFIG.animation.connectorsAnimation,
-			function(){
-				if(pathString.charAt(0) === "_") { // animation is hiding the path, hide it at the and of animation
-					path.hide();
-					path.hidden = true;
+			path.animate(
+				{
+					path: pathString.charAt(0) === "_" ? pathString.substring(1) : pathString // remove the "_" prefix if it exists
+				},
+				this.CONFIG.animation.connectorsSpeed,
+				this.CONFIG.animation.connectorsAnimation,
+				function() {
+					if ( pathString.charAt(0) === "_" ) { // animation is hiding the path, hide it at the and of animation
+						path.hide();
+						path.hidden = true;
+					}
 				}
-
-			});
-
+			);
+			return this;
 		},
 
 		getPathString: function(from_node, to_node, stacked) {
-
 			var startPoint = from_node.connectorPoint( true ),
 				endPoint = to_node.connectorPoint( false ),
 				orinet = this.CONFIG.rootOrientation,
@@ -759,7 +778,8 @@
 					pathString = ["M", sp, 'L', helpPoint, 'S', stackPoint, ep];
 				}
 
-			} else {  // NORAML CHILDREN
+			}
+			else {  // NORAML CHILDREN
 
 				if( connType == "step" ) {
 					pathString = ["M", sp, 'L', p1, 'L', p2, 'L', ep];
@@ -1158,9 +1178,6 @@
 				// at this point we are seeing the decreased size
 				this.startW = UTIL.getOuterWidth( this.nodeDOM );
 				this.startH = UTIL.getOuterHeight( this.nodeDOM );
-
-				console.log( this );
-				console.log(this.startW +' ' + this.startH);
 			}
 
 			// if parent was hidden in initial configuration, position the node behind the parent without animations
