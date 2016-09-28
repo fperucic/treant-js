@@ -281,7 +281,7 @@
 
 				this.resetLevelData();
 
-				this.firstWalk(root, 0);
+				this.firstWalk( root, 0 );
 				this.secondWalk( root, 0, 0, 0 );
 
 				this.positionNodes();
@@ -290,14 +290,22 @@
 					setTimeout(function() { root.toggleCollapse(); }, this.CONFIG.animateOnInitDelay);
 				}
 
-				if(!this.loaded) {
+				if ( !this.loaded ) {
 					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is added
-					if (Object.prototype.toString.call(callback) === "[object Function]") { callback(self); }
+					if ( Object.prototype.toString.call(callback) === "[object Function]" ) {
+						callback( self );
+					}
+					self.CONFIG.callback.onTreeLoaded.apply( self, [self] );
 					this.loaded = true;
 				}
 
-			} else {
-				setTimeout(function() { self.positionTree(callback); }, 10);
+			}
+			else {
+				setTimeout(
+					function() {
+						self.positionTree( callback );
+					}, 10
+				);
 			}
 		},
 
@@ -335,10 +343,11 @@
 				var midPoint = node.childrenCenter() - node.size() / 2;
 
 				if(leftSibling) {
-					node.prelim		= leftSibling.prelim + leftSibling.size() + this.CONFIG.siblingSeparation;
-					node.modifier	= node.prelim - midPoint;
+					node.prelim = leftSibling.prelim + leftSibling.size() + this.CONFIG.siblingSeparation;
+					node.modifier = node.prelim - midPoint;
 					this.apportion( node, level );
-				} else {
+				}
+				else {
 					node.prelim = midPoint;
 				}
 
@@ -1401,7 +1410,8 @@
 			onCreateNodeCollapseSwitch: function() {},
 			onAfterPositionNode: function() {},
 			onBeforePositionNode: function() {},
-			onCollapseFinished: function () {}
+			onCollapseFinished: function () {},
+			onTreeLoaded: function() {}
 		}
 	};
 
