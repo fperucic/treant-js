@@ -67,11 +67,16 @@
 		},
 
 		addEvent: function(el, eventType, handler) {
-			if (el.addEventListener) { // DOM Level 2 browsers
+			if ( $ ) {
+				$( el ).on( eventType+'.treant', handler );
+			}
+			else if (el.addEventListener) { // DOM Level 2 browsers
 				el.addEventListener(eventType, handler, false);
-			} else if (el.attachEvent) { // IE <= 8
+			}
+			else if (el.attachEvent) { // IE <= 8
 				el.attachEvent('on' + eventType, handler);
-			} else { // ancient browsers
+			}
+			else { // ancient browsers
 				el['on' + eventType] = handler;
 			}
 		},
@@ -284,12 +289,11 @@
 
 	Tree.prototype = {
 
-		positionTree: function(callback) {
+		positionTree: function( callback ) {
 
 			var self = this;
 
-			if (this.imageLoader.isNotLoading()) {
-
+			if ( this.imageLoader.isNotLoading() ) {
 				var root = this.root(),
 					orient = this.CONFIG.rootOrientation;
 
@@ -300,8 +304,13 @@
 
 				this.positionNodes();
 
-				if (this.CONFIG.animateOnInit) {
-					setTimeout(function() { root.toggleCollapse(); }, this.CONFIG.animateOnInitDelay);
+				if ( this.CONFIG.animateOnInit ) {
+					setTimeout(
+						function() {
+							root.toggleCollapse();
+						},
+						this.CONFIG.animateOnInitDelay
+					);
 				}
 
 				if ( !this.loaded ) {
@@ -309,7 +318,7 @@
 					if ( Object.prototype.toString.call(callback) === "[object Function]" ) {
 						callback( self );
 					}
-					self.CONFIG.callback.onTreeLoaded.apply( self, [self] );
+					self.CONFIG.callback.onTreeLoaded.apply( self, [root] );
 					this.loaded = true;
 				}
 
@@ -858,15 +867,20 @@
 
 				var stack = (node.stackChildren && !self.hasGrandChildren(node)) ? newNode.id : null;
 
-				// svildren are position on separate leves, one beneeth the other
-				if (stack !== null) { newNode.stackChildren = []; }
+				// children are positioned on separate levels, one beneath the other
+				if (stack !== null) {
+					newNode.stackChildren = [];
+				}
 
 				for (var i = 0, len = node.children.length; i < len ; i++) {
-
 					if (stack !== null) {
 						newNode =  self.createNode(node.children[i], newNode.id, tree, stack);
-						if((i + 1) < len) newNode.children = []; // last node cant have children
-					} else {
+						if ( ( i + 1 ) < len ) {
+							// last node cant have children
+							newNode.children = [];
+						}
+					}
+					else {
 						iterateChildren(node.children[i], newNode.id);
 					}
 				}
@@ -1036,13 +1050,17 @@
 		leftSibling: function () {
 			var leftNeighbor = this.leftNeighbor();
 
-			if( leftNeighbor && leftNeighbor.parentId == this.parentId ) return leftNeighbor;
+			if( leftNeighbor && leftNeighbor.parentId == this.parentId ){
+				return leftNeighbor;
+			}
 		},
 
 		rightSibling: function () {
 			var rightNeighbor = this.rightNeighbor();
 
-			if( rightNeighbor && rightNeighbor.parentId == this.parentId ) return rightNeighbor;
+			if( rightNeighbor && rightNeighbor.parentId == this.parentId ) {
+				return rightNeighbor;
+			}
 		},
 
 		childrenCenter: function ( tree ) {
@@ -1130,19 +1148,26 @@
 			}
 		},
 
-		addSwitchEvent: function(my_switch) {
+		addSwitchEvent: function( nodeSwitch ) {
 			var self = this;
-			UTIL.addEvent(my_switch, 'click', function(e){
-				e.preventDefault();
-				self.toggleCollapse();
-			});
+			UTIL.addEvent( nodeSwitch, 'click',
+				function( e ) {
+					e.preventDefault();
+					if ( self.Tree().CONFIG.callback.onBeforeClickCollapseSwitch.apply( self, [ nodeSwitch, e ] ) === false ) {
+						return false;
+					}
+
+					self.toggleCollapse();
+
+					self.Tree().CONFIG.callback.onAfterClickCollapseSwitch.apply( self, [ nodeSwitch, e ] );
+				}
+			);
 		},
 
 		toggleCollapse: function() {
 			var tree = this.Tree();
 
-			if (! tree.inAnimation) {
-
+			if ( !tree.inAnimation ) {
 				tree.inAnimation = true;
 
 				this.collapsed = !this.collapsed; // toggle the collapse at each click
@@ -1150,12 +1175,16 @@
 
 				tree.positionTree();
 
+				var self = this;
+
 				setTimeout(
 					function() { // set the flag after the animation
 						tree.inAnimation = false;
-						tree.CONFIG.callback.onCollapseFinished.apply( tree, [] );
+						tree.CONFIG.callback.onCollapseFinished.apply( tree, [ self ] );
 					},
-					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed
+					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )?
+						tree.CONFIG.animation.nodeSpeed:
+						tree.CONFIG.animation.connectorsSpeed
 				);
 			}
 		},
@@ -1175,7 +1204,6 @@
 			}
 
 			if ( !this.startW || !this.startH ) {
-				// at this point we are seeing the decreased size
 				this.startW = UTIL.getOuterWidth( this.nodeDOM );
 				this.startH = UTIL.getOuterHeight( this.nodeDOM );
 			}
@@ -1427,8 +1455,10 @@
 			onCreateNodeCollapseSwitch: function() {},
 			onAfterPositionNode: function() {},
 			onBeforePositionNode: function() {},
-			onCollapseFinished: function () {},
-			onTreeLoaded: function() {}
+			onCollapseFinished: function ( treeNode ) {}, // this = Tree
+			onAfterClickCollapseSwitch: function( nodeSwitch, event ) {}, // this = TreeNode
+			onBeforeClickCollapseSwitch: function( nodeSwitch, event ) {}, // this = TreeNode
+			onTreeLoaded: function( rootTreeNode ) {} // this = Tree
 		}
 	};
 
