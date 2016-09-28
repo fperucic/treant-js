@@ -963,8 +963,7 @@
 	* TreeNode constructor.
 	* @constructor
 	*/
-	var TreeNode = function (nodeStructure, id, parentId, tree, stackParentId) {
-
+	var TreeNode = function( nodeStructure, id, parentId, tree, stackParentId ) {
 		this.id			= id;
 		this.parentId	= parentId;
 		this.treeId		= tree.id;
@@ -974,24 +973,25 @@
 		this.stackParentId = stackParentId;
 
 		// pseudo node is a node with width=height=0, it is invisible, but necessary for the correct positioning of the tree
-		this.pseudo = nodeStructure === 'pseudo' || nodeStructure['pseudo'];
+		this.pseudo = nodeStructure === 'pseudo' || nodeStructure['pseudo']; // todo: surely if nodeStructure is a scalar then the rest will error:
 
-		this.image = nodeStructure.image;
+		this.meta = nodeStructure.meta || {};
+		this.image = nodeStructure.image || null;
 
-		this.link = UTIL.createMerge( tree.CONFIG.node.link,  nodeStructure.link);
+		this.link = UTIL.createMerge( tree.CONFIG.node.link,  nodeStructure.link );
 
-		this.connStyle = UTIL.createMerge(tree.CONFIG.connectors, nodeStructure.connectors);
+		this.connStyle = UTIL.createMerge( tree.CONFIG.connectors, nodeStructure.connectors );
 
-		this.drawLineThrough = nodeStructure.drawLineThrough === false ? false : nodeStructure.drawLineThrough || tree.CONFIG.node.drawLineThrough;
+		this.drawLineThrough = nodeStructure.drawLineThrough === false ? false : ( nodeStructure.drawLineThrough || tree.CONFIG.node.drawLineThrough );
 
-		this.collapsable = nodeStructure.collapsable === false ? false : nodeStructure.collapsable || tree.CONFIG.node.collapsable;
+		this.collapsable = nodeStructure.collapsable === false ? false : ( nodeStructure.collapsable || tree.CONFIG.node.collapsable );
 		this.collapsed = nodeStructure.collapsed;
 
 		this.text = nodeStructure.text;
 
 		// '.node' DIV
-		this.nodeInnerHTML	= nodeStructure.innerHTML;
-		this.nodeHTMLclass	= (tree.CONFIG.node.HTMLclass ? tree.CONFIG.node.HTMLclass : '') + // globaly defined class for the nodex
+		this.nodeInnerHTML = nodeStructure.innerHTML;
+		this.nodeHTMLclass = (tree.CONFIG.node.HTMLclass ? tree.CONFIG.node.HTMLclass : '') + // globally defined class for the nodex
 								(nodeStructure.HTMLclass ? (' ' + nodeStructure.HTMLclass) : '');		// + specific node class
 
 		this.nodeHTMLid		= nodeStructure.HTMLid;
@@ -1000,7 +1000,7 @@
 	TreeNode.prototype = {
 
 		Tree: function() {
-			return TreeStore.get(this.treeId);
+			return TreeStore.get( this.treeId );
 		},
 
 		dbGet: function(nodeId) {
@@ -1010,25 +1010,29 @@
 		size: function() { // returns the width of the node
 			var orient = this.Tree().CONFIG.rootOrientation;
 
-			if(this.pseudo) return - this.Tree().CONFIG.subTeeSeparation; // prevents separating the subtrees
+			if ( this.pseudo ) {
+				// prevents separating the subtrees
+				return ( -this.Tree().CONFIG.subTeeSeparation );
+			}
 
-			if (orient == 'NORTH' || orient == 'SOUTH')
+			if ( orient == 'NORTH' || orient == 'SOUTH' ) {
 				return this.width;
-
-			else if (orient == 'WEST' || orient == 'EAST')
+			}
+			else if ( orient == 'WEST' || orient == 'EAST' ) {
 				return this.height;
+			}
 		},
 
 		childrenCount: function () {
-			return	(this.collapsed || !this.children) ? 0 : this.children.length;
+			return (this.collapsed || !this.children) ? 0 : this.children.length;
 		},
 
-		childAt: function(i) {
+		childAt: function( i ) {
 			return this.dbGet( this.children[i] );
 		},
 
 		firstChild: function() {
-			return this.childAt(0);
+			return this.childAt( 0 );
 		},
 
 		lastChild: function() {
@@ -1040,17 +1044,17 @@
 		},
 
 		leftNeighbor: function() {
-			if( this.leftNeighborId ) return this.dbGet( this.leftNeighborId );
+			if ( this.leftNeighborId ) return this.dbGet( this.leftNeighborId );
 		},
 
 		rightNeighbor: function() {
-			if( this.rightNeighborId ) return this.dbGet( this.rightNeighborId );
+			if ( this.rightNeighborId ) return this.dbGet( this.rightNeighborId );
 		},
 
 		leftSibling: function () {
 			var leftNeighbor = this.leftNeighbor();
 
-			if( leftNeighbor && leftNeighbor.parentId == this.parentId ){
+			if ( leftNeighbor && leftNeighbor.parentId == this.parentId ){
 				return leftNeighbor;
 			}
 		},
@@ -1058,7 +1062,7 @@
 		rightSibling: function () {
 			var rightNeighbor = this.rightNeighbor();
 
-			if( rightNeighbor && rightNeighbor.parentId == this.parentId ) {
+			if ( rightNeighbor && rightNeighbor.parentId == this.parentId ) {
 				return rightNeighbor;
 			}
 		},
@@ -1066,27 +1070,36 @@
 		childrenCenter: function ( tree ) {
 			var first = this.firstChild(),
 				last = this.lastChild();
+
 			return first.prelim + ((last.prelim - first.prelim) + last.size()) / 2;
 		},
 
 		// find out if one of the node ancestors is collapsed
 		collapsedParent: function() {
 			var parent = this.parent();
-			if (!parent) return false;
-			if (parent.collapsed) return parent;
+			if (!parent) {
+				return false;
+			}
+			if (parent.collapsed) {
+				return parent;
+			}
 			return parent.collapsedParent();
 		},
 
 		leftMost: function ( level, depth ) { // returns the leftmost child at specific level, (initial level = 0)
 
-			if( level >= depth ) return this;
-			if( this.childrenCount() === 0 ) return;
+			if ( level >= depth ){
+				return this;
+			}
+			if ( this.childrenCount() === 0 ) {
+				return;
+			}
 
-			for(var i = 0, n = this.childrenCount(); i < n; i++) {
-
+			for (var i = 0, n = this.childrenCount(); i < n; i++) {
 				var leftmostDescendant = this.childAt(i).leftMost( level + 1, depth );
-				if(leftmostDescendant)
+				if(leftmostDescendant) {
 					return leftmostDescendant;
+				}
 			}
 		},
 
@@ -1098,24 +1111,21 @@
 				if (orient == 'NORTH' || orient == 'SOUTH') { orient = 'WEST'; }
 				else if (orient == 'EAST' || orient == 'WEST') { orient = 'NORTH'; }
 			}
+
 			// if pseudo, a virtual center is used
 			if (orient == 'NORTH') {
-
 				point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;
 				point.y = (startPoint) ? this.Y + this.height : this.Y;
-
-			} else if (orient == 'SOUTH') {
-
+			}
+			else if (orient == 'SOUTH') {
 				point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;
 				point.y = (startPoint) ? this.Y : this.Y + this.height;
-
-			} else if (orient == 'EAST') {
-
+			}
+			else if (orient == 'EAST') {
 				point.x = (startPoint) ? this.X : this.X + this.width;
 				point.y = (this.pseudo) ? this.Y - this.Tree().CONFIG.subTeeSeparation/2 : this.Y + this.height/2;
-
-			} else if (orient == 'WEST') {
-
+			}
+			else if (orient == 'WEST') {
 				point.x = (startPoint) ? this.X + this.width : this.X;
 				point.y =  (this.pseudo) ? this.Y - this.Tree().CONFIG.subTeeSeparation/2 : this.Y + this.height/2;
 			}
@@ -1135,7 +1145,7 @@
 
 			this.lineThroughMe = this.lineThroughMe || this.Tree()._R.path(pathString);
 
-			var line_style = UTIL.cloneObj(this.connStyle.style);
+			var line_style = UTIL.cloneObj( this.connStyle.style );
 
 			delete line_style['arrow-start'];
 			delete line_style['arrow-end'];
@@ -1287,7 +1297,7 @@
 				this.nodeDOM.style.overflow = '';
 			}
 
-			if(this.lineThroughMe) {
+			if ( this.lineThroughMe ) {
 				tree.animatePath(this.lineThroughMe, this.pathStringThrough());
 			}
 
@@ -1306,16 +1316,30 @@
 			image,
 
 		/////////// CREATE NODE //////////////
-		node = this.link.href ? document.createElement('a') : document.createElement('div');
+		node = this.link.href ? document.createElement('a'): document.createElement('div');
 
-		node.className = (!this.pseudo) ? TreeNode.CONFIG.nodeHTMLclass : 'pseudo';
-		if(this.nodeHTMLclass && !this.pseudo) node.className += ' ' + this.nodeHTMLclass;
+		node.className = ( !this.pseudo )? TreeNode.CONFIG.nodeHTMLclass: 'pseudo';
+		if ( this.nodeHTMLclass && !this.pseudo ) {
+			node.className += ' ' + this.nodeHTMLclass;
+		}
 
-		if(this.nodeHTMLid) node.id = this.nodeHTMLid;
+		if ( this.nodeHTMLid ) {
+			node.id = this.nodeHTMLid;
+		}
 
-		if(this.link.href) {
+		if ( this.link.href ) {
 			node.href = this.link.href;
 			node.target = this.link.target;
+		}
+
+		if ( this.meta ) {
+			if ( $ ) {
+				$( node ).data( 'meta', this.meta );
+			}
+		}
+
+		if ( $ ) {
+			$( node ).data( 'treenode', this );
 		}
 
 		/////////// CREATE innerHTML //////////////
@@ -1377,8 +1401,8 @@
 			if ( this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId) ) {
 				var my_switch = document.createElement('a');
 				my_switch.className = "collapse-switch";
-				node.appendChild(my_switch);
-				this.addSwitchEvent(my_switch);
+				node.appendChild( my_switch );
+				this.addSwitchEvent( my_switch );
 				if ( this.collapsed ) {
 					node.className += " collapsed";
 				}
