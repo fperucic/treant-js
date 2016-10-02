@@ -21,10 +21,11 @@
 	var UTIL = {
 		inheritAttrs: function(me, from) {
 			for (var attr in from) {
-				if(typeof from[attr] !== 'function') {
-					if(me[attr] instanceof Object && from[attr] instanceof Object) {
-						this.inheritAttrs(me[attr], from[attr]);
-					} else {
+				if ( from.hasOwnProperty( attr ) ) {
+					if ( ( me[attr] instanceof Object && from[attr] instanceof Object ) && (typeof from[attr] !== 'function') ) {
+						this.inheritAttrs( me[attr], from[attr] );
+					}
+					else {
 						me[attr] = from[attr];
 					}
 				}
@@ -33,8 +34,12 @@
 
 		createMerge: function(obj1, obj2) {
 			var newObj = {};
-			if(obj1) this.inheritAttrs(newObj, this.cloneObj(obj1));
-			if(obj2) this.inheritAttrs(newObj, obj2);
+			if(obj1) {
+				this.inheritAttrs(newObj, this.cloneObj(obj1));
+			}
+			if(obj2) {
+				this.inheritAttrs(newObj, obj2);
+			}
 			return newObj;
 		},
 
@@ -49,22 +54,29 @@
 		},
 
 		cloneObj: function (obj) {
-			if (Object(obj) !== obj) {
+			if ( Object(obj) !== obj ) {
 				return obj;
 			}
 			var res = new obj.constructor();
-			for (var key in obj) if (obj["hasOwnProperty"](key)) {
-				res[key] = this.cloneObj(obj[key]);
+			for (var key in obj) {
+				if ( obj.hasOwnProperty(key) ) {
+					res[key] = this.cloneObj(obj[key]);
+				}
 			}
 			return res;
 		},
 
 		addEvent: function(el, eventType, handler) {
-			if (el.addEventListener) { // DOM Level 2 browsers
+			if ( $ ) {
+				$( el ).on( eventType+'.treant', handler );
+			}
+			else if (el.addEventListener) { // DOM Level 2 browsers
 				el.addEventListener(eventType, handler, false);
-			} else if (el.attachEvent) { // IE <= 8
+			}
+			else if (el.attachEvent) { // IE <= 8
 				el.attachEvent('on' + eventType, handler);
-			} else { // ancient browsers
+			}
+			else { // ancient browsers
 				el['on' + eventType] = handler;
 			}
 		},
@@ -81,21 +93,60 @@
 		},
 
 		getOuterHeight: function( element ) {
-			if ( $ ) {
-				return $( element ).outerHeight();
+			var nRoundingCompensation = 1;
+			if ( typeof element.getBoundingClientRect == 'function' ) {
+				return element.getBoundingClientRect().height;
+			}
+			else if ( $ ) {
+				return Math.ceil( $( element ).outerHeight() ) + nRoundingCompensation;
 			}
 			else {
-				return element.clientHeight;
+				return Math.ceil(
+					element.clientHeight
+					+ UTIL.getStyle( element, 'border-top-width', true )
+					+ UTIL.getStyle( element, 'border-bottom-width', true )
+					+ UTIL.getStyle( element, 'padding-top', true )
+					+ UTIL.getStyle( element, 'padding-bottom', true )
+					+ nRoundingCompensation
+				);
 			}
 		},
 
 		getOuterWidth: function( element ) {
-			if ( $ ) {
-				return $( element ).outerWidth();
+			var nRoundingCompensation = 1;
+			if ( typeof element.getBoundingClientRect == 'function' ) {
+				return element.getBoundingClientRect().width;
+			}
+			else if ( $ ) {
+				return Math.ceil( $( element ).outerWidth() ) + nRoundingCompensation;
 			}
 			else {
-				return element.clientWidth;
+				return Math.ceil(
+					element.clientWidth
+					+ UTIL.getStyle( element, 'border-left-width', true )
+					+ UTIL.getStyle( element, 'border-right-width', true )
+					+ UTIL.getStyle( element, 'padding-left', true )
+					+ UTIL.getStyle( element, 'padding-right', true )
+					+ nRoundingCompensation
+				);
 			}
+		},
+
+		getStyle: function( element, strCssRule, asInt ) {
+			var strValue = "";
+			if ( document.defaultView && document.defaultView.getComputedStyle ) {
+				strValue = document.defaultView.getComputedStyle( element, '' ).getPropertyValue( strCssRule );
+			}
+			else if( element.currentStyle ) {
+				strCssRule = strCssRule.replace(/\-(\w)/g,
+					function (strMatch, p1){
+						return p1.toUpperCase();
+					}
+				);
+				strValue = element.currentStyle[strCssRule];
+			}
+			//Number(elem.style.width.replace(/[^\d\.\-]/g, ''));
+			return ( asInt? parseFloat( strValue ): strValue );
 		},
 
 		hasClass: function(element, my_class) {
@@ -245,34 +296,46 @@
 
 	Tree.prototype = {
 
-		positionTree: function(callback) {
+		positionTree: function( callback ) {
 
 			var self = this;
 
-			if (this.imageLoader.isNotLoading()) {
-
+			if ( this.imageLoader.isNotLoading() ) {
 				var root = this.root(),
 					orient = this.CONFIG.rootOrientation;
 
 				this.resetLevelData();
 
-				this.firstWalk(root, 0);
+				this.firstWalk( root, 0 );
 				this.secondWalk( root, 0, 0, 0 );
 
 				this.positionNodes();
 
-				if (this.CONFIG.animateOnInit) {
-					setTimeout(function() { root.toggleCollapse(); }, this.CONFIG.animateOnInitDelay);
+				if ( this.CONFIG.animateOnInit ) {
+					setTimeout(
+						function() {
+							root.toggleCollapse();
+						},
+						this.CONFIG.animateOnInitDelay
+					);
 				}
 
-				if(!this.loaded) {
+				if ( !this.loaded ) {
 					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is added
-					if (Object.prototype.toString.call(callback) === "[object Function]") { callback(self); }
+					if ( Object.prototype.toString.call(callback) === "[object Function]" ) {
+						callback( self );
+					}
+					self.CONFIG.callback.onTreeLoaded.apply( self, [root] );
 					this.loaded = true;
 				}
 
-			} else {
-				setTimeout(function() { self.positionTree(callback); }, 10);
+			}
+			else {
+				setTimeout(
+					function() {
+						self.positionTree( callback );
+					}, 10
+				);
 			}
 		},
 
@@ -310,10 +373,11 @@
 				var midPoint = node.childrenCenter() - node.size() / 2;
 
 				if(leftSibling) {
-					node.prelim		= leftSibling.prelim + leftSibling.size() + this.CONFIG.siblingSeparation;
-					node.modifier	= node.prelim - midPoint;
+					node.prelim = leftSibling.prelim + leftSibling.size() + this.CONFIG.siblingSeparation;
+					node.modifier = node.prelim - midPoint;
 					this.apportion( node, level );
-				} else {
+				}
+				else {
 					node.prelim = midPoint;
 				}
 
@@ -519,7 +583,12 @@
 
 				node = this.nodeDB.get(i);
 
-				if(node.id === 0 && this.CONFIG.hideRootNode) continue;
+				self.CONFIG.callback.onBeforePositionNode.apply( self, [node, i, containerCenter, treeCenter] );
+
+				if ( node.id === 0 && this.CONFIG.hideRootNode ) {
+					self.CONFIG.callback.onAfterPositionNode.apply( self, [node, i, containerCenter, treeCenter] );
+					continue;
+				}
 
 				// if the tree is smaller than the draw area, then center the tree within drawing area
 				node.X += negOffsetX + ((treeWidth < this.drawArea.clientWidth) ? deltaX : this.CONFIG.padding);
@@ -528,18 +597,19 @@
 				var collapsedParent = node.collapsedParent(),
 					hidePoint = null;
 
-				if(collapsedParent) {
+				if (collapsedParent) {
 					// position the node behind the connector point of the parent, so future animations can be visible
 					hidePoint = collapsedParent.connectorPoint( true );
 					node.hide(hidePoint);
 
-				} else if(node.positioned) {
+				}
+				else if (node.positioned) {
 					// node is already positioned,
 					node.show();
-				} else { // inicijalno stvaranje nodeova, postavi lokaciju
+				}
+				else { // inicijalno stvaranje nodeova, postavi lokaciju
 					node.nodeDOM.style.left = node.X + 'px';
 					node.nodeDOM.style.top = node.Y + 'px';
-
 					node.positioned = true;
 				}
 
@@ -550,8 +620,9 @@
 					// drawlinethrough is performed for for the root node also
 					node.drawLineThroughMe();
 				}
-			}
 
+				self.CONFIG.callback.onAfterPositionNode.apply( self, [node, i, containerCenter, treeCenter] );
+			}
 		},
 
 		// create Raphael instance, set scrollbars if necessary
@@ -578,7 +649,6 @@
 				if(this.drawArea.clientHeight < treeHeight) { // is overflow-y necessary
 					this.drawArea.style.overflowY = "auto";
 				}
-
 			}
 			// Fancy scrollbar relies heavily on jQuery, so guarding with if ( $ )
 			else if ( this.CONFIG.scrollbar == 'fancy') {
@@ -607,10 +677,10 @@
 				}
 			} // else this.CONFIG.scrollbar == 'None'
 
+			return this;
 		},
 
 		setConnectionToParent: function(node, hidePoint) {
-
 			var stacked = node.stackParentId,
 				connLine,
 				parent = stacked ? this.nodeDB.get(stacked) : node.parent(),
@@ -618,56 +688,61 @@
 				pathString = hidePoint ? this.getPointPathString(hidePoint):
 							this.getPathString(parent, node, stacked);
 
-
 			if (this.connectionStore[node.id]) {
 				// connector allready exists, update the connector geometry
 				connLine = this.connectionStore[node.id];
 				this.animatePath(connLine, pathString);
-
-			} else {
-
+			}
+			else {
 				connLine = this._R.path( pathString );
 				this.connectionStore[node.id] = connLine;
 
 				// don't show connector arrows por pseudo nodes
-				if(node.pseudo) { delete parent.connStyle.style['arrow-end']; }
-				if(parent.pseudo) { delete parent.connStyle.style['arrow-start']; }
+				if (node.pseudo) {
+					delete parent.connStyle.style['arrow-end'];
+				}
+				if (parent.pseudo) {
+					delete parent.connStyle.style['arrow-start'];
+				}
 
 				connLine.attr(parent.connStyle.style);
 
-				if(node.drawLineThrough || node.pseudo) { node.drawLineThroughMe(hidePoint); }
+				if (node.drawLineThrough || node.pseudo) {
+					node.drawLineThroughMe(hidePoint);
+				}
 			}
+			return this;
 		},
 
-		// create the path which is represanted as a point, used for hiding the connection
+		// create the path which is represented as a point, used for hiding the connection
 		getPointPathString: function(hp) {
 			// "_" indicates the path will be hidden
 			return ["_M", hp.x, ",", hp.y, 'L', hp.x, ",", hp.y, hp.x, ",", hp.y].join(" ");
 		},
 
 		animatePath: function(path, pathString) {
-
-
 			if (path.hidden && pathString.charAt(0) !== "_") { // path will be shown, so show it
 				path.show();
 				path.hidden = false;
 			}
 
-			path.animate({
-				path: pathString.charAt(0) === "_" ? pathString.substring(1) : pathString // remove the "_" prefix if it exists
-			}, this.CONFIG.animation.connectorsSpeed,  this.CONFIG.animation.connectorsAnimation,
-			function(){
-				if(pathString.charAt(0) === "_") { // animation is hiding the path, hide it at the and of animation
-					path.hide();
-					path.hidden = true;
+			path.animate(
+				{
+					path: pathString.charAt(0) === "_" ? pathString.substring(1) : pathString // remove the "_" prefix if it exists
+				},
+				this.CONFIG.animation.connectorsSpeed,
+				this.CONFIG.animation.connectorsAnimation,
+				function() {
+					if ( pathString.charAt(0) === "_" ) { // animation is hiding the path, hide it at the and of animation
+						path.hide();
+						path.hidden = true;
+					}
 				}
-
-			});
-
+			);
+			return this;
 		},
 
 		getPathString: function(from_node, to_node, stacked) {
-
 			var startPoint = from_node.connectorPoint( true ),
 				endPoint = to_node.connectorPoint( false ),
 				orinet = this.CONFIG.rootOrientation,
@@ -719,7 +794,8 @@
 					pathString = ["M", sp, 'L', helpPoint, 'S', stackPoint, ep];
 				}
 
-			} else {  // NORAML CHILDREN
+			}
+			else {  // NORAML CHILDREN
 
 				if( connType == "step" ) {
 					pathString = ["M", sp, 'L', p1, 'L', p2, 'L', ep];
@@ -798,15 +874,20 @@
 
 				var stack = (node.stackChildren && !self.hasGrandChildren(node)) ? newNode.id : null;
 
-				// svildren are position on separate leves, one beneeth the other
-				if (stack !== null) { newNode.stackChildren = []; }
+				// children are positioned on separate levels, one beneath the other
+				if (stack !== null) {
+					newNode.stackChildren = [];
+				}
 
 				for (var i = 0, len = node.children.length; i < len ; i++) {
-
 					if (stack !== null) {
 						newNode =  self.createNode(node.children[i], newNode.id, tree, stack);
-						if((i + 1) < len) newNode.children = []; // last node cant have children
-					} else {
+						if ( ( i + 1 ) < len ) {
+							// last node cant have children
+							newNode.children = [];
+						}
+					}
+					else {
 						iterateChildren(node.children[i], newNode.id);
 					}
 				}
@@ -889,8 +970,7 @@
 	* TreeNode constructor.
 	* @constructor
 	*/
-	var TreeNode = function (nodeStructure, id, parentId, tree, stackParentId) {
-
+	var TreeNode = function( nodeStructure, id, parentId, tree, stackParentId ) {
 		this.id			= id;
 		this.parentId	= parentId;
 		this.treeId		= tree.id;
@@ -900,24 +980,25 @@
 		this.stackParentId = stackParentId;
 
 		// pseudo node is a node with width=height=0, it is invisible, but necessary for the correct positioning of the tree
-		this.pseudo = nodeStructure === 'pseudo' || nodeStructure['pseudo'];
+		this.pseudo = nodeStructure === 'pseudo' || nodeStructure['pseudo']; // todo: surely if nodeStructure is a scalar then the rest will error:
 
-		this.image = nodeStructure.image;
+		this.meta = nodeStructure.meta || {};
+		this.image = nodeStructure.image || null;
 
-		this.link = UTIL.createMerge( tree.CONFIG.node.link,  nodeStructure.link);
+		this.link = UTIL.createMerge( tree.CONFIG.node.link,  nodeStructure.link );
 
-		this.connStyle = UTIL.createMerge(tree.CONFIG.connectors, nodeStructure.connectors);
+		this.connStyle = UTIL.createMerge( tree.CONFIG.connectors, nodeStructure.connectors );
 
-		this.drawLineThrough = nodeStructure.drawLineThrough === false ? false : nodeStructure.drawLineThrough || tree.CONFIG.node.drawLineThrough;
+		this.drawLineThrough = nodeStructure.drawLineThrough === false ? false : ( nodeStructure.drawLineThrough || tree.CONFIG.node.drawLineThrough );
 
-		this.collapsable = nodeStructure.collapsable === false ? false : nodeStructure.collapsable || tree.CONFIG.node.collapsable;
+		this.collapsable = nodeStructure.collapsable === false ? false : ( nodeStructure.collapsable || tree.CONFIG.node.collapsable );
 		this.collapsed = nodeStructure.collapsed;
 
 		this.text = nodeStructure.text;
 
 		// '.node' DIV
-		this.nodeInnerHTML	= nodeStructure.innerHTML;
-		this.nodeHTMLclass	= (tree.CONFIG.node.HTMLclass ? tree.CONFIG.node.HTMLclass : '') + // globaly defined class for the nodex
+		this.nodeInnerHTML = nodeStructure.innerHTML;
+		this.nodeHTMLclass = (tree.CONFIG.node.HTMLclass ? tree.CONFIG.node.HTMLclass : '') + // globally defined class for the nodex
 								(nodeStructure.HTMLclass ? (' ' + nodeStructure.HTMLclass) : '');		// + specific node class
 
 		this.nodeHTMLid		= nodeStructure.HTMLid;
@@ -926,7 +1007,7 @@
 	TreeNode.prototype = {
 
 		Tree: function() {
-			return TreeStore.get(this.treeId);
+			return TreeStore.get( this.treeId );
 		},
 
 		dbGet: function(nodeId) {
@@ -936,25 +1017,29 @@
 		size: function() { // returns the width of the node
 			var orient = this.Tree().CONFIG.rootOrientation;
 
-			if(this.pseudo) return - this.Tree().CONFIG.subTeeSeparation; // prevents separating the subtrees
+			if ( this.pseudo ) {
+				// prevents separating the subtrees
+				return ( -this.Tree().CONFIG.subTeeSeparation );
+			}
 
-			if (orient == 'NORTH' || orient == 'SOUTH')
+			if ( orient == 'NORTH' || orient == 'SOUTH' ) {
 				return this.width;
-
-			else if (orient == 'WEST' || orient == 'EAST')
+			}
+			else if ( orient == 'WEST' || orient == 'EAST' ) {
 				return this.height;
+			}
 		},
 
 		childrenCount: function () {
-			return	(this.collapsed || !this.children) ? 0 : this.children.length;
+			return (this.collapsed || !this.children) ? 0 : this.children.length;
 		},
 
-		childAt: function(i) {
+		childAt: function( i ) {
 			return this.dbGet( this.children[i] );
 		},
 
 		firstChild: function() {
-			return this.childAt(0);
+			return this.childAt( 0 );
 		},
 
 		lastChild: function() {
@@ -966,49 +1051,62 @@
 		},
 
 		leftNeighbor: function() {
-			if( this.leftNeighborId ) return this.dbGet( this.leftNeighborId );
+			if ( this.leftNeighborId ) return this.dbGet( this.leftNeighborId );
 		},
 
 		rightNeighbor: function() {
-			if( this.rightNeighborId ) return this.dbGet( this.rightNeighborId );
+			if ( this.rightNeighborId ) return this.dbGet( this.rightNeighborId );
 		},
 
 		leftSibling: function () {
 			var leftNeighbor = this.leftNeighbor();
 
-			if( leftNeighbor && leftNeighbor.parentId == this.parentId ) return leftNeighbor;
+			if ( leftNeighbor && leftNeighbor.parentId == this.parentId ){
+				return leftNeighbor;
+			}
 		},
 
 		rightSibling: function () {
 			var rightNeighbor = this.rightNeighbor();
 
-			if( rightNeighbor && rightNeighbor.parentId == this.parentId ) return rightNeighbor;
+			if ( rightNeighbor && rightNeighbor.parentId == this.parentId ) {
+				return rightNeighbor;
+			}
 		},
 
 		childrenCenter: function ( tree ) {
 			var first = this.firstChild(),
 				last = this.lastChild();
+
 			return first.prelim + ((last.prelim - first.prelim) + last.size()) / 2;
 		},
 
 		// find out if one of the node ancestors is collapsed
 		collapsedParent: function() {
 			var parent = this.parent();
-			if (!parent) return false;
-			if (parent.collapsed) return parent;
+			if (!parent) {
+				return false;
+			}
+			if (parent.collapsed) {
+				return parent;
+			}
 			return parent.collapsedParent();
 		},
 
 		leftMost: function ( level, depth ) { // returns the leftmost child at specific level, (initial level = 0)
 
-			if( level >= depth ) return this;
-			if( this.childrenCount() === 0 ) return;
+			if ( level >= depth ){
+				return this;
+			}
+			if ( this.childrenCount() === 0 ) {
+				return;
+			}
 
-			for(var i = 0, n = this.childrenCount(); i < n; i++) {
-
+			for (var i = 0, n = this.childrenCount(); i < n; i++) {
 				var leftmostDescendant = this.childAt(i).leftMost( level + 1, depth );
-				if(leftmostDescendant)
+				if(leftmostDescendant) {
 					return leftmostDescendant;
+				}
 			}
 		},
 
@@ -1020,24 +1118,21 @@
 				if (orient == 'NORTH' || orient == 'SOUTH') { orient = 'WEST'; }
 				else if (orient == 'EAST' || orient == 'WEST') { orient = 'NORTH'; }
 			}
+
 			// if pseudo, a virtual center is used
 			if (orient == 'NORTH') {
-
 				point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;
 				point.y = (startPoint) ? this.Y + this.height : this.Y;
-
-			} else if (orient == 'SOUTH') {
-
+			}
+			else if (orient == 'SOUTH') {
 				point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;
 				point.y = (startPoint) ? this.Y : this.Y + this.height;
-
-			} else if (orient == 'EAST') {
-
+			}
+			else if (orient == 'EAST') {
 				point.x = (startPoint) ? this.X : this.X + this.width;
 				point.y = (this.pseudo) ? this.Y - this.Tree().CONFIG.subTeeSeparation/2 : this.Y + this.height/2;
-
-			} else if (orient == 'WEST') {
-
+			}
+			else if (orient == 'WEST') {
 				point.x = (startPoint) ? this.X + this.width : this.X;
 				point.y =  (this.pseudo) ? this.Y - this.Tree().CONFIG.subTeeSeparation/2 : this.Y + this.height/2;
 			}
@@ -1057,7 +1152,7 @@
 
 			this.lineThroughMe = this.lineThroughMe || this.Tree()._R.path(pathString);
 
-			var line_style = UTIL.cloneObj(this.connStyle.style);
+			var line_style = UTIL.cloneObj( this.connStyle.style );
 
 			delete line_style['arrow-start'];
 			delete line_style['arrow-end'];
@@ -1070,19 +1165,26 @@
 			}
 		},
 
-		addSwitchEvent: function(my_switch) {
+		addSwitchEvent: function( nodeSwitch ) {
 			var self = this;
-			UTIL.addEvent(my_switch, 'click', function(e){
-				e.preventDefault();
-				self.toggleCollapse();
-			});
+			UTIL.addEvent( nodeSwitch, 'click',
+				function( e ) {
+					e.preventDefault();
+					if ( self.Tree().CONFIG.callback.onBeforeClickCollapseSwitch.apply( self, [ nodeSwitch, e ] ) === false ) {
+						return false;
+					}
+
+					self.toggleCollapse();
+
+					self.Tree().CONFIG.callback.onAfterClickCollapseSwitch.apply( self, [ nodeSwitch, e ] );
+				}
+			);
 		},
 
 		toggleCollapse: function() {
 			var tree = this.Tree();
 
-			if (! tree.inAnimation) {
-
+			if ( !tree.inAnimation ) {
 				tree.inAnimation = true;
 
 				this.collapsed = !this.collapsed; // toggle the collapse at each click
@@ -1090,12 +1192,16 @@
 
 				tree.positionTree();
 
+				var self = this;
+
 				setTimeout(
 					function() { // set the flag after the animation
 						tree.inAnimation = false;
-						tree.CONFIG.callback.onCollapseFinished.apply( tree, [] );
+						tree.CONFIG.callback.onCollapseFinished.apply( tree, [ self ] );
 					},
-					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )? tree.CONFIG.animation.nodeSpeed : tree.CONFIG.animation.connectorsSpeed
+					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )?
+						tree.CONFIG.animation.nodeSpeed:
+						tree.CONFIG.animation.connectorsSpeed
 				);
 			}
 		},
@@ -1198,7 +1304,7 @@
 				this.nodeDOM.style.overflow = '';
 			}
 
-			if(this.lineThroughMe) {
+			if ( this.lineThroughMe ) {
 				tree.animatePath(this.lineThroughMe, this.pathStringThrough());
 			}
 
@@ -1217,16 +1323,30 @@
 			image,
 
 		/////////// CREATE NODE //////////////
-		node = this.link.href ? document.createElement('a') : document.createElement('div');
+		node = this.link.href ? document.createElement('a'): document.createElement('div');
 
-		node.className = (!this.pseudo) ? TreeNode.CONFIG.nodeHTMLclass : 'pseudo';
-		if(this.nodeHTMLclass && !this.pseudo) node.className += ' ' + this.nodeHTMLclass;
+		node.className = ( !this.pseudo )? TreeNode.CONFIG.nodeHTMLclass: 'pseudo';
+		if ( this.nodeHTMLclass && !this.pseudo ) {
+			node.className += ' ' + this.nodeHTMLclass;
+		}
 
-		if(this.nodeHTMLid) node.id = this.nodeHTMLid;
+		if ( this.nodeHTMLid ) {
+			node.id = this.nodeHTMLid;
+		}
 
-		if(this.link.href) {
+		if ( this.link.href ) {
 			node.href = this.link.href;
 			node.target = this.link.target;
+		}
+
+		if ( this.meta ) {
+			if ( $ ) {
+				$( node ).data( 'meta', this.meta );
+			}
+		}
+
+		if ( $ ) {
+			$( node ).data( 'treenode', this );
 		}
 
 		/////////// CREATE innerHTML //////////////
@@ -1288,8 +1408,8 @@
 			if ( this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId) ) {
 				var my_switch = document.createElement('a');
 				my_switch.className = "collapse-switch";
-				node.appendChild(my_switch);
-				this.addSwitchEvent(my_switch);
+				node.appendChild( my_switch );
+				this.addSwitchEvent( my_switch );
 				if ( this.collapsed ) {
 					node.className += " collapsed";
 				}
@@ -1364,7 +1484,12 @@
 		callback: {
 			onCreateNode: function() {},
 			onCreateNodeCollapseSwitch: function() {},
-			onCollapseFinished: function () {}
+			onAfterPositionNode: function() {},
+			onBeforePositionNode: function() {},
+			onCollapseFinished: function ( treeNode ) {}, // this = Tree
+			onAfterClickCollapseSwitch: function( nodeSwitch, event ) {}, // this = TreeNode
+			onBeforeClickCollapseSwitch: function( nodeSwitch, event ) {}, // this = TreeNode
+			onTreeLoaded: function( rootTreeNode ) {} // this = Tree
 		}
 	};
 
