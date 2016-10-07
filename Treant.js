@@ -340,6 +340,8 @@
 
 			oNewNode.parent().createSwitchGeometry( this );
 
+			this.positionTree();
+
 			this.CONFIG.callback.onAfterAddNode.apply( this, oNewNode, parentTreeNode, nodeDefinition );
 
 			return oNewNode;
