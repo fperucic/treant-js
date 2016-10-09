@@ -247,7 +247,6 @@ var my_chart = new Treant(simple_chart_config);
                             An example of the complete constructor with a test callback and jQuery.
                         </p>
                         <pre class="jsCode">
-/* javascript */
 var chart = new Treant(simple_chart_config, function() { alert( 'Tree Loaded' ) }, $ );
 </pre>
 						<p>
@@ -434,11 +433,16 @@ simple_chart_config = {
 										<p>
 											<code> chart_structure </code> is a required parameter. Its detailed definition is explained
 											further down in the API documentation. <br/>
-											<code> callback </code> is an optional parameter. Function passed as callback will be executed after chart initialization.
+											<code> callback</code> (deprecated) is an optional parameter. Function passed as callback will
+                                            be executed after chart initialization. It is now preferred to use the onTreeLoaded callback
+                                            which is now part of the chart configuration.
+                                            <code> jQuery </code> is an optional parameter. If jQuery is available simply pass <code>$</code>
+                                            for this parameter. This will provide animation support, ability to get TreeNode class instances
+                                            directly from the DOM using <code>.data( 'treenode' );</code>, and many more features.
 										</p>
 
 										<h6> Usage </h6>
-										<pre class="jsCode"> var my_chart = new Treant(chart_structure, callback); </pre>
+										<pre class="jsCode"> var my_chart = new Treant( chart_structure, callback, $ ); </pre>
 									</td>
 								</tr>
 
