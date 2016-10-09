@@ -329,6 +329,7 @@
 		/**
 		 * @param {TreeNode} parentTreeNode
 		 * @param {object} nodeDefinition
+		 * @returns {TreeNode}
 		 */
 		addNode: function( parentTreeNode, nodeDefinition ) {
 			var dbEntry = this.nodeDB.get( parentTreeNode.id );
@@ -394,6 +395,7 @@
 					}, 10
 				);
 			}
+			return this;
 		},
 
 		/**
@@ -403,6 +405,7 @@
 		 * children to the right (held in field node->modifier).
 		 * @param {TreeNode} node
 		 * @param {number} level
+		 * @returns {Tree}
 		 */
 		firstWalk: function( node, level ) {
 			node.prelim = null;
@@ -424,7 +427,7 @@
 			}
 			else {
 				//node is not a leaf,  firstWalk for each child
-				for(var i = 0, n = node.childrenCount(); i < n; i++) {
+				for ( var i = 0, n = node.childrenCount(); i < n; i++ ) {
 					this.firstWalk(node.childAt(i), level + 1);
 				}
 
@@ -440,13 +443,14 @@
 				}
 
 				// handle stacked children positioning
-				if(node.stackParent) { // handle the parent of stacked children
+				if ( node.stackParent ) { // handle the parent of stacked children
 					node.modifier += this.nodeDB.get( node.stackChildren[0] ).size()/2 + node.connStyle.stackIndent;
 				}
 				else if ( node.stackParentId ) { // handle stacked children
 					node.prelim = 0;
 				}
 			}
+			return this;
 		},
 
 		/*
@@ -471,14 +475,16 @@
 					leftAncestor		= firstChildLeftNeighbor,
 					rightAncestor		= firstChild;
 
-				for(var i = 0; i < compareDepth; i++) {
+				for ( var i = 0; i < compareDepth; i++ ) {
+					leftAncestor = leftAncestor.parent();
+					rightAncestor = rightAncestor.parent();
+					modifierSumLeft += leftAncestor.modifier;
+					modifierSumRight += rightAncestor.modifier;
 
-					leftAncestor		= leftAncestor.parent();
-					rightAncestor		= rightAncestor.parent();
-					modifierSumLeft		+= leftAncestor.modifier;
-					modifierSumRight	+= rightAncestor.modifier;
 					// all the stacked children are oriented towards right so use right variables
-					if(rightAncestor.stackParent !== undefined) modifierSumRight += rightAncestor.size()/2;
+					if ( rightAncestor.stackParent !== undefined ) {
+						modifierSumRight += rightAncestor.size() / 2;
+					}
 				}
 
 				// find the gap between two trees and apply it to subTrees
@@ -486,26 +492,25 @@
 
 				var totalGap = (firstChildLeftNeighbor.prelim + modifierSumLeft + firstChildLeftNeighbor.size() + this.CONFIG.subTeeSeparation) - (firstChild.prelim + modifierSumRight );
 
-				if(totalGap > 0) {
-
+				if ( totalGap > 0 ) {
 					var subtreeAux = node,
 						numSubtrees = 0;
 
 					// count all the subtrees in the LeftSibling
-					while(subtreeAux && subtreeAux.id != leftAncestor.id) {
+					while ( subtreeAux && subtreeAux.id != leftAncestor.id ) {
 						subtreeAux = subtreeAux.leftSibling();
 						numSubtrees++;
 					}
 
-					if(subtreeAux) {
-
+					if ( subtreeAux ) {
 						var subtreeMoveAux = node,
 							singleGap = totalGap / numSubtrees;
 
-						while(subtreeMoveAux.id != leftAncestor.id) {
-							subtreeMoveAux.prelim	+= totalGap;
-							subtreeMoveAux.modifier	+= totalGap;
-							totalGap				-= singleGap;
+						while ( subtreeMoveAux.id != leftAncestor.id ) {
+							subtreeMoveAux.prelim += totalGap;
+							subtreeMoveAux.modifier += totalGap;
+
+							totalGap -= singleGap;
 							subtreeMoveAux = subtreeMoveAux.leftSibling();
 						}
 					}
@@ -513,14 +518,11 @@
 
 				compareDepth++;
 
-				if(firstChild.childrenCount() === 0){
-					firstChild = node.leftMost(0, compareDepth);
-				}
-				else {
+				firstChild = ( firstChild.childrenCount() === 0 )?
+					node.leftMost(0, compareDepth):
 					firstChild = firstChild.firstChild();
-				}
 
-				if(firstChild) {
+				if ( firstChild ) {
 					firstChildLeftNeighbor = firstChild.leftNeighbor();
 				}
 			}
@@ -534,16 +536,14 @@
 		 * the tree.  (The roles of x and y are reversed for
 		 * RootOrientations of EAST or WEST.)
 		 */
-		secondWalk: function( node, level, X, Y) {
-
-			if(level <= this.CONFIG.maxDepth) {
+		secondWalk: function( node, level, X, Y ) {
+			if ( level <= this.CONFIG.maxDepth ) {
 				var xTmp = node.prelim + X,
 					yTmp = Y, align = this.CONFIG.nodeAlign,
 					orinet = this.CONFIG.rootOrientation,
 					levelHeight, nodesizeTmp;
 
 				if (orinet == 'NORTH' || orinet == 'SOUTH') {
-
 					levelHeight = this.levelMaxDim[level].height;
 					nodesizeTmp = node.height;
 					if (node.pseudo) {
@@ -574,21 +574,21 @@
 							yTmp;
 				}
 
-				if(orinet == 'WEST' || orinet == 'EAST') {
+				if ( orinet == 'WEST' || orinet == 'EAST' ) {
 					var swapTmp = node.X;
 					node.X = node.Y;
 					node.Y = swapTmp;
 				}
 
-				if (orinet == 'SOUTH') {
+				if (orinet == 'SOUTH' ) {
 					node.Y = -node.Y - nodesizeTmp;
 				}
-				else if (orinet == 'EAST') {
+				else if ( orinet == 'EAST' ) {
 					node.X = -node.X - nodesizeTmp;
 				}
 
-				if(node.childrenCount() !== 0) {
-					if(node.id === 0 && this.CONFIG.hideRootNode) {
+				if ( node.childrenCount() !== 0 ) {
+					if ( node.id === 0 && this.CONFIG.hideRootNode ) {
 						// ako je root node Hiden onda nemoj njegovu dijecu pomaknut po Y osi za Level separation, neka ona budu na vrhu
 						this.secondWalk(node.firstChild(), level + 1, X + node.modifier, Y);
 					}
@@ -597,8 +597,8 @@
 					}
 				}
 
-				if(node.rightSibling()) {
-					this.secondWalk(node.rightSibling(), level, X, Y);
+				if ( node.rightSibling() ) {
+					this.secondWalk( node.rightSibling(), level, X, Y );
 				}
 			}
 		},
