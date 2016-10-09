@@ -229,7 +229,7 @@
 					<div class="ym-gbox-right">
 						<p>
 							In the following article, a simple exemple is given for presentation purposes.   
-							The initialization of the Treant library is perfomed by inserting a simple HTML and JavaScript snippet on your website:
+							The initialization of the Treant library is performed by inserting a simple HTML and JavaScript snippet on your website:
 						</p>
 						<pre class="htmlCode">
 &lt;!-- HTML --&gt;
@@ -239,7 +239,17 @@
 /* javascript */
 var my_chart = new Treant(simple_chart_config);
 </pre>
-
+                        <p>
+                            The constructor of Treant can take 3 possible parameter. The first is the configuration object (required), which is later described in detail.
+                            The second is an optional callback function that is executed as soon as the tree is rendered and ready to be used.
+                            The last parameter is also optional and should be the jQuery instance ($) if available. Providing jQuery to Treant extends the functionality and internal
+                            efficiencies of the library. The documentation details where jQuery comes into play.<br />
+                            An example of the complete constructor with a test callback and jQuery.
+                        </p>
+                        <pre class="jsCode">
+/* javascript */
+var chart = new Treant(simple_chart_config, function() { alert( 'Tree Loaded' ) }, $ );
+</pre>
 						<p>
 							The only unknown part of the shown snippet is the variable called <code>simple_chart_config</code>. That variable contains all the information necessary to reneder and visualize the required chart. Luckily, two ways are used for defining this variable. It can either be defined as an Javascript
 							<code>Array</code> or as a Javascript Object known as a <code>JSON</code> structure.
