@@ -99,10 +99,10 @@
 				// todo: getElementsByTagName()
 				// todo: getElementsByTagNameNS()
 
-				if ( selector.substring( 1 ) == '#' ) {
+				if ( selector.charAt( 0 ) == '#' ) {
 					return parentEl.getElementById( selector.substring( 1 ) );
 				}
-				else if ( selector.substring( 1 ) == '.' ) {
+				else if ( selector.charAt( 0 ) == '.' ) {
 					return parentEl.getElementsByClassName( selector.substring( 1 ) );
 				}
 
