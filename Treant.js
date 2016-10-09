@@ -348,12 +348,17 @@
 			return oNewNode;
 		},
 
+		/**
+		 * @returns {Tree}
+		 */
 		redraw: function() {
-
+			this.positionTree();
+			return this;
 		},
 
 		/**
 		 * @param {function} callback
+		 * @returns {Tree}
 		 */
 		positionTree: function( callback ) {
 			var self = this;
