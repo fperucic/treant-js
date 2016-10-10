@@ -167,6 +167,22 @@
 			return ( asInt? parseFloat( strValue ): strValue );
 		},
 
+		addClass: function( element, cssClass ) {
+			if ( $ ) {
+				$( element ).addClass( cssClass );
+			}
+			else {
+				if ( !UTIL.hasClass( element, cssClass ) ) {
+					if ( element.classList ) {
+						element.className.add( cssClass );
+					}
+					else {
+						element.className += " "+cssClass;
+					}
+				}
+			}
+		},
+
 		hasClass: function(element, my_class) {
 			return (" " + element.className + " ").replace(/[\n\t]/g, " ").indexOf(" "+my_class+" ") > -1;
 		},
@@ -203,17 +219,25 @@
 	 * 	Node size (width, height) can be correctly determined only when all inner images are loaded
 	 */
 	var ImageLoader = function() {
-		this.loading = [];
+		this.reset();
 	};
 
 	ImageLoader.prototype = {
+
+		/**
+		 * @returns {ImageLoader}
+		 */
+		reset: function() {
+			this.loading = [];
+			return this;
+		},
 
 		/**
 		 * @param {TreeNode} node
 		 * @returns {ImageLoader}
 		 */
 		processNode: function( node ) {
-			var images = node.nodeDOM.getElementsByTagName('img'),
+			var images = node.nodeDOM.getElementsByTagName( 'img' ),
 				i =	images.length;
 			while ( i-- ) {
 				this.create( node, images[i] );
@@ -234,7 +258,12 @@
 			return this;
 		},
 
-		create: function (node, image) {
+		/**
+		 * @param {TreeNode} node
+		 * @param {Element} image
+		 * @returns {*}
+		 */
+		create: function ( node, image ) {
 			var self = this, source = image.src;
 
 			function imgTrigger() {
@@ -260,8 +289,12 @@
 				imgTrigger();
 			}
 		},
+
+		/**
+		 * @returns {boolean}
+		 */
 		isNotLoading: function() {
-			return this.loading.length === 0;
+			return ( this.loading.length === 0 );
 		}
 	};
 
@@ -292,19 +325,26 @@
 			return this.store[treeId];
 		},
 
+		/**
+		 * @param {number} treeId
+		 * @returns {TreeStore}
+		 */
 		destroy: function( treeId ) {
-			var tree = this.get(treeId);
-			if (tree) {
+			var tree = this.get( treeId );
+			if ( tree ) {
 				tree._R.remove();
 				var draw_area = tree.drawArea;
-				while(draw_area.firstChild) {
-					draw_area.removeChild(draw_area.firstChild);
+
+				while ( draw_area.firstChild ) {
+					draw_area.removeChild( draw_area.firstChild );
 				}
+
 				var classes = draw_area.className.split(' '),
 					classes_to_stay = [];
-				for (var i = 0; i < classes.length; i++) {
+
+				for ( var i = 0; i < classes.length; i++ ) {
 					var cls = classes[i];
-					if (cls != 'Treant' && cls != 'Treant-loaded') {
+					if ( cls != 'Treant' && cls != 'Treant-loaded' ) {
 						classes_to_stay.push(cls);
 					}
 				}
@@ -320,20 +360,54 @@
 
 	/**
 	 * Tree constructor.
+	 * @param {object} jsonConfig
+	 * @param {number} treeId
+	 * @constructor
 	 */
 	var Tree = function (jsonConfig, treeId ) {
 
-		this.id = treeId;
+		/**
+		 * @param {object} jsonConfig
+		 * @param {number} treeId
+		 * @returns {Tree}
+		 */
+		var reset = function( jsonConfig, treeId ) {
+			this.initJsonConfig = jsonConfig;
+			this.initTreeId = treeId;
 
-		this.imageLoader = new ImageLoader();
-		this.CONFIG = UTIL.extend( Tree.CONFIG, jsonConfig.chart );
-		this.drawArea = UTIL.findEl( this.CONFIG.container, true );
-		this.drawArea.className += " Treant";
-		this.nodeDB = new NodeDB( jsonConfig.nodeStructure, this );
+			this.id = treeId;
 
-		// key store for storing reference to node connectors,
-		// key = nodeId where the connector ends
-		this.connectionStore = {};
+			this.CONFIG = UTIL.extend( Tree.CONFIG, jsonConfig.chart );
+			this.drawArea = UTIL.findEl( this.CONFIG.container, true );
+			UTIL.addClass( this.drawArea, 'Treant' );
+
+			// kill of any child elements that may be there
+			this.drawArea.innerHTML = '';
+
+			this.imageLoader = new ImageLoader();
+
+			this.nodeDB = new NodeDB( jsonConfig.nodeStructure, this );
+
+			// key store for storing reference to node connectors,
+			// key = nodeId where the connector ends
+			this.connectionStore = {};
+
+			this.loaded = false;
+
+			this._R = new Raphael( this.drawArea, 100, 100 );
+
+			return this;
+		};
+
+		/**
+		 * @returns {Tree}
+		 */
+		this.reload = function() {
+			reset.apply( this, [ this.initJsonConfig, this.initTreeId ] ).redraw();
+			return this;
+		};
+
+		reset.apply( this, [ jsonConfig, treeId ] )
 	};
 
 	Tree.prototype = {
@@ -369,13 +443,6 @@
 		},
 
 		/**
-		 * @returns {Tree}
-		 */
-		reload: function() {
-			return this;
-		},
-
-		/**
 		 * @param {function} callback
 		 * @returns {Tree}
 		 */
@@ -403,8 +470,8 @@
 				}
 
 				if ( !this.loaded ) {
-					this.drawArea.className += " Treant-loaded"; // nodes are hidden until .loaded class is added
-					if ( Object.prototype.toString.call(callback) === "[object Function]" ) {
+					UTIL.addClass( this.drawArea, 'Treant-loaded' ); // nodes are hidden until .loaded class is added
+					if ( Object.prototype.toString.call( callback ) === "[object Function]" ) {
 						callback( self );
 					}
 					self.CONFIG.callback.onTreeLoaded.apply( self, [root] );
@@ -721,12 +788,7 @@
 			var viewWidth = (treeWidth < this.drawArea.clientWidth) ? this.drawArea.clientWidth : treeWidth + this.CONFIG.padding*2,
 				viewHeight = (treeHeight < this.drawArea.clientHeight) ? this.drawArea.clientHeight : treeHeight + this.CONFIG.padding*2;
 
-			if ( this._R ) {
-				this._R.setSize( viewWidth, viewHeight );
-			}
-			else {
-				this._R = Raphael( this.drawArea, viewWidth, viewHeight );
-			}
+			this._R.setSize( viewWidth, viewHeight );
 
 			if ( this.CONFIG.scrollbar == 'resize') {
 				UTIL.setDimensions( this.drawArea, viewWidth, viewHeight );
@@ -984,62 +1046,73 @@
 	 * @constructor
 	 */
 	var NodeDB = function ( nodeStructure, tree ) {
-
-		this.db	= [];
-
-		var self = this;
-
-		/**
-		 * @param {object} node
-		 * @param {number} parentId
-		 */
-		function iterateChildren( node, parentId ) {
-			var newNode = self.createNode( node, parentId, tree, null );
-
-			if ( node.children ) {
-				// pseudo node is used for descending children to the next level
-				if ( node.childrenDropLevel && node.childrenDropLevel > 0 ) {
-					while ( node.childrenDropLevel-- ) {
-						// pseudo node needs to inherit the connection style from its parent for continuous connectors
-						var connStyle = UTIL.cloneObj( newNode.connStyle );
-						newNode = self.createNode( 'pseudo', newNode.id, tree, null );
-						newNode.connStyle = connStyle;
-						newNode.children = [];
-					}
-				}
-
-				var stack = ( node.stackChildren && !self.hasGrandChildren( node ) )? newNode.id: null;
-
-				// children are positioned on separate levels, one beneath the other
-				if ( stack !== null ) {
-					newNode.stackChildren = [];
-				}
-
-				for ( var i = 0, len = node.children.length; i < len ; i++ ) {
-					if ( stack !== null ) {
-						newNode =  self.createNode( node.children[i], newNode.id, tree, stack );
-						if ( ( i + 1 ) < len ) {
-							// last node cant have children
-							newNode.children = [];
-						}
-					}
-					else {
-						iterateChildren( node.children[i], newNode.id );
-					}
-				}
-			}
-		}
-
-		if ( tree.CONFIG.animateOnInit ) {
-			nodeStructure.collapsed = true;
-		}
-
-		iterateChildren( nodeStructure, -1 ); // root node
-
-		this.createGeometries( tree );
+		this.reset( nodeStructure, tree )
 	};
 
 	NodeDB.prototype = {
+
+		/**
+		 * @param {object} nodeStructure
+		 * @param {Tree} tree
+		 * @returns {NodeDB}
+		 */
+		reset: function( nodeStructure, tree ) {
+
+			this.db	= [];
+
+			var self = this;
+
+			/**
+			 * @param {object} node
+			 * @param {number} parentId
+			 */
+			function iterateChildren( node, parentId ) {
+				var newNode = self.createNode( node, parentId, tree, null );
+
+				if ( node.children ) {
+					// pseudo node is used for descending children to the next level
+					if ( node.childrenDropLevel && node.childrenDropLevel > 0 ) {
+						while ( node.childrenDropLevel-- ) {
+							// pseudo node needs to inherit the connection style from its parent for continuous connectors
+							var connStyle = UTIL.cloneObj( newNode.connStyle );
+							newNode = self.createNode( 'pseudo', newNode.id, tree, null );
+							newNode.connStyle = connStyle;
+							newNode.children = [];
+						}
+					}
+
+					var stack = ( node.stackChildren && !self.hasGrandChildren( node ) )? newNode.id: null;
+
+					// children are positioned on separate levels, one beneath the other
+					if ( stack !== null ) {
+						newNode.stackChildren = [];
+					}
+
+					for ( var i = 0, len = node.children.length; i < len ; i++ ) {
+						if ( stack !== null ) {
+							newNode =  self.createNode( node.children[i], newNode.id, tree, stack );
+							if ( ( i + 1 ) < len ) {
+								// last node cant have children
+								newNode.children = [];
+							}
+						}
+						else {
+							iterateChildren( node.children[i], newNode.id );
+						}
+					}
+				}
+			}
+
+			if ( tree.CONFIG.animateOnInit ) {
+				nodeStructure.collapsed = true;
+			}
+
+			iterateChildren( nodeStructure, -1 ); // root node
+
+			this.createGeometries( tree );
+
+			return this;
+		},
 
 		/**
 		 * @param {Tree} tree
@@ -1119,9 +1192,9 @@
 			parent = parent || this.get(0);
 
 			MinMax = MinMax || { // start with root node dimensions
-				min: parent[dim],
-				max: parent[dim] + ( ( dim == 'X' )? parent.width: parent.height )
-			};
+					min: parent[dim],
+					max: parent[dim] + ( ( dim == 'X' )? parent.width: parent.height )
+				};
 
 			var i = parent.childrenCount();
 
@@ -1157,9 +1230,13 @@
 		}
 	};
 
-
 	/**
 	 * TreeNode constructor.
+	 * @param {object} nodeStructure
+	 * @param {number} id
+	 * @param {number} parentId
+	 * @param {Tree} tree
+	 * @param {number} stackParentId
 	 * @constructor
 	 */
 	var TreeNode = function( nodeStructure, id, parentId, tree, stackParentId ) {
@@ -1169,7 +1246,6 @@
 	TreeNode.prototype = {
 
 		/**
-		 *
 		 * @param {object} nodeStructure
 		 * @param {number} id
 		 * @param {number} parentId
@@ -1906,9 +1982,8 @@
 	 * Chart constructor.
 	 */
 	var Treant = function(jsonConfig, callback, jQuery) {
-
-		if (jsonConfig instanceof Array) {
-			jsonConfig = JSONconfig.make(jsonConfig);
+		if ( jsonConfig instanceof Array ) {
+			jsonConfig = JSONconfig.make( jsonConfig );
 		}
 
 		// optional
@@ -1926,4 +2001,5 @@
 
 	/* expose constructor globally */
 	window.Treant = Treant;
+
 })();
