@@ -206,29 +206,39 @@
 		this.loading = [];
 	};
 
-
 	ImageLoader.prototype = {
-		processNode: function(node) {
+
+		/**
+		 * @param {TreeNode} node
+		 * @returns {ImageLoader}
+		 */
+		processNode: function( node ) {
 			var images = node.nodeDOM.getElementsByTagName('img'),
 				i =	images.length;
-			while(i--) {
-				this.create(node, images[i]);
+			while ( i-- ) {
+				this.create( node, images[i] );
 			}
+			return this;
 		},
 
-		removeAll: function(img_src) {
+		/**
+		 * @returns {ImageLoader}
+		 */
+		removeAll: function( img_src ) {
 			var i = this.loading.length;
-			while (i--) {
-				if (this.loading[i] === img_src) { this.loading.splice(i,1); }
+			while ( i-- ) {
+				if ( this.loading[i] === img_src ) {
+					this.loading.splice( i, 1 );
+				}
 			}
+			return this;
 		},
 
 		create: function (node, image) {
 			var self = this, source = image.src;
 
-
 			function imgTrigger() {
-				self.removeAll(source);
+				self.removeAll( source );
 				node.width = node.nodeDOM.offsetWidth;
 				node.height = node.nodeDOM.offsetHeight;
 			}
@@ -282,8 +292,8 @@
 			return this.store[treeId];
 		},
 
-		destroy: function(tree_id){
-			var tree = this.get(tree_id);
+		destroy: function( treeId ) {
+			var tree = this.get(treeId);
 			if (tree) {
 				tree._R.remove();
 				var draw_area = tree.drawArea;
@@ -301,8 +311,10 @@
 				draw_area.style.overflowY = '';
 				draw_area.style.overflowX = '';
 				draw_area.className = classes_to_stay.join(' ');
-				this.store[tree_id] = null;
+
+				this.store[treeId] = null;
 			}
+			return this;
 		}
 	};
 
@@ -353,6 +365,13 @@
 		 */
 		redraw: function() {
 			this.positionTree();
+			return this;
+		},
+
+		/**
+		 * @returns {Tree}
+		 */
+		reload: function() {
 			return this;
 		},
 
@@ -978,7 +997,6 @@
 			var newNode = self.createNode( node, parentId, tree, null );
 
 			if ( node.children ) {
-
 				// pseudo node is used for descending children to the next level
 				if ( node.childrenDropLevel && node.childrenDropLevel > 0 ) {
 					while ( node.childrenDropLevel-- ) {
@@ -997,9 +1015,9 @@
 					newNode.stackChildren = [];
 				}
 
-				for (var i = 0, len = node.children.length; i < len ; i++) {
-					if (stack !== null) {
-						newNode =  self.createNode(node.children[i], newNode.id, tree, stack);
+				for ( var i = 0, len = node.children.length; i < len ; i++ ) {
+					if ( stack !== null ) {
+						newNode =  self.createNode( node.children[i], newNode.id, tree, stack );
 						if ( ( i + 1 ) < len ) {
 							// last node cant have children
 							newNode.children = [];
@@ -1051,7 +1069,7 @@
 		 * @param {number} stackParentId
 		 * @returns {TreeNode}
 		 */
-		createNode: function(nodeStructure, parentId, tree, stackParentId) {
+		createNode: function( nodeStructure, parentId, tree, stackParentId ) {
 			var node = new TreeNode( nodeStructure, this.db.length, parentId, tree, stackParentId );
 
 			this.db.push( node );
@@ -1098,26 +1116,28 @@
 
 		getMinMaxCoord: function( dim, parent, MinMax ) { // used for getting the dimensions of the tree, dim = 'X' || 'Y'
 			// looks for min and max (X and Y) within the set of nodes
-			var parent = parent || this.get(0),
-				i = parent.childrenCount(),
-				MinMax = MinMax || { // start with root node dimensions
-						min: parent[dim],
-						max: parent[dim] + ((dim == 'X') ? parent.width : parent.height)
-					};
+			parent = parent || this.get(0);
+
+			MinMax = MinMax || { // start with root node dimensions
+				min: parent[dim],
+				max: parent[dim] + ( ( dim == 'X' )? parent.width: parent.height )
+			};
+
+			var i = parent.childrenCount();
 
 			while ( i-- ) {
-				var node = parent.childAt(i),
-					maxTest = node[dim] + ((dim == 'X') ? node.width : node.height),
+				var node = parent.childAt( i ),
+					maxTest = node[dim] + ( ( dim == 'X' )? node.width: node.height ),
 					minTest = node[dim];
 
-				if (maxTest > MinMax.max) {
+				if ( maxTest > MinMax.max ) {
 					MinMax.max = maxTest;
 				}
-				if (minTest < MinMax.min) {
+				if ( minTest < MinMax.min ) {
 					MinMax.min = minTest;
 				}
 
-				this.getMinMaxCoord(dim, node, MinMax);
+				this.getMinMaxCoord( dim, node, MinMax );
 			}
 			return MinMax;
 		},
@@ -1143,55 +1163,81 @@
 	 * @constructor
 	 */
 	var TreeNode = function( nodeStructure, id, parentId, tree, stackParentId ) {
-		this.id			= id;
-		this.parentId	= parentId;
-		this.treeId		= tree.id;
-
-		this.prelim = 0;
-		this.modifier = 0;
-		this.leftNeighborId = null;
-
-		this.stackParentId = stackParentId;
-
-		// pseudo node is a node with width=height=0, it is invisible, but necessary for the correct positioning of the tree
-		this.pseudo = nodeStructure === 'pseudo' || nodeStructure['pseudo']; // todo: surely if nodeStructure is a scalar then the rest will error:
-
-		this.meta = nodeStructure.meta || {};
-		this.image = nodeStructure.image || null;
-
-		this.link = UTIL.createMerge( tree.CONFIG.node.link,  nodeStructure.link );
-
-		this.connStyle = UTIL.createMerge( tree.CONFIG.connectors, nodeStructure.connectors );
-		this.connector = null;
-
-		this.drawLineThrough = nodeStructure.drawLineThrough === false ? false : ( nodeStructure.drawLineThrough || tree.CONFIG.node.drawLineThrough );
-
-		this.collapsable = nodeStructure.collapsable === false ? false : ( nodeStructure.collapsable || tree.CONFIG.node.collapsable );
-		this.collapsed = nodeStructure.collapsed;
-
-		this.text = nodeStructure.text;
-
-		// '.node' DIV
-		this.nodeInnerHTML = nodeStructure.innerHTML;
-		this.nodeHTMLclass = (tree.CONFIG.node.HTMLclass ? tree.CONFIG.node.HTMLclass : '') + // globally defined class for the nodex
-			(nodeStructure.HTMLclass ? (' ' + nodeStructure.HTMLclass) : '');		// + specific node class
-
-		this.nodeHTMLid = nodeStructure.HTMLid;
-
-		this.children = [];
+		this.reset( nodeStructure, id, parentId, tree, stackParentId );
 	};
 
 	TreeNode.prototype = {
 
+		/**
+		 *
+		 * @param {object} nodeStructure
+		 * @param {number} id
+		 * @param {number} parentId
+		 * @param {Tree} tree
+		 * @param {number} stackParentId
+		 * @returns {TreeNode}
+		 */
+		reset: function( nodeStructure, id, parentId, tree, stackParentId ) {
+			this.id = id;
+			this.parentId = parentId;
+			this.treeId = tree.id;
+
+			this.prelim = 0;
+			this.modifier = 0;
+			this.leftNeighborId = null;
+
+			this.stackParentId = stackParentId;
+
+			// pseudo node is a node with width=height=0, it is invisible, but necessary for the correct positioning of the tree
+			this.pseudo = nodeStructure === 'pseudo' || nodeStructure['pseudo']; // todo: surely if nodeStructure is a scalar then the rest will error:
+
+			this.meta = nodeStructure.meta || {};
+			this.image = nodeStructure.image || null;
+
+			this.link = UTIL.createMerge( tree.CONFIG.node.link,  nodeStructure.link );
+
+			this.connStyle = UTIL.createMerge( tree.CONFIG.connectors, nodeStructure.connectors );
+			this.connector = null;
+
+			this.drawLineThrough = nodeStructure.drawLineThrough === false ? false : ( nodeStructure.drawLineThrough || tree.CONFIG.node.drawLineThrough );
+
+			this.collapsable = nodeStructure.collapsable === false ? false : ( nodeStructure.collapsable || tree.CONFIG.node.collapsable );
+			this.collapsed = nodeStructure.collapsed;
+
+			this.text = nodeStructure.text;
+
+			// '.node' DIV
+			this.nodeInnerHTML = nodeStructure.innerHTML;
+			this.nodeHTMLclass = (tree.CONFIG.node.HTMLclass ? tree.CONFIG.node.HTMLclass : '') + // globally defined class for the nodex
+				(nodeStructure.HTMLclass ? (' ' + nodeStructure.HTMLclass) : '');		// + specific node class
+
+			this.nodeHTMLid = nodeStructure.HTMLid;
+
+			this.children = [];
+
+			return this;
+		},
+
+		/**
+		 * @returns {Tree}
+		 */
 		Tree: function() {
 			return TreeStore.get( this.treeId );
 		},
 
-		dbGet: function(nodeId) {
-			return this.Tree().nodeDB.get(nodeId);
+		/**
+		 * @param {number} nodeId
+		 * @returns {TreeNode}
+		 */
+		dbGet: function( nodeId ) {
+			return this.Tree().nodeDB.get( nodeId );
 		},
 
-		size: function() { // returns the width of the node
+		/**
+		 * Returns the width of the node
+		 * @returns {float}
+		 */
+		size: function() {
 			var orient = this.Tree().CONFIG.rootOrientation;
 
 			if ( this.pseudo ) {
@@ -1207,34 +1253,63 @@
 			}
 		},
 
+		/**
+		 * @returns {number}
+		 */
 		childrenCount: function () {
-			return (this.collapsed || !this.children) ? 0 : this.children.length;
+			return ( this.collapsed || !this.children)? 0: this.children.length;
 		},
 
-		childAt: function( i ) {
-			return this.dbGet( this.children[i] );
+		/**
+		 * @param {number} index
+		 * @returns {TreeNode}
+		 */
+		childAt: function( index ) {
+			return this.dbGet( this.children[index] );
 		},
 
+		/**
+		 * @returns {TreeNode}
+		 */
 		firstChild: function() {
 			return this.childAt( 0 );
 		},
 
+		/**
+		 * @returns {TreeNode}
+		 */
 		lastChild: function() {
 			return this.childAt( this.children.length - 1 );
 		},
 
+		/**
+		 * @returns {TreeNode}
+		 */
 		parent: function() {
 			return this.dbGet( this.parentId );
 		},
 
+		/**
+		 * @returns {TreeNode}
+		 */
 		leftNeighbor: function() {
-			if ( this.leftNeighborId ) return this.dbGet( this.leftNeighborId );
+			if ( this.leftNeighborId ) {
+				return this.dbGet( this.leftNeighborId );
+			}
 		},
 
+		/**
+		 * @returns {TreeNode}
+		 */
 		rightNeighbor: function() {
-			if ( this.rightNeighborId ) return this.dbGet( this.rightNeighborId );
+			if ( this.rightNeighborId ) {
+				return this.dbGet( this.rightNeighborId );
+			}
 		},
 
+		/**
+		 * @returns {TreeNode}
+		 */
 		leftSibling: function () {
 			var leftNeighbor = this.leftNeighbor();
 
@@ -1243,6 +1318,9 @@
 			}
 		},
 
+		/**
+		 * @returns {TreeNode}
+		 */
 		rightSibling: function () {
 			var rightNeighbor = this.rightNeighbor();
 
@@ -1251,37 +1329,48 @@
 			}
 		},
 
-		childrenCenter: function ( tree ) {
+		/**
+		 * @returns {number}
+		 */
+		childrenCenter: function () {
 			var first = this.firstChild(),
 				last = this.lastChild();
 
-			return first.prelim + ((last.prelim - first.prelim) + last.size()) / 2;
+			return ( first.prelim + ((last.prelim - first.prelim) + last.size()) / 2 );
 		},
 
-		// find out if one of the node ancestors is collapsed
+		/**
+		 * Find out if one of the node ancestors is collapsed
+		 * @returns {*}
+		 */
 		collapsedParent: function() {
 			var parent = this.parent();
 			if (!parent) {
 				return false;
 			}
-			if (parent.collapsed) {
+			if ( parent.collapsed ) {
 				return parent;
 			}
 			return parent.collapsedParent();
 		},
 
-		leftMost: function ( level, depth ) { // returns the leftmost child at specific level, (initial level = 0)
-
-			if ( level >= depth ){
+		/**
+		 * Returns the leftmost child at specific level, (initial level = 0)
+		 * @param level
+		 * @param depth
+		 * @returns {*}
+		 */
+		leftMost: function ( level, depth ) {
+			if ( level >= depth ) {
 				return this;
 			}
 			if ( this.childrenCount() === 0 ) {
 				return;
 			}
 
-			for (var i = 0, n = this.childrenCount(); i < n; i++) {
-				var leftmostDescendant = this.childAt(i).leftMost( level + 1, depth );
-				if(leftmostDescendant) {
+			for ( var i = 0, n = this.childrenCount(); i < n; i++ ) {
+				var leftmostDescendant = this.childAt( i ).leftMost( level + 1, depth );
+				if ( leftmostDescendant ) {
 					return leftmostDescendant;
 				}
 			}
@@ -1291,13 +1380,17 @@
 		connectorPoint: function(startPoint) {
 			var orient = this.Tree().CONFIG.rootOrientation, point = {};
 
-			if(this.stackParentId) { // return different end point if node is a stacked child
-				if (orient == 'NORTH' || orient == 'SOUTH') { orient = 'WEST'; }
-				else if (orient == 'EAST' || orient == 'WEST') { orient = 'NORTH'; }
+			if ( this.stackParentId ) { // return different end point if node is a stacked child
+				if ( orient == 'NORTH' || orient == 'SOUTH' ) {
+					orient = 'WEST';
+				}
+				else if ( orient == 'EAST' || orient == 'WEST' ) {
+					orient = 'NORTH';
+				}
 			}
 
 			// if pseudo, a virtual center is used
-			if (orient == 'NORTH') {
+			if ( orient == 'NORTH' ) {
 				point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;
 				point.y = (startPoint) ? this.Y + this.height : this.Y;
 			}
