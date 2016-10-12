@@ -413,6 +413,13 @@
 	Tree.prototype = {
 
 		/**
+		 * @returns {NodeDB}
+		 */
+		getNodeDb: function() {
+			return this.nodeDB;
+		},
+
+		/**
 		 * @param {TreeNode} parentTreeNode
 		 * @param {object} nodeDefinition
 		 * @returns {TreeNode}
@@ -420,7 +427,7 @@
 		addNode: function( parentTreeNode, nodeDefinition ) {
 			var dbEntry = this.nodeDB.get( parentTreeNode.id );
 
-			this.CONFIG.callback.onBeforeAddNode.apply( this, parentTreeNode, nodeDefinition );
+			this.CONFIG.callback.onBeforeAddNode.apply( this, [parentTreeNode, nodeDefinition] );
 
 			var oNewNode = this.nodeDB.createNode( nodeDefinition, parentTreeNode.id, this );
 			oNewNode.createGeometry( this );
@@ -429,7 +436,7 @@
 
 			this.positionTree();
 
-			this.CONFIG.callback.onAfterAddNode.apply( this, oNewNode, parentTreeNode, nodeDefinition );
+			this.CONFIG.callback.onAfterAddNode.apply( this, [oNewNode, parentTreeNode, nodeDefinition] );
 
 			return oNewNode;
 		},
