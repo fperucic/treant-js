@@ -1126,7 +1126,8 @@
 		 * @returns {NodeDB}
 		 */
 		createGeometries: function( tree ) {
-			var i = this.db.length, node;
+			var i = this.db.length;
+
 			while ( i-- ) {
 				this.get( i ).createGeometry( tree );
 			}
@@ -1139,6 +1140,19 @@
 		 */
 		get: function ( nodeId ) {
 			return this.db[nodeId]; // get TreeNode by ID
+		},
+
+		/**
+		 * @param {function} callback
+		 * @returns {NodeDB}
+		 */
+		walk: function( callback ) {
+			var i = this.db.length;
+
+			while ( i-- ) {
+				callback.apply( this, [ this.get( i ) ] );
+			}
+			return this;
 		},
 
 		/**
@@ -1157,6 +1171,8 @@
 			// skip root node (0)
 			if ( parentId >= 0 ) {
 				var parent = this.get( parentId );
+
+				// todo: refactor into separate private method
 				if ( nodeStructure.position ) {
 					if ( nodeStructure.position == 'left' ) {
 						parent.children.push( node.id );
