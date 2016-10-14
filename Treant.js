@@ -98,12 +98,12 @@
 				// todo: getElementsByName()
 				// todo: getElementsByTagName()
 				// todo: getElementsByTagNameNS()
-
 				if ( selector.charAt( 0 ) == '#' ) {
 					return parentEl.getElementById( selector.substring( 1 ) );
 				}
 				else if ( selector.charAt( 0 ) == '.' ) {
-					return parentEl.getElementsByClassName( selector.substring( 1 ) );
+					var oElements = parentEl.getElementsByClassName( selector.substring( 1 ) );
+					return ( oElements.length? oElements[0]: null );
 				}
 
 				throw new Error( 'Unknown container element' );
@@ -174,7 +174,7 @@
 			else {
 				if ( !UTIL.hasClass( element, cssClass ) ) {
 					if ( element.classList ) {
-						element.className.add( cssClass );
+						element.classList.add( cssClass );
 					}
 					else {
 						element.className += " "+cssClass;
@@ -371,7 +371,7 @@
 		 * @param {number} treeId
 		 * @returns {Tree}
 		 */
-		var reset = function( jsonConfig, treeId ) {
+		this.reset = function( jsonConfig, treeId ) {
 			this.initJsonConfig = jsonConfig;
 			this.initTreeId = treeId;
 
@@ -379,6 +379,10 @@
 
 			this.CONFIG = UTIL.extend( Tree.CONFIG, jsonConfig.chart );
 			this.drawArea = UTIL.findEl( this.CONFIG.container, true );
+			if ( !this.drawArea ) {
+				throw new Error( 'Failed to find element by selector "'+selector+'"' );
+			}
+
 			UTIL.addClass( this.drawArea, 'Treant' );
 
 			// kill of any child elements that may be there
@@ -403,11 +407,11 @@
 		 * @returns {Tree}
 		 */
 		this.reload = function() {
-			reset.apply( this, [ this.initJsonConfig, this.initTreeId ] ).redraw();
+			this.reset( this.initJsonConfig, this.initTreeId ).redraw();
 			return this;
 		};
 
-		reset.apply( this, [ jsonConfig, treeId ] )
+		this.reset( jsonConfig, treeId );
 	};
 
 	Tree.prototype = {
@@ -1643,8 +1647,8 @@
 
 			this.nodeDOM.style.overflow = 'hidden';
 
-			var tree = this.Tree(),
-				config = tree.CONFIG,
+			var tree = this.getTree(),
+				config = this.getTreeConfig(),
 				oNewState = {
 					opacity: 0
 				};
@@ -1676,8 +1680,10 @@
 						}
 					);
 				}
-				// animation not possible without jQuery
 				else {
+					this.nodeDOM.style.transition = 'all '+config.animation.nodeSpeed+'ms ease';
+					this.nodeDOM.style.transitionProperty = 'opacity, left, top';
+					this.nodeDOM.style.opacity = oNewState.opacity;
 					this.nodeDOM.style.left = oNewState.left + 'px';
 					this.nodeDOM.style.top = oNewState.top + 'px';
 					this.nodeDOM.style.visibility = 'hidden';
@@ -1729,10 +1735,9 @@
 					top: this.Y,
 					opacity: 1
 				},
-				tree = this.Tree(),
-				config = tree.CONFIG;
+				config = this.getTreeConfig();
 
-			// if the node was hidden, update width and height
+			// if the node was hidden, update opacity and position
 			if ( $ ) {
 				$( this.nodeDOM ).animate(
 					oNewState,
@@ -1744,13 +1749,16 @@
 				);
 			}
 			else {
+				this.nodeDOM.style.transition = 'all '+config.animation.nodeSpeed+'ms ease';
+				this.nodeDOM.style.transitionProperty = 'opacity, left, top';
 				this.nodeDOM.style.left = oNewState.left + 'px';
 				this.nodeDOM.style.top = oNewState.top + 'px';
+				this.nodeDOM.style.opacity = oNewState.opacity;
 				this.nodeDOM.style.overflow = '';
 			}
 
 			if ( this.lineThroughMe ) {
-				tree.animatePath( this.lineThroughMe, this.pathStringThrough() );
+				this.getTree().animatePath( this.lineThroughMe, this.pathStringThrough() );
 			}
 
 			return this;
@@ -1787,7 +1795,7 @@
 			image,
 
 			/////////// CREATE NODE //////////////
-			node = document.createElement( this.link.href? 'a': 'div' )
+			node = document.createElement( this.link.href? 'a': 'div' );
 
 		node.className = ( !this.pseudo )? TreeNode.CONFIG.nodeHTMLclass: 'pseudo';
 		if ( this.nodeHTMLclass && !this.pseudo ) {
@@ -1805,6 +1813,11 @@
 
 		if ( $ ) {
 			$( node ).data( 'treenode', this );
+		}
+		else {
+			node.data = {
+				'treenode': this
+			};
 		}
 
 		/////////// CREATE innerHTML //////////////
