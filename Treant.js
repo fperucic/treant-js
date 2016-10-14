@@ -845,7 +845,7 @@
 		setConnectionToParent: function( treeNode, hidePoint ) {
 			var stacked = treeNode.stackParentId,
 				connLine,
-				parent = stacked? this.nodeDB.get( stacked ): treeNode.parent(),
+				parent = ( stacked? this.nodeDB.get( stacked ): treeNode.parent() ),
 
 				pathString = hidePoint?
 					this.getPointPathString(hidePoint):
@@ -1320,6 +1320,35 @@
 		/**
 		 * @returns {Tree}
 		 */
+		getTree: function() {
+			return TreeStore.get( this.treeId );
+		},
+
+		/**
+		 * @returns {object}
+		 */
+		getTreeConfig: function() {
+			return this.getTree().CONFIG;
+		},
+
+		/**
+		 * @returns {NodeDB}
+		 */
+		getTreeNodeDb: function() {
+			return this.getTree().getNodeDb();
+		},
+
+		/**
+		 * @param {number} nodeId
+		 * @returns {TreeNode}
+		 */
+		lookupNode: function( nodeId ) {
+			return this.getTreeNodeDb().get( nodeId );
+		},
+
+		/**
+		 * @returns {Tree}
+		 */
 		Tree: function() {
 			return TreeStore.get( this.treeId );
 		},
@@ -1329,7 +1358,7 @@
 		 * @returns {TreeNode}
 		 */
 		dbGet: function( nodeId ) {
-			return this.Tree().nodeDB.get( nodeId );
+			return this.getTreeNodeDb().get( nodeId );
 		},
 
 		/**
@@ -1337,17 +1366,17 @@
 		 * @returns {float}
 		 */
 		size: function() {
-			var orient = this.Tree().CONFIG.rootOrientation;
+			var orientation = this.getTreeConfig().rootOrientation;
 
 			if ( this.pseudo ) {
 				// prevents separating the subtrees
-				return ( -this.Tree().CONFIG.subTeeSeparation );
+				return ( -this.getTreeConfig().subTeeSeparation );
 			}
 
-			if ( orient == 'NORTH' || orient == 'SOUTH' ) {
+			if ( orientation == 'NORTH' || orientation == 'SOUTH' ) {
 				return this.width;
 			}
-			else if ( orient == 'WEST' || orient == 'EAST' ) {
+			else if ( orientation == 'WEST' || orientation == 'EAST' ) {
 				return this.height;
 			}
 		},
@@ -1356,7 +1385,7 @@
 		 * @returns {number}
 		 */
 		childrenCount: function () {
-			return ( this.collapsed || !this.children)? 0: this.children.length;
+			return ( ( this.collapsed || !this.children)? 0: this.children.length );
 		},
 
 		/**
@@ -1385,7 +1414,7 @@
 		 * @returns {TreeNode}
 		 */
 		parent: function() {
-			return this.dbGet( this.parentId );
+			return this.lookupNode( this.parentId );
 		},
 
 		/**
@@ -1393,7 +1422,7 @@
 		 */
 		leftNeighbor: function() {
 			if ( this.leftNeighborId ) {
-				return this.dbGet( this.leftNeighborId );
+				return this.lookupNode( this.leftNeighborId );
 			}
 		},
 
@@ -1402,7 +1431,7 @@
 		 */
 		rightNeighbor: function() {
 			if ( this.rightNeighborId ) {
-				return this.dbGet( this.rightNeighborId );
+				return this.lookupNode( this.rightNeighborId );
 			}
 		},
 
@@ -1444,7 +1473,7 @@
 		 */
 		collapsedParent: function() {
 			var parent = this.parent();
-			if (!parent) {
+			if ( !parent ) {
 				return false;
 			}
 			if ( parent.collapsed ) {
@@ -1508,9 +1537,12 @@
 			return point;
 		},
 
+		/**
+		 * @returns {string}
+		 */
 		pathStringThrough: function() { // get the geometry of a path going through the node
-			var startPoint = this.connectorPoint(true),
-				endPoint = this.connectorPoint(false);
+			var startPoint = this.connectorPoint( true ),
+				endPoint = this.connectorPoint( false );
 
 			return ["M", startPoint.x+","+startPoint.y, 'L', endPoint.x+","+endPoint.y].join(" ");
 		},
@@ -1518,9 +1550,10 @@
 		/**
 		 * @param {object} hidePoint
 		 */
-		drawLineThroughMe: function(hidePoint) { // hidepoint se proslijedjuje ako je node sakriven zbog collapsed
-
-			var pathString = hidePoint ? this.Tree().getPointPathString(hidePoint) : this.pathStringThrough();
+		drawLineThroughMe: function( hidePoint ) { // hidepoint se proslijedjuje ako je node sakriven zbog collapsed
+			var pathString = hidePoint?
+				this.Tree().getPointPathString( hidePoint ):
+				this.pathStringThrough();
 
 			this.lineThroughMe = this.lineThroughMe || this.Tree()._R.path(pathString);
 
@@ -1542,13 +1575,13 @@
 			UTIL.addEvent( nodeSwitch, 'click',
 				function( e ) {
 					e.preventDefault();
-					if ( self.Tree().CONFIG.callback.onBeforeClickCollapseSwitch.apply( self, [ nodeSwitch, e ] ) === false ) {
+					if ( self.getTreeConfig().callback.onBeforeClickCollapseSwitch.apply( self, [ nodeSwitch, e ] ) === false ) {
 						return false;
 					}
 
 					self.toggleCollapse();
 
-					self.Tree().CONFIG.callback.onAfterClickCollapseSwitch.apply( self, [ nodeSwitch, e ] );
+					self.getTreeConfig().callback.onAfterClickCollapseSwitch.apply( self, [ nodeSwitch, e ] );
 				}
 			);
 		},
@@ -1577,66 +1610,67 @@
 		 * @returns {TreeNode}
 		 */
 		toggleCollapse: function() {
-			var tree = this.Tree();
+			var oTree = this.getTree();
 
-			if ( !tree.inAnimation ) {
-				tree.inAnimation = true;
+			if ( !oTree.inAnimation ) {
+				oTree.inAnimation = true;
 
 				this.collapsed = !this.collapsed; // toggle the collapse at each click
 				UTIL.toggleClass( this.nodeDOM, 'collapsed', this.collapsed );
 
-				tree.positionTree();
+				oTree.positionTree();
 
 				var self = this;
 
 				setTimeout(
 					function() { // set the flag after the animation
-						tree.inAnimation = false;
-						tree.CONFIG.callback.onToggleCollapseFinished.apply( tree, [ self, self.collapsed ] );
+						oTree.inAnimation = false;
+						oTree.CONFIG.callback.onToggleCollapseFinished.apply( oTree, [ self, self.collapsed ] );
 					},
-					( tree.CONFIG.animation.nodeSpeed > tree.CONFIG.animation.connectorsSpeed )?
-						tree.CONFIG.animation.nodeSpeed:
-						tree.CONFIG.animation.connectorsSpeed
+					( oTree.CONFIG.animation.nodeSpeed > oTree.CONFIG.animation.connectorsSpeed )?
+						oTree.CONFIG.animation.nodeSpeed:
+						oTree.CONFIG.animation.connectorsSpeed
 				);
 			}
 			return this;
 		},
 
-		hide: function(collapse_to_point) {
-			this.nodeDOM.style.overflow = "hidden";
+		hide: function( collapse_to_point ) {
+			collapse_to_point = collapse_to_point || false;
+
+			var bCurrentState = this.hidden;
+			this.hidden = true;
+
+			this.nodeDOM.style.overflow = 'hidden';
 
 			var tree = this.Tree(),
 				config = tree.CONFIG,
-				new_pos = {
-					left: collapse_to_point.x,
-					top: collapse_to_point.y
+				oNewState = {
+					opacity: 0
 				};
 
-			if ( !this.hidden ) {
-				new_pos.width = new_pos.height = 0;
-			}
-
-			if ( !this.startW || !this.startH ) {
-				this.startW = UTIL.getOuterWidth( this.nodeDOM );
-				this.startH = UTIL.getOuterHeight( this.nodeDOM );
+			if ( collapse_to_point ) {
+				oNewState.left = collapse_to_point.x;
+				oNewState.top = collapse_to_point.y;
 			}
 
 			// if parent was hidden in initial configuration, position the node behind the parent without animations
-			if ( !this.positioned || this.hidden ) {
+			if ( !this.positioned || bCurrentState ) {
 				this.nodeDOM.style.visibility = 'hidden';
 				if ( $ ) {
-					$( this.nodeDOM ).css( new_pos );
+					$( this.nodeDOM ).css( oNewState );
 				}
 				else {
-					this.nodeDOM.style.left = new_pos.left + 'px';
-					this.nodeDOM.style.top = new_pos.top + 'px';
+					this.nodeDOM.style.left = oNewState.left + 'px';
+					this.nodeDOM.style.top = oNewState.top + 'px';
 				}
 				this.positioned = true;
 			}
 			else {
+				// todo: fix flashy bug when a node is manually hidden and tree.redraw is called.
 				if ( $ ) {
 					$( this.nodeDOM ).animate(
-						new_pos, config.animation.nodeSpeed, config.animation.nodeAnimation,
+						oNewState, config.animation.nodeSpeed, config.animation.nodeAnimation,
 						function () {
 							this.style.visibility = 'hidden';
 						}
@@ -1644,45 +1678,64 @@
 				}
 				// animation not possible without jQuery
 				else {
-					this.nodeDOM.style.left = new_pos.left + 'px';
-					this.nodeDOM.style.top = new_pos.top + 'px';
+					this.nodeDOM.style.left = oNewState.left + 'px';
+					this.nodeDOM.style.top = oNewState.top + 'px';
 					this.nodeDOM.style.visibility = 'hidden';
 				}
 			}
 
 			// animate the line through node if the line exists
 			if ( this.lineThroughMe ) {
-				var new_path = tree.getPointPathString(collapse_to_point);
-				if (this.hidden) {
+				var new_path = tree.getPointPathString( collapse_to_point );
+				if ( bCurrentState ) {
 					// update without animations
-					this.lineThroughMe.attr({path: new_path});
-				} else {
+					this.lineThroughMe.attr( { path: new_path } );
+				}
+				else {
 					// update with animations
-					tree.animatePath(this.lineThroughMe, tree.getPointPathString(collapse_to_point));
+					tree.animatePath( this.lineThroughMe, tree.getPointPathString( collapse_to_point ) );
 				}
 			}
 
-			this.hidden = true;
+			return this;
+		},
+
+		/**
+		 * @returns {TreeNode}
+		 */
+		hideConnector: function() {
+			var oTree = this.Tree();
+			var oPath = oTree.connectionStore[this.id];
+			if ( oPath ) {
+				oPath.animate(
+					{ 'opacity': 0 },
+					oTree.CONFIG.animation.connectorsSpeed,
+					oTree.CONFIG.animation.connectorsAnimation
+				);
+			}
+			return this;
 		},
 
 		show: function() {
+			var bCurrentState = this.hidden;
+			this.hidden = false;
+
 			this.nodeDOM.style.visibility = 'visible';
 
-			var new_pos = {
+			var oTree = this.Tree();
+
+			var oNewState = {
 					left: this.X,
-					top: this.Y
+					top: this.Y,
+					opacity: 1
 				},
-				tree = this.Tree(),  config = tree.CONFIG;
+				tree = this.Tree(),
+				config = tree.CONFIG;
 
 			// if the node was hidden, update width and height
-			if(this.hidden) {
-				new_pos.width = this.startW;
-				new_pos.height = this.startH;
-			}
-
 			if ( $ ) {
 				$( this.nodeDOM ).animate(
-					new_pos,
+					oNewState,
 					config.animation.nodeSpeed, config.animation.nodeAnimation,
 					function () {
 						// $.animate applies "overflow:hidden" to the node, remove it to avoid visual problems
@@ -1691,27 +1744,39 @@
 				);
 			}
 			else {
-				if ( this.hidden ) {
-					this.nodeDOM.style.height = new_pos.height + 'px';
-					this.nodeDOM.style.width = new_pos.width + 'px';
-				}
-				this.nodeDOM.style.left = new_pos.left + 'px';
-				this.nodeDOM.style.top = new_pos.top + 'px';
+				this.nodeDOM.style.left = oNewState.left + 'px';
+				this.nodeDOM.style.top = oNewState.top + 'px';
 				this.nodeDOM.style.overflow = '';
 			}
 
 			if ( this.lineThroughMe ) {
-				tree.animatePath(this.lineThroughMe, this.pathStringThrough());
+				tree.animatePath( this.lineThroughMe, this.pathStringThrough() );
 			}
 
-			this.hidden = false;
+			return this;
+		},
+
+		/**
+		 * @returns {TreeNode}
+		 */
+		showConnector: function() {
+			var oTree = this.Tree();
+			var oPath = oTree.connectionStore[this.id];
+			if ( oPath ) {
+				oPath.animate(
+					{ 'opacity': 1 },
+					oTree.CONFIG.animation.connectorsSpeed,
+					oTree.CONFIG.animation.connectorsAnimation
+				);
+			}
+			return this;
 		}
 	};
 
 	/**
 	 * @param {Tree} tree
 	 */
-	TreeNode.prototype.createGeometry = function(tree) {
+	TreeNode.prototype.createGeometry = function( tree ) {
 		if ( this.id === 0 && tree.CONFIG.hideRootNode ) {
 			this.width = 0;
 			this.height = 0;
