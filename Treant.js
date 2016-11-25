@@ -12,37 +12,58 @@
  * References:
  * Emilio Cortegoso Lobato: ECOTree.js v1.0 (October 26th, 2006)
  *
+ * Contributors:
+ * Fran Peručić, https://github.com/fperucic
+ * Dave Goodchild, https://github.com/dlgoodchild
  */
 
-;(function(){
+;( function() {
 
 	var $ = null;
 
 	var UTIL = {
-		inheritAttrs: function(me, from) {
-			for (var attr in from) {
-				if ( from.hasOwnProperty( attr ) ) {
-					if ( ( me[attr] instanceof Object && from[attr] instanceof Object ) && (typeof from[attr] !== 'function') ) {
-						this.inheritAttrs( me[attr], from[attr] );
+
+		/**
+		 * Directly updates, recursively/deeply, the first object with all properties in the second object
+		 * @param {object} applyTo
+		 * @param {object} applyFrom
+		 * @return {object}
+		 */
+		inheritAttrs: function( applyTo, applyFrom ) {
+			for ( var attr in applyFrom ) {
+				if ( applyFrom.hasOwnProperty( attr ) ) {
+					if ( ( applyTo[attr] instanceof Object && applyFrom[attr] instanceof Object ) && ( typeof applyFrom[attr] !== 'function' ) ) {
+						this.inheritAttrs( applyTo[attr], applyFrom[attr] );
 					}
 					else {
-						me[attr] = from[attr];
+						applyTo[attr] = applyFrom[attr];
 					}
 				}
 			}
+			return applyTo;
 		},
 
-		createMerge: function(obj1, obj2) {
+		/**
+		 * Returns a new object by merging the two supplied objects
+		 * @param {object} obj1
+		 * @param {object} obj2
+		 * @returns {object}
+		 */
+		createMerge: function( obj1, obj2 ) {
 			var newObj = {};
-			if(obj1) {
-				this.inheritAttrs(newObj, this.cloneObj(obj1));
+			if ( obj1 ) {
+				this.inheritAttrs( newObj, this.cloneObj( obj1 ) );
 			}
-			if(obj2) {
-				this.inheritAttrs(newObj, obj2);
+			if ( obj2 ) {
+				this.inheritAttrs( newObj, obj2 );
 			}
 			return newObj;
 		},
 
+		/**
+		 * Takes any number of arguments
+		 * @returns {*}
+		 */
 		extend: function() {
 			if ( $ ) {
 				Array.prototype.unshift.apply( arguments, [true, {}] );
@@ -53,12 +74,16 @@
 			}
 		},
 
-		cloneObj: function (obj) {
-			if ( Object(obj) !== obj ) {
+		/**
+		 * @param {object} obj
+		 * @returns {*}
+		 */
+		cloneObj: function ( obj ) {
+			if ( Object( obj ) !== obj ) {
 				return obj;
 			}
 			var res = new obj.constructor();
-			for (var key in obj) {
+			for ( var key in obj ) {
 				if ( obj.hasOwnProperty(key) ) {
 					res[key] = this.cloneObj(obj[key]);
 				}
@@ -66,15 +91,20 @@
 			return res;
 		},
 
-		addEvent: function(el, eventType, handler) {
+		/**
+		 * @param {Element} el
+		 * @param {string} eventType
+		 * @param {function} handler
+		 */
+		addEvent: function( el, eventType, handler ) {
 			if ( $ ) {
 				$( el ).on( eventType+'.treant', handler );
 			}
-			else if (el.addEventListener) { // DOM Level 2 browsers
-				el.addEventListener(eventType, handler, false);
+			else if ( el.addEventListener ) { // DOM Level 2 browsers
+				el.addEventListener( eventType, handler, false );
 			}
-			else if (el.attachEvent) { // IE <= 8
-				el.attachEvent('on' + eventType, handler);
+			else if ( el.attachEvent ) { // IE <= 8
+				el.attachEvent( 'on' + eventType, handler );
 			}
 			else { // ancient browsers
 				el['on' + eventType] = handler;
