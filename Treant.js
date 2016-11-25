@@ -244,9 +244,8 @@
 	};
 
 	/**
-	 * ImageLoader constructor.
 	 * ImageLoader is used for determining if all the images from the Tree are loaded.
-	 * 	Node size (width, height) can be correctly determined only when all inner images are loaded
+	 * Node size (width, height) can be correctly determined only when all inner images are loaded
 	 */
 	var ImageLoader = function() {
 		this.reset();
@@ -267,10 +266,11 @@
 		 * @returns {ImageLoader}
 		 */
 		processNode: function( node ) {
-			var images = node.nodeDOM.getElementsByTagName( 'img' ),
-				i =	images.length;
+			var aImages = node.nodeDOM.getElementsByTagName( 'img' );
+
+			var i =	aImages.length;
 			while ( i-- ) {
-				this.create( node, images[i] );
+				this.create( node, aImages[i] );
 			}
 			return this;
 		},
@@ -313,7 +313,7 @@
 				UTIL.addEvent( image, 'error', imgTrigger ); // handle broken url-s
 
 				// load event is not fired for cached images, force the load event
-				image.src += "?" + new Date().getTime();
+				image.src += ( ( image.src.indexOf( '?' ) > 0)? '&': '?' ) + new Date().getTime();
 			}
 			else {
 				imgTrigger();
@@ -2101,18 +2101,20 @@
 			}
 		},
 
-		getID: (function() {
-			var i = 0;
-			return function() {
-				return i++;
-			};
-		})()
+		getID: (
+			function() {
+				var i = 0;
+				return function() {
+					return i++;
+				};
+			}
+		)()
 	};
 
 	/**
 	 * Chart constructor.
 	 */
-	var Treant = function(jsonConfig, callback, jQuery) {
+	var Treant = function( jsonConfig, callback, jQuery ) {
 		if ( jsonConfig instanceof Array ) {
 			jsonConfig = JSONconfig.make( jsonConfig );
 		}
