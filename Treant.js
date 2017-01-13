@@ -2047,7 +2047,7 @@
 
 				if (!node.hasOwnProperty('parent') && ! node.hasOwnProperty('container')) {
 					this.jsonStructure.nodeStructure = node;
-					node.myID = this.getID();
+					node._json_id = 0;
 				}
 			}
 
@@ -2067,14 +2067,14 @@
 
 				for(;i<len;i++) {
 					var node = nodes[i];
-					if(node.parent && (node.parent.myID == parentId)) { // skip config and root nodes
+					if(node.parent && (node.parent._json_id == parentId)) { // skip config and root nodes
 
-						node.myID = this.getID();
+						node._json_id = this.getID();
 
 						delete node.parent;
 
 						children.push(node);
-						parents.push(node.myID);
+						parents.push(node._json_id);
 					}
 				}
 
@@ -2087,7 +2087,7 @@
 		findNode: function( node, nodeId ) {
 			var childrenLen, found;
 
-			if (node.myID === nodeId) {
+			if (node._json_id === nodeId) {
 				return node;
 			}
 			else if ( node.children ) {
@@ -2103,7 +2103,7 @@
 
 		getID: (
 			function() {
-				var i = 0;
+				var i = 1;
 				return function() {
 					return i++;
 				};
