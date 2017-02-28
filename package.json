@@ -1,0 +1,30 @@
+{
+  "name": "treantjs",
+  "version": "1.0.0",
+  "description": "JavaScipt library for visualization of tree diagrams",
+  "main": "Treant.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fperucic/treant-js.git"
+  },
+  "keywords": [
+    "treant",
+    "diagram",
+    "tree",
+    "js",
+    "svg",
+    "draw"
+  ],
+  "author": "Fran Peručić",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fperucic/treant-js/issues"
+  },
+  "homepage": "https://github.com/fperucic/treant-js#readme"
+}
