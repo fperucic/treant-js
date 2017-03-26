@@ -1327,6 +1327,8 @@
 			this.meta = nodeStructure.meta || {};
 			this.image = nodeStructure.image || null;
 
+			this.nodeClick = nodeStructure.nodeClick;
+			
 			this.link = UTIL.createMerge( tree.CONFIG.node.link,  nodeStructure.link );
 
 			this.connStyle = UTIL.createMerge( tree.CONFIG.connectors, nodeStructure.connectors );
@@ -1840,7 +1842,11 @@
 			node.href = this.link.href;
 			node.target = this.link.target;
 		}
-
+		
+		if ( this.nodeClick ) {
+			node.onclick = this.nodeClick;
+		}
+		
 		if ( $ ) {
 			$( node ).data( 'treenode', this );
 		}
