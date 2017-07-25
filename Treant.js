@@ -1864,6 +1864,12 @@
 				// TEXT
 				if ( this.text ) {
 					for ( var key in this.text ) {
+						
+						// adding DATA Attributes to the node
+						if(key.match(/data/g)){
+							node.setAttribute(key, this.text[key]);
+						}
+						
 						if ( TreeNode.CONFIG.textClass[key] ) {
 							var text = document.createElement( this.text[key].href? 'a' : 'p' );
 
