@@ -1866,7 +1866,7 @@
 					for ( var key in this.text ) {
 						
 						// adding DATA Attributes to the node
-						if(key.match(/data/g)){
+						if(key.startsWith("data-")){
 							node.setAttribute(key, this.text[key]);
 						}
 						
