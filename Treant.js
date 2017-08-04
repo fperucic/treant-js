@@ -1938,7 +1938,7 @@
 			};
 		}
 
-		/////////// CREATE innerHTML //////////////
+		/////////// BUILD NODE CONTENT //////////////
 		if ( !this.pseudo ) {
             node = this.nodeInnerHTML? this.buildNodeFromHtml(node) : this.buildNodeFromText(node)
 
