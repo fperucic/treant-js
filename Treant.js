@@ -1811,6 +1811,94 @@
 		}
 	};
 
+
+    /**
+     * Build a node from the 'text' and 'img' property and return with it.
+	 *
+     * The node will contain all the fields that present under the 'text' property
+     * Each field will refer to a css class with name defined as node-{$property_name}
+     *
+	 * Example:
+     * The definition:
+     *
+     *   text: {
+	 *     desc: "some description",
+	 *     paragraph: "some text"
+	 *   }
+     *
+     * will generate the following elements:
+     *
+     *   <p class="node-desc">some description</p>
+     *   <p class="node-paragraph">some text</p>
+     *
+	 * @Returns the configured node
+     */
+    TreeNode.prototype.buildNodeFromText = function (node) {
+        // IMAGE
+        if (this.image) {
+            image = document.createElement('img');
+            image.src = this.image;
+            node.appendChild(image);
+        }
+
+        // TEXT
+        if (this.text) {
+            for (var key in this.text) {
+                // adding DATA Attributes to the node
+                if (key.startsWith("data-")) {
+                    node.setAttribute(key, this.text[key]);
+                }
+
+                var textElement = document.createElement(this.text[key].href ? 'a' : 'p');
+
+                // make an <a> element if required
+                if (this.text[key].href) {
+                    textElement.href = this.text[key].href;
+                    if (this.text[key].target) {
+                        textElement.target = this.text[key].target;
+                    }
+                }
+
+                textElement.className =  "node-"+key;
+                textElement.appendChild(document.createTextNode(
+                    this.text[key].val ? this.text[key].val :
+                        this.text[key] instanceof Object ? "'val' param missing!" : this.text[key]
+                    )
+                );
+
+                node.appendChild(textElement);
+            }
+        }
+        return node;
+    };
+
+    /**
+     * Build a node from  'nodeInnerHTML' property that defines an existing HTML element, referenced by it's id, e.g: #someElement
+	 * Change the text in the passed node to 'Wrong ID selector' if the referenced element does ot exist,
+	 * return with a cloned and configured node otherwise
+	 *
+	 * @Returns node the configured node
+     */
+    TreeNode.prototype.buildNodeFromHtml = function(node) {
+        // get some element by ID and clone its structure into a node
+        if (this.nodeInnerHTML.charAt(0) === "#") {
+            var elem = document.getElementById(this.nodeInnerHTML.substring(1));
+            if (elem) {
+                node = elem.cloneNode(true);
+                node.id += "-clone";
+                node.className += " node";
+            }
+            else {
+                node.innerHTML = "<b> Wrong ID selector </b>";
+            }
+        }
+        else {
+            // insert your custom HTML into a node
+            node.innerHTML = this.nodeInnerHTML;
+        }
+        return node;
+    };
+
 	/**
 	 * @param {Tree} tree
 	 */
@@ -1850,70 +1938,9 @@
 			};
 		}
 
-		/////////// CREATE innerHTML //////////////
+		/////////// BUILD NODE CONTENT //////////////
 		if ( !this.pseudo ) {
-			if ( !this.nodeInnerHTML ) {
-
-				// IMAGE
-				if ( this.image ) {
-					image = document.createElement( 'img' );
-					image.src = this.image;
-					node.appendChild( image );
-				}
-
-				// TEXT
-				if ( this.text ) {
-					for ( var key in this.text ) {
-						
-						// adding DATA Attributes to the node
-						if(key.startsWith("data-")){
-							node.setAttribute(key, this.text[key]);
-						}
-						
-						if ( TreeNode.CONFIG.textClass[key] ) {
-							var text = document.createElement( this.text[key].href? 'a' : 'p' );
-
-							// make an <a> element if required
-							if (this.text[key].href) {
-								text.href = this.text[key].href;
-								if (this.text[key].target) {
-									text.target = this.text[key].target;
-								}
-							}
-
-							text.className = TreeNode.CONFIG.textClass[key];
-							text.appendChild(document.createTextNode(
-								this.text[key].val ? this.text[key].val :
-									this.text[key] instanceof Object?
-										"'val' param missing!":
-										this.text[key]
-								)
-							);
-
-							node.appendChild(text);
-						}
-					}
-				}
-
-			}
-			else {
-				// get some element by ID and clone its structure into a node
-				if (this.nodeInnerHTML.charAt(0) === "#") {
-					var elem = document.getElementById(this.nodeInnerHTML.substring(1));
-					if (elem) {
-						node = elem.cloneNode(true);
-						node.id += "-clone";
-						node.className += " node";
-					}
-					else {
-						node.innerHTML = "<b> Wrong ID selector </b>";
-					}
-				}
-				else {
-					// insert your custom HTML into a node
-					node.innerHTML = this.nodeInnerHTML;
-				}
-			}
+            node = this.nodeInnerHTML? this.buildNodeFromHtml(node) : this.buildNodeFromText(node)
 
 			// handle collapse switch
 			if ( this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId) ) {
@@ -2020,14 +2047,7 @@
 	};
 
 	TreeNode.CONFIG = {
-		nodeHTMLclass: 'node',
-
-		textClass: {
-			name:	'node-name',
-			title:	'node-title',
-			desc:	'node-desc',
-			contact: 'node-contact'
-		}
+		nodeHTMLclass: 'node'
 	};
 
 	// #############################################

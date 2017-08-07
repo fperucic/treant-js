@@ -176,7 +176,6 @@ var config = {
                     image: "../headshots/5.jpg",
                     children: [
                         {
-                            parent: cbo,
                             text:{
                                 name: "Alice Lopez",
                                 title: "Chief Communications Officer"
