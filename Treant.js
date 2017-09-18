@@ -410,7 +410,7 @@
 			this.CONFIG = UTIL.extend( Tree.CONFIG, jsonConfig.chart );
 			this.drawArea = UTIL.findEl( this.CONFIG.container, true );
 			if ( !this.drawArea ) {
-				throw new Error( 'Failed to find element by selector "'+selector+'"' );
+				throw new Error( 'Failed to find element by selector "'+this.CONFIG.container+'"' );
 			}
 
 			UTIL.addClass( this.drawArea, 'Treant' );
