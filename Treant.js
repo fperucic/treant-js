@@ -1853,26 +1853,27 @@
                 // adding DATA Attributes to the node
                 if (key.startsWith("data-")) {
                     node.setAttribute(key, this.text[key]);
-                }
-
-                var textElement = document.createElement(this.text[key].href ? 'a' : 'p');
-
-                // make an <a> element if required
-                if (this.text[key].href) {
-                    textElement.href = this.text[key].href;
-                    if (this.text[key].target) {
-                        textElement.target = this.text[key].target;
+                } else {
+                    
+                    var textElement = document.createElement(this.text[key].href ? 'a' : 'p');
+                    
+                    // make an <a> element if required
+                    if (this.text[key].href) {
+                        textElement.href = this.text[key].href;
+                        if (this.text[key].target) {
+                            textElement.target = this.text[key].target;
+                        }
                     }
-                }
-
-                textElement.className =  "node-"+key;
-                textElement.appendChild(document.createTextNode(
-                    this.text[key].val ? this.text[key].val :
+                    
+                    textElement.className =  "node-"+key;
+                    textElement.appendChild(document.createTextNode(
+                        this.text[key].val ? this.text[key].val :
                         this.text[key] instanceof Object ? "'val' param missing!" : this.text[key]
                     )
-                );
-
-                node.appendChild(textElement);
+                    );
+                    
+                    node.appendChild(textElement);
+                }
             }
         }
         return node;
