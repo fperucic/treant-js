@@ -114,7 +114,7 @@ var config = {
 
 
 
-    // Antoher approach, same result
+    // Another approach, same result
     // JSON approach
 
 /*
