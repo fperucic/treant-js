@@ -114,7 +114,7 @@ var config = {
         cio2,ciso2,ciso3,ciso4
     ];
 
-    // Antoher approach, same result
+    // Another approach, same result
     // JSON approach
 
 /*
