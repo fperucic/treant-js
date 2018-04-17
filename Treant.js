@@ -246,7 +246,8 @@
                 element.style.width = width+'px';
                 element.style.height = height+'px';
             }
-        }
+        },
+        isjQueryAvailable: function() {return(typeof ($) !== 'undefined' && $);},
     };
 
     /**
@@ -840,7 +841,7 @@
             if ( this.CONFIG.scrollbar === 'resize') {
                 UTIL.setDimensions( this.drawArea, viewWidth, viewHeight );
             }
-            else if ( !this.isjQueryAvailable() || this.CONFIG.scrollbar === 'native' ) {
+            else if ( !UTIL.isjQueryAvailable() || this.CONFIG.scrollbar === 'native' ) {
 
                 if ( this.drawArea.clientWidth < treeWidth ) { // is overflow-x necessary
                     this.drawArea.style.overflowX = "auto";
@@ -875,8 +876,7 @@
             } // else this.CONFIG.scrollbar == 'None'
 
             return this;
-        },
-        isjQueryAvailable: function() {return(typeof ($) !== 'undefined' && $);},
+        },        
         /**
          * @param {TreeNode} treeNode
          * @param {boolean} hidePoint
