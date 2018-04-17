@@ -134,10 +134,10 @@
                 // todo: getElementsByName()
                 // todo: getElementsByTagName()
                 // todo: getElementsByTagNameNS()
-                if ( selector.charAt( 0 ) == '#' ) {
+                if ( selector.charAt( 0 ) === '#' ) {
                     return parentEl.getElementById( selector.substring( 1 ) );
                 }
-                else if ( selector.charAt( 0 ) == '.' ) {
+                else if ( selector.charAt( 0 ) === '.' ) {
                     var oElements = parentEl.getElementsByClassName( selector.substring( 1 ) );
                     return ( oElements.length? oElements[0]: null );
                 }
@@ -148,7 +148,7 @@
 
         getOuterHeight: function( element ) {
             var nRoundingCompensation = 1;
-            if ( typeof element.getBoundingClientRect == 'function' ) {
+            if ( typeof element.getBoundingClientRect === 'function' ) {
                 return element.getBoundingClientRect().height;
             }
             else if ( $ ) {
@@ -168,7 +168,7 @@
 
         getOuterWidth: function( element ) {
             var nRoundingCompensation = 1;
-            if ( typeof element.getBoundingClientRect == 'function' ) {
+            if ( typeof element.getBoundingClientRect === 'function' ) {
                 return element.getBoundingClientRect().width;
             }
             else if ( $ ) {
@@ -380,7 +380,7 @@
 
                 for ( var i = 0; i < classes.length; i++ ) {
                     var cls = classes[i];
-                    if ( cls != 'Treant' && cls != 'Treant-loaded' ) {
+                    if ( cls !== 'Treant' && cls !== 'Treant-loaded' ) {
                         classes_to_stay.push(cls);
                     }
                 }
@@ -635,7 +635,7 @@
                         numSubtrees = 0;
 
                     // count all the subtrees in the LeftSibling
-                    while ( subtreeAux && subtreeAux.id != leftAncestor.id ) {
+                    while ( subtreeAux && subtreeAux.id !== leftAncestor.id ) {
                         subtreeAux = subtreeAux.leftSibling();
                         numSubtrees++;
                     }
@@ -644,7 +644,7 @@
                         var subtreeMoveAux = node,
                             singleGap = totalGap / numSubtrees;
 
-                        while ( subtreeMoveAux.id != leftAncestor.id ) {
+                        while ( subtreeMoveAux.id !== leftAncestor.id ) {
                             subtreeMoveAux.prelim += totalGap;
                             subtreeMoveAux.modifier += totalGap;
 
@@ -681,14 +681,14 @@
                     orinet = this.CONFIG.rootOrientation,
                     levelHeight, nodesizeTmp;
 
-                if (orinet == 'NORTH' || orinet == 'SOUTH') {
+                if (orinet === 'NORTH' || orinet === 'SOUTH') {
                     levelHeight = this.levelMaxDim[level].height;
                     nodesizeTmp = node.height;
                     if (node.pseudo) {
                         node.height = levelHeight;
                     } // assign a new size to pseudo nodes
                 }
-                else if (orinet == 'WEST' || orinet == 'EAST') {
+                else if (orinet === 'WEST' || orinet === 'EAST') {
                     levelHeight = this.levelMaxDim[level].width;
                     nodesizeTmp = node.width;
                     if (node.pseudo) {
@@ -699,29 +699,29 @@
                 node.X = xTmp;
 
                 if (node.pseudo) { // pseudo nodes need to be properly aligned, otherwise position is not correct in some examples
-                    if (orinet == 'NORTH' || orinet == 'WEST') {
+                    if (orinet === 'NORTH' || orinet === 'WEST') {
                         node.Y = yTmp; // align "BOTTOM"
                     }
-                    else if (orinet == 'SOUTH' || orinet == 'EAST') {
+                    else if (orinet === 'SOUTH' || orinet === 'EAST') {
                         node.Y = (yTmp + (levelHeight - nodesizeTmp)); // align "TOP"
                     }
 
                 } else {
-                    node.Y = ( align == 'CENTER' ) ? (yTmp + (levelHeight - nodesizeTmp) / 2) :
-                        ( align == 'TOP' )  ? (yTmp + (levelHeight - nodesizeTmp)) :
+                    node.Y = ( align === 'CENTER' ) ? (yTmp + (levelHeight - nodesizeTmp) / 2) :
+                        ( align === 'TOP' )  ? (yTmp + (levelHeight - nodesizeTmp)) :
                             yTmp;
                 }
 
-                if ( orinet == 'WEST' || orinet == 'EAST' ) {
+                if ( orinet === 'WEST' || orinet === 'EAST' ) {
                     var swapTmp = node.X;
                     node.X = node.Y;
                     node.Y = swapTmp;
                 }
 
-                if (orinet == 'SOUTH' ) {
+                if (orinet === 'SOUTH' ) {
                     node.Y = -node.Y - nodesizeTmp;
                 }
-                else if ( orinet == 'EAST' ) {
+                else if ( orinet === 'EAST' ) {
                     node.X = -node.X - nodesizeTmp;
                 }
 
@@ -837,10 +837,10 @@
 
             this._R.setSize( viewWidth, viewHeight );
 
-            if ( this.CONFIG.scrollbar == 'resize') {
+            if ( this.CONFIG.scrollbar === 'resize') {
                 UTIL.setDimensions( this.drawArea, viewWidth, viewHeight );
             }
-            else if ( $ == undefined || this.CONFIG.scrollbar == 'native' ) {
+            else if ( $ === undefined || this.CONFIG.scrollbar === 'native' ) {
 
                 if ( this.drawArea.clientWidth < treeWidth ) { // is overflow-x necessary
                     this.drawArea.style.overflowX = "auto";
@@ -851,7 +851,7 @@
                 }
             }
             // Fancy scrollbar relies heavily on jQuery, so guarding with if ( $ )
-            else if ( this.CONFIG.scrollbar == 'fancy') {
+            else if ( this.CONFIG.scrollbar === 'fancy') {
                 var jq_drawArea = $( this.drawArea );
                 if (jq_drawArea.hasClass('ps-container')) { // znaci da je 'fancy' vec inicijaliziran, treba updateat
                     jq_drawArea.find('.Treant').css({
@@ -976,13 +976,13 @@
                 connType = from_node.connStyle.type,
                 P1 = {}, P2 = {};
 
-            if ( orientation == 'NORTH' || orientation == 'SOUTH' ) {
+            if ( orientation === 'NORTH' || orientation === 'SOUTH' ) {
                 P1.y = P2.y = (startPoint.y + endPoint.y) / 2;
 
                 P1.x = startPoint.x;
                 P2.x = endPoint.x;
             }
-            else if ( orientation == 'EAST' || orientation == 'WEST' ) {
+            else if ( orientation === 'EAST' || orientation === 'WEST' ) {
                 P1.x = P2.x = (startPoint.x + endPoint.x) / 2;
 
                 P1.y = startPoint.y;
@@ -995,27 +995,27 @@
 
             if ( stacked ) { // STACKED CHILDREN
 
-                stackPoint = (orientation == 'EAST' || orientation == 'WEST')?
+                stackPoint = (orientation === 'EAST' || orientation === 'WEST')?
                 endPoint.x+','+startPoint.y:
                 startPoint.x+','+endPoint.y;
 
-                if ( connType == "step" || connType == "straight" ) {
+                if ( connType === "step" || connType === "straight" ) {
                     pathString = ["M", sp, 'L', stackPoint, 'L', ep];
                 }
-                else if ( connType == "curve" || connType == "bCurve" ) {
+                else if ( connType === "curve" || connType === "bCurve" ) {
                     var helpPoint, // used for nicer curve lines
                         indent = from_node.connStyle.stackIndent;
 
-                    if ( orientation == 'NORTH' ) {
+                    if ( orientation === 'NORTH' ) {
                         helpPoint = (endPoint.x - indent)+','+(endPoint.y - indent);
                     }
-                    else if ( orientation == 'SOUTH' ) {
+                    else if ( orientation === 'SOUTH' ) {
                         helpPoint = (endPoint.x - indent)+','+(endPoint.y + indent);
                     }
-                    else if ( orientation == 'EAST' ) {
+                    else if ( orientation === 'EAST' ) {
                         helpPoint = (endPoint.x + indent) +','+startPoint.y;
                     }
-                    else if ( orientation == 'WEST' ) {
+                    else if ( orientation === 'WEST' ) {
                         helpPoint = (endPoint.x - indent) +','+startPoint.y;
                     }
                     pathString = ["M", sp, 'L', helpPoint, 'S', stackPoint, ep];
@@ -1023,16 +1023,16 @@
 
             }
             else {  // NORMAL CHILDREN
-                if ( connType == "step" ) {
+                if ( connType === "step" ) {
                     pathString = ["M", sp, 'L', p1, 'L', p2, 'L', ep];
                 }
-                else if ( connType == "curve" ) {
+                else if ( connType === "curve" ) {
                     pathString = ["M", sp, 'C', p1, p2, ep ];
                 }
-                else if ( connType == "bCurve" ) {
+                else if ( connType === "bCurve" ) {
                     pathString = ["M", sp, 'Q', p1, pm, 'T', ep];
                 }
-                else if (connType == "straight" ) {
+                else if (connType === "straight" ) {
                     pathString = ["M", sp, 'L', sp, ep];
                 }
             }
@@ -1093,7 +1093,7 @@
      * @constructor
      */
     var NodeDB = function ( nodeStructure, tree ) {
-        this.reset( nodeStructure, tree )
+        this.reset( nodeStructure, tree );
     };
 
     NodeDB.prototype = {
@@ -1214,19 +1214,19 @@
 
                 // todo: refactor into separate private method
                 if ( nodeStructure.position ) {
-                    if ( nodeStructure.position == 'left' ) {
+                    if ( nodeStructure.position === 'left' ) {
                         parent.children.push( node.id );
                     }
-                    else if ( nodeStructure.position == 'right' ) {
+                    else if ( nodeStructure.position === 'right' ) {
                         parent.children.splice( 0, 0, node.id );
                     }
-                    else if ( nodeStructure.position == 'center' ) {
+                    else if ( nodeStructure.position === 'center' ) {
                         parent.children.splice( Math.floor( parent.children.length / 2 ), 0, node.id );
                     }
                     else {
                         // edge case when there's only 1 child
                         var position = parseInt( nodeStructure.position );
-                        if ( parent.children.length == 1 && position > 0 ) {
+                        if ( parent.children.length === 1 && position > 0 ) {
                             parent.children.splice( 0, 0, node.id );
                         }
                         else {
@@ -1256,14 +1256,14 @@
 
             MinMax = MinMax || { // start with root node dimensions
                     min: parent[dim],
-                    max: parent[dim] + ( ( dim == 'X' )? parent.width: parent.height )
+                    max: parent[dim] + ( ( dim === 'X' )? parent.width: parent.height )
                 };
 
             var i = parent.childrenCount();
 
             while ( i-- ) {
                 var node = parent.childAt( i ),
-                    maxTest = node[dim] + ( ( dim == 'X' )? node.width: node.height ),
+                    maxTest = node[dim] + ( ( dim === 'X' )? node.width: node.height ),
                     minTest = node[dim];
 
                 if ( maxTest > MinMax.max ) {
@@ -1413,10 +1413,10 @@
                 return ( -this.getTreeConfig().subTeeSeparation );
             }
 
-            if ( orientation == 'NORTH' || orientation == 'SOUTH' ) {
+            if ( orientation === 'NORTH' || orientation === 'SOUTH' ) {
                 return this.width;
             }
-            else if ( orientation == 'WEST' || orientation == 'EAST' ) {
+            else if ( orientation === 'WEST' || orientation === 'EAST' ) {
                 return this.height;
             }
         },
@@ -1481,7 +1481,7 @@
         leftSibling: function () {
             var leftNeighbor = this.leftNeighbor();
 
-            if ( leftNeighbor && leftNeighbor.parentId == this.parentId ){
+            if ( leftNeighbor && leftNeighbor.parentId === this.parentId ){
                 return leftNeighbor;
             }
         },
@@ -1492,7 +1492,7 @@
         rightSibling: function () {
             var rightNeighbor = this.rightNeighbor();
 
-            if ( rightNeighbor && rightNeighbor.parentId == this.parentId ) {
+            if ( rightNeighbor && rightNeighbor.parentId === this.parentId ) {
                 return rightNeighbor;
             }
         },
@@ -1549,28 +1549,28 @@
             var orient = this.Tree().CONFIG.rootOrientation, point = {};
 
             if ( this.stackParentId ) { // return different end point if node is a stacked child
-                if ( orient == 'NORTH' || orient == 'SOUTH' ) {
+                if ( orient === 'NORTH' || orient === 'SOUTH' ) {
                     orient = 'WEST';
                 }
-                else if ( orient == 'EAST' || orient == 'WEST' ) {
+                else if ( orient === 'EAST' || orient === 'WEST' ) {
                     orient = 'NORTH';
                 }
             }
 
             // if pseudo, a virtual center is used
-            if ( orient == 'NORTH' ) {
+            if ( orient === 'NORTH' ) {
                 point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;
                 point.y = (startPoint) ? this.Y + this.height : this.Y;
             }
-            else if (orient == 'SOUTH') {
+            else if (orient === 'SOUTH') {
                 point.x = (this.pseudo) ? this.X - this.Tree().CONFIG.subTeeSeparation/2 : this.X + this.width/2;
                 point.y = (startPoint) ? this.Y : this.Y + this.height;
             }
-            else if (orient == 'EAST') {
+            else if (orient === 'EAST') {
                 point.x = (startPoint) ? this.X : this.X + this.width;
                 point.y = (this.pseudo) ? this.Y - this.Tree().CONFIG.subTeeSeparation/2 : this.Y + this.height/2;
             }
-            else if (orient == 'WEST') {
+            else if (orient === 'WEST') {
                 point.x = (startPoint) ? this.X + this.width : this.X;
                 point.y =  (this.pseudo) ? this.Y - this.Tree().CONFIG.subTeeSeparation/2 : this.Y + this.height/2;
             }
@@ -2100,7 +2100,7 @@
 
                 for(;i<len;i++) {
                     var node = nodes[i];
-                    if(node.parent && (node.parent._json_id == parentId)) { // skip config and root nodes
+                    if(node.parent && (node.parent._json_id === parentId)) { // skip config and root nodes
 
                         node._json_id = this.getID();
 
