@@ -679,17 +679,17 @@
             if ( level <= this.CONFIG.maxDepth ) {
                 var xTmp = node.prelim + X,
                     yTmp = Y, align = this.CONFIG.nodeAlign,
-                    orinet = this.CONFIG.rootOrientation,
+                    orient = this.CONFIG.rootOrientation,
                     levelHeight, nodesizeTmp;
 
-                if (orinet === 'NORTH' || orinet === 'SOUTH') {
+                if (orient === 'NORTH' || orient === 'SOUTH') {
                     levelHeight = this.levelMaxDim[level].height;
                     nodesizeTmp = node.height;
                     if (node.pseudo) {
                         node.height = levelHeight;
                     } // assign a new size to pseudo nodes
                 }
-                else if (orinet === 'WEST' || orinet === 'EAST') {
+                else if (orient === 'WEST' || orient === 'EAST') {
                     levelHeight = this.levelMaxDim[level].width;
                     nodesizeTmp = node.width;
                     if (node.pseudo) {
@@ -700,10 +700,10 @@
                 node.X = xTmp;
 
                 if (node.pseudo) { // pseudo nodes need to be properly aligned, otherwise position is not correct in some examples
-                    if (orinet === 'NORTH' || orinet === 'WEST') {
+                    if (orient === 'NORTH' || orient === 'WEST') {
                         node.Y = yTmp; // align "BOTTOM"
                     }
-                    else if (orinet === 'SOUTH' || orinet === 'EAST') {
+                    else if (orient === 'SOUTH' || orient === 'EAST') {
                         node.Y = (yTmp + (levelHeight - nodesizeTmp)); // align "TOP"
                     }
 
@@ -713,16 +713,16 @@
                             yTmp;
                 }
 
-                if ( orinet === 'WEST' || orinet === 'EAST' ) {
+                if ( orient === 'WEST' || orient === 'EAST' ) {
                     var swapTmp = node.X;
                     node.X = node.Y;
                     node.Y = swapTmp;
                 }
 
-                if (orinet === 'SOUTH' ) {
+                if (orient === 'SOUTH' ) {
                     node.Y = -node.Y - nodesizeTmp;
                 }
-                else if ( orinet === 'EAST' ) {
+                else if ( orient === 'EAST' ) {
                     node.X = -node.X - nodesizeTmp;
                 }
 
