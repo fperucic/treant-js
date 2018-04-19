@@ -676,70 +676,72 @@
          * RootOrientations of EAST or WEST.)
          */
         secondWalk: function( node, level, X, Y ) {
-            if ( level <= this.CONFIG.maxDepth ) {
-                var xTmp = node.prelim + X,
-                    yTmp = Y, align = this.CONFIG.nodeAlign,
-                    orient = this.CONFIG.rootOrientation,
-                    levelHeight, nodesizeTmp;
+            if ( level > this.CONFIG.maxDepth ) {
+                return;
+            }
 
-                if (orient === 'NORTH' || orient === 'SOUTH') {
-                    levelHeight = this.levelMaxDim[level].height;
-                    nodesizeTmp = node.height;
-                    if (node.pseudo) {
-                        node.height = levelHeight;
-                    } // assign a new size to pseudo nodes
+            var xTmp = node.prelim + X,
+                yTmp = Y, align = this.CONFIG.nodeAlign,
+                orient = this.CONFIG.rootOrientation,
+                levelHeight, nodesizeTmp;
+
+            if (orient === 'NORTH' || orient === 'SOUTH') {
+                levelHeight = this.levelMaxDim[level].height;
+                nodesizeTmp = node.height;
+                if (node.pseudo) {
+                    node.height = levelHeight;
+                } // assign a new size to pseudo nodes
+            }
+            else if (orient === 'WEST' || orient === 'EAST') {
+                levelHeight = this.levelMaxDim[level].width;
+                nodesizeTmp = node.width;
+                if (node.pseudo) {
+                    node.width = levelHeight;
+                } // assign a new size to pseudo nodes
+            }
+
+            node.X = xTmp;
+
+            if (node.pseudo) { // pseudo nodes need to be properly aligned, otherwise position is not correct in some examples
+                if (orient === 'NORTH' || orient === 'WEST') {
+                    node.Y = yTmp; // align "BOTTOM"
                 }
-                else if (orient === 'WEST' || orient === 'EAST') {
-                    levelHeight = this.levelMaxDim[level].width;
-                    nodesizeTmp = node.width;
-                    if (node.pseudo) {
-                        node.width = levelHeight;
-                    } // assign a new size to pseudo nodes
-                }
-
-                node.X = xTmp;
-
-                if (node.pseudo) { // pseudo nodes need to be properly aligned, otherwise position is not correct in some examples
-                    if (orient === 'NORTH' || orient === 'WEST') {
-                        node.Y = yTmp; // align "BOTTOM"
-                    }
-                    else if (orient === 'SOUTH' || orient === 'EAST') {
-                        node.Y = (yTmp + (levelHeight - nodesizeTmp)); // align "TOP"
-                    }
-
-                } else {
-                    node.Y = ( align === 'CENTER' ) ? (yTmp + (levelHeight - nodesizeTmp) / 2) :
-                        ( align === 'TOP' )  ? (yTmp + (levelHeight - nodesizeTmp)) :
-                            yTmp;
+                else if (orient === 'SOUTH' || orient === 'EAST') {
+                    node.Y = (yTmp + (levelHeight - nodesizeTmp)); // align "TOP"
                 }
 
-                if ( orient === 'WEST' || orient === 'EAST' ) {
-                    var swapTmp = node.X;
-                    node.X = node.Y;
-                    node.Y = swapTmp;
-                }
+            } else {
+                node.Y = ( align === 'CENTER' ) ? (yTmp + (levelHeight - nodesizeTmp) / 2) :
+                    ( align === 'TOP' )  ? (yTmp + (levelHeight - nodesizeTmp)) :
+                        yTmp;
+            }
 
-                if (orient === 'SOUTH' ) {
-                    node.Y = -node.Y - nodesizeTmp;
-                }
-                else if ( orient === 'EAST' ) {
-                    node.X = -node.X - nodesizeTmp;
-                }
+            if ( orient === 'WEST' || orient === 'EAST' ) {
+                var swapTmp = node.X;
+                node.X = node.Y;
+                node.Y = swapTmp;
+            }
 
-                if ( node.childrenCount() !== 0 ) {
-                    if ( node.id === 0 && this.CONFIG.hideRootNode ) {
-                        // ako je root node Hiden onda nemoj njegovu dijecu pomaknut po Y osi za Level separation, neka ona budu na vrhu
-                        this.secondWalk(node.firstChild(), level + 1, X + node.modifier, Y);
-                    }
-                    else {
-                        this.secondWalk(node.firstChild(), level + 1, X + node.modifier, Y + levelHeight + this.CONFIG.levelSeparation);
-                    }
-                }
+            if (orient === 'SOUTH' ) {
+                node.Y = -node.Y - nodesizeTmp;
+            }
+            else if ( orient === 'EAST' ) {
+                node.X = -node.X - nodesizeTmp;
+            }
 
-                if ( node.rightSibling() ) {
-                    this.secondWalk( node.rightSibling(), level, X, Y );
+            if ( node.childrenCount() !== 0 ) {
+                if ( node.id === 0 && this.CONFIG.hideRootNode ) {
+                    // ako je root node Hiden onda nemoj njegovu dijecu pomaknut po Y osi za Level separation, neka ona budu na vrhu
+                    this.secondWalk(node.firstChild(), level + 1, X + node.modifier, Y);
+                }
+                else {
+                    this.secondWalk(node.firstChild(), level + 1, X + node.modifier, Y + levelHeight + this.CONFIG.levelSeparation);
                 }
             }
+
+            if ( node.rightSibling() ) {
+                this.secondWalk( node.rightSibling(), level, X, Y );
+            }            
         },
 
         /**
