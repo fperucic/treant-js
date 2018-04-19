@@ -466,8 +466,6 @@
          * @returns {TreeNode}
          */
         addNode: function( parentTreeNode, nodeDefinition ) {
-            var dbEntry = this.nodeDB.get( parentTreeNode.id );
-
             this.CONFIG.callback.onBeforeAddNode.apply( this, [parentTreeNode, nodeDefinition] );
 
             var oNewNode = this.nodeDB.createNode( nodeDefinition, parentTreeNode.id, this );
@@ -498,8 +496,7 @@
             var self = this;
 
             if ( this.imageLoader.isNotLoading() ) {
-                var root = this.root(),
-                    orient = this.CONFIG.rootOrientation;
+                var root = this.root();                    
 
                 this.resetLevelData();
 
@@ -1760,8 +1757,7 @@
             return this;
         },
 
-        show: function() {
-            var bCurrentState = this.hidden;
+        show: function() {            
             this.hidden = false;
 
             this.nodeDOM.style.visibility = 'visible';
