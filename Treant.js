@@ -247,7 +247,7 @@
                 element.style.height = height+'px';
             }
         },
-        isjQueryAvailable: function() {return(typeof ($) !== 'undefined' && $);},
+        isjQueryAvailable: function() {return(typeof ($) !== 'undefined' && $);}
     };
 
     /**
@@ -1945,7 +1945,7 @@
 
         /////////// BUILD NODE CONTENT //////////////
         if ( !this.pseudo ) {
-            node = this.nodeInnerHTML? this.buildNodeFromHtml(node) : this.buildNodeFromText(node)
+            node = this.nodeInnerHTML? this.buildNodeFromHtml(node) : this.buildNodeFromText(node);
 
             // handle collapse switch
             if ( this.collapsed || (this.collapsable && this.childrenCount() && !this.stackParentId) ) {
