@@ -624,7 +624,7 @@
                 }
 
                 // find the gap between two trees and apply it to subTrees
-                // and mathing smaller gaps to smaller subtrees
+                // and matching smaller gaps to smaller subtrees
 
                 var totalGap = (firstChildLeftNeighbor.prelim + modifierSumLeft + firstChildLeftNeighbor.size() + this.CONFIG.subTeeSeparation) - (firstChild.prelim + modifierSumRight );
 
