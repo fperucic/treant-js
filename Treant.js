@@ -659,7 +659,7 @@
 
                 firstChild = ( firstChild.childrenCount() === 0 )?
                     node.leftMost(0, compareDepth):
-                    firstChild = firstChild.firstChild();
+                    firstChild.firstChild();
 
                 if ( firstChild ) {
                     firstChildLeftNeighbor = firstChild.leftNeighbor();
