@@ -1282,15 +1282,15 @@
          * @param {object} nodeStructure
          * @returns {boolean}
          */
-		hasGrandChildren: function (nodeStructure) {
-		    var i = nodeStructure.children.length;
-		    while (i--) {
-		        if (nodeStructure.children[i].children && nodeStructure.children[i].children.length > 0) {
-		            return true;
-		        }
-		    }
-		    return false;
-		}
+	hasGrandChildren: function (nodeStructure) {
+	    var i = nodeStructure.children.length;
+	    while (i--) {
+	        if (nodeStructure.children[i].children && nodeStructure.children[i].children.length > 0) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
     };
 
     /**
