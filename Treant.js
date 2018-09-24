@@ -1888,7 +1888,7 @@
      */
     TreeNode.prototype.buildNodeFromHtml = function(node) {
         // get some element by ID and clone its structure into a node
-        if (this.nodeInnerHTML.charAt(0) === "#") {
+        if (typeof this.nodeInnerHTML === "string" && this.nodeInnerHTML.charAt(0) === "#") {
             var elem = document.getElementById(this.nodeInnerHTML.substring(1));
             if (elem) {
                 node = elem.cloneNode(true);
@@ -1899,9 +1899,13 @@
                 node.innerHTML = "<b> Wrong ID selector </b>";
             }
         }
-        else {
+        else if (typeof this.nodeInnerHTML === "string"){
             // insert your custom HTML into a node
             node.innerHTML = this.nodeInnerHTML;
+        }
+        else if (typeof this.nodeInnerHTML === "object"){
+            // insert your custom HTML into a node
+            node.appendChild(this.nodeInnerHTML);
         }
         return node;
     };
