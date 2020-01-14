@@ -248,6 +248,32 @@
             }
         },
         isjQueryAvailable: function() {return(typeof ($) !== 'undefined' && $);},
+
+		urlValidator: undefined,
+		urlInput: undefined,
+
+		validateURL: function( url ) {
+			// Check for HTML5 url input support and cache results
+			if( undefined === this.urlValidator ) {
+				if(!this.urlInput) {
+					this.urlInput = document.createElement('input');
+					this.urlInput.setAttribute('type', 'url');
+				}
+				this.urlValidator = this.urlInput.type !== 'text';
+				if( !this.urlValidator ) {
+					this.urlInput.remove();
+				}
+			}	
+			// If input type="url" supported use that to validate via browser
+			if( this.urlValidator ) {
+				this.urlInput.value = url;
+				return this.urlInput.validity.valid;
+			}
+			// Otherwise use validator taken from jQuery Validator plugin
+			// copyright Jörn Zaefferer
+			// https://jqueryvalidation.org/
+			return /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url);
+		},
     };
 
     /**
@@ -312,7 +338,7 @@
             if ( image.src.indexOf( 'data:' ) !== 0 ) {
                 this.loading.push( source );
 
-                if ( image.complete ) {
+                if ( image.complete || !UTIL.validateURL(source) ) {
                     return imgTrigger();
                 }
 
