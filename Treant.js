@@ -497,7 +497,7 @@
         positionTree: function( callback ) {
             var self = this;
 
-            if ( this.imageLoader.isNotLoading() ) {
+            if ( !this.imageLoader.isNotLoading() ) {
                 var root = this.root(),
                     orient = this.CONFIG.rootOrientation;
 
