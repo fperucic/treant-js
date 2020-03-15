@@ -1,9 +1,14 @@
 ;( function() {
+	// init options begin
 	var options = {
 		selectedElBackgroundColor: "grey"
 	};
-	var treantJs = null, selectedEl = null, selectedNodeTree = null;
-	
+	// init options end
+	// init defaults values begin
+	var treantJs = null, selectedEl = null, selectedNodeTree = null
+	, treantGui;
+	// init defaults values end
+	// callbacks begin
 	var selectFunc = function(nodeEl){
 	  if (selectedEl != null){
 		  selectedEl.css("background-color", "");
@@ -16,8 +21,9 @@
 		var newNodeText = $("#addNodeText").val();
 		treantJs.tree.addNode(selectedNodeTree, { text: { name: newNodeText } });
 		$('#modalWin').dialog( "close" );
-	}
-	
+	}	
+	// callbacks end
+	// GUI buttons begin
 	var buttons = [{
 			id: 'addBtn',
 			text: 'add',
@@ -35,15 +41,41 @@
 					}					
 				}
 			}
-		},{
+		}/*,{
 			id: 'removeBtn',
 			text: 'remove',
 			callback: function(el){
-				console.log(el);
+				if (selectedEl != null){
+					var nodeText = $(selectedEl).text()
+					, tree = treantJs.tree.getNodeDb().db;																			
+					for(var key in tree){
+						var nodeTree = tree[key];
+						if(nodeTree.text.name == nodeText){
+							console.log(tree);
+							console.log(nodeTree);
+							console.log(nodeTree.parentId);
+							console.log(nodeTree.lookupNode(nodeTree.parentId));
+							//selectedNodeTree = nodeTree;
+							//$('#modalWin').dialog( "open" );
+							break;
+						}						
+					}
+				}
+			}
+		}*/,{
+			id: 'exportNodeStructureBtn',
+			text: 'exrpot NodeStructure',
+			callback: function(){
+				var data = JSON.stringify(treantGui.prototype.exportNodeStructure());				
+				$('#modalWin').html(data);
+				$('#modalWin').dialog({title: "Export NodeStructure"});
+				$('#modalWin').dialog( "open" );
 			}
 		}
 	];
-	var treantGui = function(idDiv, treant){
+	// GUI buttons end
+	// init GUI elements and callbacks
+	treantGui = function(idDiv, treant){
 		var guiDiv = $('#' + idDiv);		
 		treantJs = treant;		
 		$('.node').each(function() {
@@ -72,6 +104,24 @@
 			$(modalWin).dialog({
 			  autoOpen: false
 			});
+		}
+	};
+	treantGui.prototype = {
+		exportNodeStructure: function(root, nodeStructure){			
+			var root = root || treantJs.tree.root()
+			, nodeStructure = nodeStructure || {text: root.text, children: []};			
+			if (typeof root.children != "undefined"){
+				var children = root.children;
+				for(var key in children){
+					var child = treantJs.tree.getNodeDb().db[children[key]]
+					, childNode = { text: child.text, children: [] };										
+					if (typeof child.children != "undefined"){
+						this.exportNodeStructure(child, childNode);
+					}
+					nodeStructure.children.push(childNode);
+				}
+			}
+			return nodeStructure;
 		}
 	};
 	window.treantGui = treantGui;
