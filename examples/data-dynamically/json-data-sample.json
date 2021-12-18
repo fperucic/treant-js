@@ -1,0 +1,65 @@
+[
+    {
+        "id": "ceo",
+        "name": "Mark Hill",
+        "title": "Chief executive officer",
+        "contact": "Tel: 01 213 123 134",
+        "image": "../headshots/2.jpg"
+    },
+    {
+        "id": "cto",
+        "parent": "ceo",
+        "name": "Joe Linux",
+        "title": "Chief Technology Officer",
+        "image": "../headshots/1.jpg"
+    },
+    {
+        "id": "cbo",
+        "parent": "ceo",
+        "name": "Linda May",
+        "title": "Chief Business Officer",
+        "image": "../headshots/5.jpg"
+    },
+    {
+        "id": "cdo",
+        "parent": "ceo",
+        "name": "John Green",
+        "title": "Chief accounting officer",
+        "image": "../headshots/6.jpg"
+    },
+    {
+        "id": "ciso",
+        "parent": "cto",
+        "name": "Michael Rubin",
+        "title": "Chief Innovation Officer",
+        "image": "../headshots/9.jpg"
+    },
+    {
+        "id": "ciso2",
+        "parent": "cbo",
+        "name": "Alice Lopez",
+        "title": "Chief Communications Officer",
+        "image": "../headshots/7.jpg"
+    },
+    {
+        "id": "cio2",
+        "parent": "cdo",
+        "name": "Erica Reel",
+        "title": "Chief Customer Officer",
+        "image": "../headshots/10.jpg"
+    },
+    {
+        "id": "ciso3",
+        "parent": "cbo",
+        "name": "Mary Johnson",
+        "title": "Chief Brand Officer",
+        "image": "../headshots/4.jpg"
+    },
+    {
+        "id": "ciso4",
+        "parent": "cbo",
+        "name": "Kirk Douglas",
+        "title": "Chief Business Development Officer",
+        "image": "../headshots/11.jpg"
+    }
+]
