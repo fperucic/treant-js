@@ -1,0 +1,10 @@
+
+.buttonBox {
+    width: 100%;
+    background-color: navy;
+    margin-top: 20px;
+    padding: 10px;
+}
+.faded {
+    opacity: 0.25 !important;
+}
