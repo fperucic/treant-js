@@ -320,7 +320,7 @@
                 UTIL.addEvent( image, 'error', imgTrigger ); // handle broken url-s
 
                 // load event is not fired for cached images, force the load event
-                image.src += ( ( image.src.indexOf( '?' ) > 0)? '&': '?' ) + new Date().getTime();
+                image.src += ( ( image.src.indexOf( '?' ) > 0)? '&': '?' ) + new Date().getTime() + '=1';
             }
             else {
                 imgTrigger();
