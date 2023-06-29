@@ -14,3 +14,12 @@ It relies on Raphael for handling SVG and animations.
 
 For Docs, Examples, and everything else see:
 http://fperucic.github.io/treant-js
+
+
+Compile:
+
+npx webpack --config webpack.config.js
+
+Dev-server:
+
+npx webpack serve --open

@@ -1,0 +1,27 @@
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { margin:0; padding:0; }
+table { border-collapse:collapse; border-spacing:0; }
+fieldset,img { border:0; }
+address,caption,cite,code,dfn,em,strong,th,var { font-style:normal; font-weight:normal; }
+caption,th { text-align:left; }
+h1,h2,h3,h4,h5,h6 {	font-size:100%; font-weight:normal; }
+q:before,q:after { content:''; }
+abbr,acronym { border:0; }
+
+body { background: #333; }
+
+/* optional Container STYLES */
+.chart { height: 290px; margin: 5px; width: 400px; border: 2px solid #727564; border-radius: 3px; float: left; }
+
+/* optional STYLES */
+.Treant > .node { font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; font-weight: bold; font-size: 8px; }
+
+.Treant .extra-title { font-size: 20px; }
+.Treant > .node { background-color: gray; border: 2px solid #ccc; padding: 2px; border-radius: 2px; }
+.Treant > .redNode { background-color: red; }
+.Treant > .greenNode { background-color: green; }
+.Treant > .blueNode { background-color: blue; }
+.Treant > .cyan { background-color: cyan; height: 30px; width: 40px; }
+/*.Treant > .cyan { background-color: cyan; height: 0; width: 0; border: 0; padding: 0; overflow: hidden; }*/
+.Treant ul { padding-left: 17px; }
+
+#NodeID { background-color: white; }

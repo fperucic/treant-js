@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+	<title> Chart emulation </title>
+	<link rel="stylesheet" href="../../Treant.css">
+	<link rel="stylesheet" href="index.css">
+	
+	<link rel="stylesheet" href="../../vendor/perfect-scrollbar/perfect-scrollbar.css">
+	
+</head>
+<body>
+	<div class="chart" id="OrganiseChart1">
+		<a href="http://www.treant-js.com/"></a>
+	</div>
+	<div class="chart" id="OrganiseChart2"></div>
+	<div class="chart" id="OrganiseChart3"></div>
+	<div class="chart" id="OrganiseChart4"></div>
+	<div class="chart" id="OrganiseChart5"></div>
+	
+	<script src="../../vendor/jquery.min.js"></script>
+    <script src="../../vendor/jquery.mousewheel.js"></script>
+    <script src="../../vendor/perfect-scrollbar/perfect-scrollbar.js"></script>
+	
+	<script src="../../vendor/raphael.js"></script>
+	
+	<script src="../../Treant.js"></script>
+	<script src="example_configs.js"></script>
+
+	<script>
+
+		var UTIL = {
+			inheritAttrs: function(me, from) {
+
+				for (var attr in from) {
+					if(typeof from[attr] !== 'function') {
+						if(me[attr] instanceof Object && from[attr] instanceof Object) {
+
+							this.inheritAttrs( me[attr], from[attr] );
+						} else {
+
+							me[attr] = from[attr];
+						}
+					}
+				}
+			},
+
+			createMerge: function(obj1, obj2) {
+				var newObj = {}; 
+				if(obj1) this.inheritAttrs( newObj, this.clone(obj1) ); 
+				if(obj2) this.inheritAttrs( newObj, obj2 );
+				return newObj;
+			},
+
+			clone: function (obj) {
+				if (Object(obj) !== obj) {
+					return obj;
+				}
+				var res = new obj.constructor();
+				for (var key in obj) if (obj["hasOwnProperty"](key)) {
+					res[key] = this.clone(obj[key]);
+				}
+				return res;
+			}
+		};
+
+		var T1 = new Treant(example1);
+		
+		var example2 = UTIL.createMerge(
+			example1, 
+			{
+				chart: { 
+					container: "#OrganiseChart2",
+					rootOrientation: "EAST",
+					connectors: {
+						type: 'bCurve',
+						style: {
+							"stroke": 'green'
+						}
+					},
+					node: {
+						HTMLclass: 'blueNode'
+					}
+				}
+			}
+		);
+		var T2 = new Treant(example2);
+
+		var example3 = UTIL.createMerge(
+			example1,
+			{
+				chart: { 
+					container: "#OrganiseChart3",
+					rootOrientation: "SOUTH",
+					connectors: {
+						type: 'straight',
+						style: {
+							"stroke": 'cyan'
+						}
+					},
+					node: {
+						HTMLclass: 'redNode'
+					}
+				} 
+			}
+		);
+		var T3 = new Treant(example3);
+
+		var example4 = UTIL.createMerge(
+			example1,
+			{
+				chart:{ 
+					container: "#OrganiseChart4",
+					rootOrientation: "WEST",
+					connectors: {
+						type: 'step',
+						style: {
+							"stroke": 'yellow'
+						}
+					},
+					node: {
+						HTMLclass: 'greenNode'
+					}
+				}
+			}
+		);
+		var T4 = new Treant(example4);
+
+		var T5 = new Treant(ALTERNATIVE);
+
+	</script>
+
+</body>
+</html>

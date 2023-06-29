@@ -7,11 +7,11 @@
     "example": "examples"
   },
   "scripts": {
+    "dev": "webpack --mode development",
+    "build": "webpack --mode production",
+    "watch": "webpack --mode development",
+    "start": "webpack serve --mode development",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fperucic/treant-js.git"
   },
   "keywords": [
     "treant",
@@ -26,5 +26,29 @@
   "bugs": {
     "url": "https://github.com/fperucic/treant-js/issues"
   },
-  "homepage": "https://github.com/fperucic/treant-js#readme"
+  "homepage": "https://github.com/fperucic/treant-js#readme",
+  "dependencies": {
+    "@types/raphael": "^2.3.3",
+    "assert": "^2.0.0",
+    "css-loader": "^5.2.7",
+    "fs": "^0.0.1-security",
+    "google-closure-compiler": "^20230411.0.0",
+    "mini-css-extract-plugin": "^1.6.2",
+    "net": "^1.0.2",
+    "tls": "^0.0.1",
+    "treant-js": "^1.0.1",
+    "ts-loader": "^8.4.0",
+    "url": "^0.11.0",
+    "webpack": "^4.46.0",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/jquery": "^1.8.2",
+    "eve-raphael": "^0.5.0",
+    "html-webpack-plugin": "^4.5.2",
+    "jquery": "^1.8.2",
+    "typescript": "^5.0.4",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.15.0"
+  }
 }
