@@ -44,7 +44,7 @@ export class UTIL {
      * @returns {*}
      */
     extend(...args: any) {
-        if ( $ ) {
+        if ( typeof ($) !== 'undefined' ) {
             Array.prototype.unshift.apply( args, [true, {}] );
             return $.extend.apply( $, args );
         }
@@ -53,10 +53,10 @@ export class UTIL {
         }
     }
 
-    /**
-     * @param {object} obj
-     * @returns {*}
-     */
+    // /**
+    //  * @param {object} obj
+    //  * @returns {*}
+    //  */
     cloneObj( obj: any ) {
         if ( Object( obj ) !== obj ) {
             return obj;
@@ -70,11 +70,11 @@ export class UTIL {
         return res;
     }
 
-    /**
-     * @param {Element} el
-     * @param {string} eventType
-     * @param {function} handler
-     */
+    // /**
+    //  * @param {Element} el
+    //  * @param {string} eventType
+    //  * @param {function} handler
+    //  */
     addEvent( el: any, eventType: string, handler: any ) {
         if ( $ ) {
             $( el ).on( eventType+'.treant', handler );
@@ -90,12 +90,12 @@ export class UTIL {
         }
     }
 
-    /**
-     * @param {string} selector
-     * @param {boolean} raw
-     * @param {Element} parentEl
-     * @returns {Element|jQuery}
-     */
+    // /**
+    //  * @param {string} selector
+    //  * @param {boolean} raw
+    //  * @param {Element} parentEl
+    //  * @returns {Element|jQuery}
+    //  */
     findEl( selector: string, raw: boolean, parentEl?: any ) {
         parentEl = parentEl || document;
 

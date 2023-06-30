@@ -1,35 +1,41 @@
 import "./Treant.css";
 import { JSONconfig } from "./JSONConfig";
 import { TreeStore } from "./TreeStore";
+import { inject, injectable } from "inversify";
+import { DI_LIST } from "./InjectableList";
+import "reflect-metadata";
 
 /**
  * Chart constructor.
  */
-export class Treant {  
+@injectable()
+export class Treant {
   protected jsonConfigService: JSONconfig = new JSONconfig();
-  protected treeStore: TreeStore = new TreeStore();
+  jsonConfig: any[] = [];
 
   tree: any;
 
   constructor(
+    @inject(DI_LIST.treeStore) public treeStore: TreeStore) { }
+
+  destroy() {
+    this.treeStore.destroy(this.tree.id);
+  }
+
+  init(
     jsonConfig: any,
     callback?: any,
     jQuery?: any
   ) {
     if (jsonConfig instanceof Array) {
-      jsonConfig = this.jsonConfigService.make(jsonConfig);
+      this.jsonConfig = this.jsonConfigService.make(jsonConfig);
+    }
+    // optional
+    if (jQuery) {
+      $ = jQuery;
     }
 
-    // optional
-    // if (jQuery) {
-    //   $ = jQuery;
-    // }
-
-    this.tree = this.treeStore.createTree(jsonConfig);
+    this.tree = this.treeStore.createTree(this.jsonConfig);
     this.tree.positionTree(callback);
-  }
-
-  destroy() {
-    this.treeStore.destroy(this.tree.id);
   }
 }

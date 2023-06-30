@@ -6,7 +6,6 @@ const webpack = require('webpack');
 module.exports = {
   mode: 'development',
   target: "web",
-  watch: true,
   plugins: [  
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
@@ -76,8 +75,8 @@ module.exports = {
     extensions: [".ts", ".js"],
     alias: {
       eve: "eve-raphael/eve",
-      jQuery: "@types/jquery",
-      $: "@types/jquery",
+      jQuery: "jquery/src/jquery",
+      $: "jquery/src/jquery",
     }
   },
   output: {

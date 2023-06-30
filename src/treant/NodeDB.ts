@@ -9,7 +9,7 @@ import { TreeNode } from "./TreeNode";
 import { UTIL } from "./Util";
 
 export class NodeDB {
-    protected util: UTIL = new UTIL();
+  protected util: UTIL = new UTIL();
   db: any;
 
   constructor(nodeStructure: any, tree: any) {
@@ -45,13 +45,16 @@ export class NodeDB {
 
       for (var i = 0, len = node.children.length; i < len; i++) {
         if (stack !== null) {
+          console.log('createNode');
           newNode = this.createNode(node.children[i], newNode.id, tree, stack);
           if (i + 1 < len) {
             // last node cant have children
             newNode.children = [];
           }
-        } else {
-          this.iterateChildren(node.children[i], newNode.id);
+        } else {          
+          console.log('iterateChildren');
+          console.log(node.children);
+          this.iterateChildren(node.children[i], newNode.id, tree);
         }
       }
     }
@@ -70,10 +73,11 @@ export class NodeDB {
     if (tree.CONFIG.animateOnInit) {
       nodeStructure.collapsed = true;
     }
+    console.log(tree);
 
     this.iterateChildren(nodeStructure, -1, tree); // root node
 
-    this.createGeometries(tree);
+    // this.createGeometries(tree);
 
     return this;
   }

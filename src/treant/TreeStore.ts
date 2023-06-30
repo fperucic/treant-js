@@ -1,10 +1,13 @@
+import { injectable } from "inversify";
 import { Tree } from "./Tree";
+import "reflect-metadata";
 
 /**
  * Class: TreeStore
  * TreeStore is used for holding initialized Tree objects
  *  Its purpose is to avoid global variables and enable multiple Trees on the page.
  */
+@injectable()
 export class TreeStore {
   store: any[] = [];
 

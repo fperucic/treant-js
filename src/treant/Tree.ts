@@ -1,7 +1,7 @@
 import { ImageLoader } from "./ImageLoader";
 import { NodeDB } from "./NodeDB";
 import { UTIL } from "./Util";
-import { Raphael } from "../../vendor/raphael.no-deps";
+import Raphael from "../../vendor/raphael.no-deps";
 
 /**
  * Tree constructor.
@@ -134,7 +134,7 @@ export class Tree {
 
     this.loaded = false;
 
-    this._R = new Raphael(this.drawArea, 100, 100);
+    this._R = Raphael(this.drawArea, 100, 100);
 
     return this;
   }

@@ -6,6 +6,11 @@
   "directories": {
     "example": "examples"
   },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  },
   "scripts": {
     "dev": "webpack --mode development",
     "build": "webpack --mode production",
@@ -31,10 +36,11 @@
     "@types/raphael": "^2.3.3",
     "assert": "^2.0.0",
     "css-loader": "^5.2.7",
-    "fs": "^0.0.1-security",
     "google-closure-compiler": "^20230411.0.0",
+    "inversify": "^6.0.1",
     "mini-css-extract-plugin": "^1.6.2",
     "net": "^1.0.2",
+    "reflect-metadata": "^0.1.13",
     "tls": "^0.0.1",
     "treant-js": "^1.0.1",
     "ts-loader": "^8.4.0",
@@ -43,10 +49,14 @@
     "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
-    "@types/jquery": "^1.8.2",
+    "@types/jquery": "^1.10.27",
+    "@typescript-eslint/eslint-plugin": "^5.60.1",
+    "@typescript-eslint/parser": "^5.60.1",
+    "eslint": "^8.43.0",
     "eve-raphael": "^0.5.0",
     "html-webpack-plugin": "^4.5.2",
-    "jquery": "^1.8.2",
+    "jquery": "^1.11.0",
+    "prettier": "^2.8.8",
     "typescript": "^5.0.4",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.15.0"

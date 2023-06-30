@@ -1,5 +1,10 @@
-// import { Treant } from "../treant/Treant";
+import { Container } from "inversify";
+import { Treant } from "../treant/Treant";
 import "./basic-example.css";
+import { DI_LIST } from "../treant/InjectableList";
+import { TreeStore } from "../treant/TreeStore";
+import { TreeNode } from "../treant/TreeNode";
+import "reflect-metadata";
 
 // const config = {
 //     container: "#basic-example",
@@ -117,107 +122,116 @@ import "./basic-example.css";
 // // JSON approach
 
 // /*
-//     var chart_config = {
-//         chart: {
-//             container: "#basic-example",
-            
-//             connectors: {
-//                 type: 'step'
-//             },
-//             node: {
-//                 HTMLclass: 'nodeExample1'
-//             }
-//         },
-//         nodeStructure: {
-//             text: {
-//                 name: "Mark Hill",
-//                 title: "Chief executive officer",
-//                 contact: "Tel: 01 213 123 134",
-//             },
-//             image: "../headshots/2.jpg",
-//             children: [
-//                 {
-//                     text:{
-//                         name: "Joe Linux",
-//                         title: "Chief Technology Officer",
-//                     },
-//                     stackChildren: true,
-//                     image: "../headshots/1.jpg",
-//                     children: [
-//                         {
-//                             text:{
-//                                 name: "Ron Blomquist",
-//                                 title: "Chief Information Security Officer"
-//                             },
-//                             image: "../headshots/8.jpg"
-//                         },
-//                         {
-//                             text:{
-//                                 name: "Michael Rubin",
-//                                 title: "Chief Innovation Officer",
-//                                 contact: "we@aregreat.com"
-//                             },
-//                             image: "../headshots/9.jpg"
-//                         }
-//                     ]
-//                 },
-//                 {
-//                     stackChildren: true,
-//                     text:{
-//                         name: "Linda May",
-//                         title: "Chief Business Officer",
-//                     },
-//                     image: "../headshots/5.jpg",
-//                     children: [
-//                         {
-//                             text:{
-//                                 name: "Alice Lopez",
-//                                 title: "Chief Communications Officer"
-//                             },
-//                             image: "../headshots/7.jpg"
-//                         },
-//                         {
-//                             text:{
-//                                 name: "Mary Johnson",
-//                                 title: "Chief Brand Officer"
-//                             },
-//                             image: "../headshots/4.jpg"
-//                         },
-//                         {
-//                             text:{
-//                                 name: "Kirk Douglas",
-//                                 title: "Chief Business Development Officer"
-//                             },
-//                             image: "../headshots/11.jpg"
-//                         }
-//                     ]
-//                 },
-//                 {
-//                     text:{
-//                         name: "John Green",
-//                         title: "Chief accounting officer",
-//                         contact: "Tel: 01 213 123 134",
-//                     },
-//                     image: "../headshots/6.jpg",
-//                     children: [
-//                         {
-//                             text:{
-//                                 name: "Erica Reel",
-//                                 title: "Chief Customer Officer"
-//                             },
-//                             link: {
-//                                 href: "http://www.google.com"
-//                             },
-//                             image: "../headshots/10.jpg"
-//                         }
-//                     ]
-//                 }
-//             ]
-//         }
-//     };
+var chart_config = {
+    chart: {
+        container: "#basic-example",
 
-// */
+        connectors: {
+            type: 'step'
+        },
+        node: {
+            HTMLclass: 'nodeExample1'
+        }
+    },
+    nodeStructure: {
+        text: {
+            name: "Mark Hill",
+            title: "Chief executive officer",
+            contact: "Tel: 01 213 123 134",
+        },
+        image: "../headshots/2.jpg",
+        children: [
+            {
+                text: {
+                    name: "Joe Linux",
+                    title: "Chief Technology Officer",
+                },
+                stackChildren: true,
+                image: "../headshots/1.jpg",
+                children: [
+                    {
+                        text: {
+                            name: "Ron Blomquist",
+                            title: "Chief Information Security Officer"
+                        },
+                        image: "../headshots/8.jpg"
+                    },
+                    {
+                        text: {
+                            name: "Michael Rubin",
+                            title: "Chief Innovation Officer",
+                            contact: "we@aregreat.com"
+                        },
+                        image: "../headshots/9.jpg"
+                    }
+                ]
+            },
+            {
+                stackChildren: true,
+                text: {
+                    name: "Linda May",
+                    title: "Chief Business Officer",
+                },
+                image: "../headshots/5.jpg",
+                children: [
+                    {
+                        text: {
+                            name: "Alice Lopez",
+                            title: "Chief Communications Officer"
+                        },
+                        image: "../headshots/7.jpg"
+                    },
+                    {
+                        text: {
+                            name: "Mary Johnson",
+                            title: "Chief Brand Officer"
+                        },
+                        image: "../headshots/4.jpg"
+                    },
+                    {
+                        text: {
+                            name: "Kirk Douglas",
+                            title: "Chief Business Development Officer"
+                        },
+                        image: "../headshots/11.jpg"
+                    }
+                ]
+            },
+            {
+                text: {
+                    name: "John Green",
+                    title: "Chief accounting officer",
+                    contact: "Tel: 01 213 123 134",
+                },
+                image: "../headshots/6.jpg",
+                children: [
+                    {
+                        text: {
+                            name: "Erica Reel",
+                            title: "Chief Customer Officer"
+                        },
+                        link: {
+                            href: "http://www.google.com"
+                        },
+                        image: "../headshots/10.jpg"
+                    }
+                ]
+            }
+        ]
+    }
+};
+
+// // */
 
 // const treant = new Treant(chart_config);
+
+const container = new Container();
+
+container.bind(DI_LIST.treeStore).to(TreeStore).inSingletonScope();
+container.bind(DI_LIST.treeNode).to(TreeNode);
+container.bind(DI_LIST.treant).to(Treant);
+
+const treant = container.get<Treant>(DI_LIST.treant);
+treant.init(chart_config);
 
 // alert('test');

@@ -12,9 +12,8 @@ import { TreeStore } from "./TreeStore";
 import { UTIL } from "./Util";
 
 export class TreeNode {
-    
-    protected util: UTIL = new UTIL();
-    protected treeStore: TreeStore = new TreeStore();
+  protected util: UTIL = new UTIL();
+  protected treeStore: TreeStore = new TreeStore();
 
   id: number = 0;
   parentId: number = 0;
@@ -58,7 +57,7 @@ export class TreeNode {
     id: number,
     parentId: number,
     tree: any,
-    stackParentId: number | null,
+    stackParentId: number | null
   ) {
     this.reset(nodeStructure, id, parentId, tree, stackParentId);
   }
@@ -135,6 +134,8 @@ export class TreeNode {
    * @returns {Tree}
    */
   getTree() {
+    console.log('getTree');
+    console.log(this.treeStore);
     return this.treeStore.get(this.treeId);
   }
 

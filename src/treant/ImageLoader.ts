@@ -1,4 +1,4 @@
-import { UTIL } from "./Util";
+// import { UTIL } from "./Util";
 
 /**
  * ImageLoader is used for determining if all the images from the Tree are loaded.
@@ -6,7 +6,7 @@ import { UTIL } from "./Util";
  */
 
 export class ImageLoader {
-  protected util: UTIL = new UTIL();
+  // protected util: UTIL = new UTIL();
   loading: any[] = [];
 
   constructor() {
@@ -70,8 +70,8 @@ export class ImageLoader {
         return imgTrigger();
       }
 
-      this.util.addEvent(image, "load", imgTrigger);
-      this.util.addEvent(image, "error", imgTrigger); // handle broken url-s
+      // this.util.addEvent(image, "load", imgTrigger);
+      // this.util.addEvent(image, "error", imgTrigger); // handle broken url-s
 
       // load event is not fired for cached images, force the load event
       image.src +=
