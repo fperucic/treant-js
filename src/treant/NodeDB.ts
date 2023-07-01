@@ -5,15 +5,22 @@
  * @constructor
  */
 
+import { inject, injectable } from "inversify";
 import { TreeNode } from "./TreeNode";
 import { UTIL } from "./Util";
+import { DI_LIST } from "./InjectableList";
+import { TreeStore } from "./TreeStore";
 
+@injectable()
 export class NodeDB {
   protected util: UTIL = new UTIL();
-  db: any;
+  db: TreeNode[] = [];
 
-  constructor(nodeStructure: any, tree: any) {
-    this.reset(nodeStructure, tree);
+  // constructor(@inject(DI_LIST.treeNode) public treeNode: TreeNode) {
+  // }
+
+  init(nodeStructure: any, tree: any) {
+    return this.reset(nodeStructure, tree);
   }
 
   /**
@@ -45,15 +52,12 @@ export class NodeDB {
 
       for (var i = 0, len = node.children.length; i < len; i++) {
         if (stack !== null) {
-          console.log('createNode');
           newNode = this.createNode(node.children[i], newNode.id, tree, stack);
           if (i + 1 < len) {
             // last node cant have children
             newNode.children = [];
           }
-        } else {          
-          console.log('iterateChildren');
-          console.log(node.children);
+        } else {
           this.iterateChildren(node.children[i], newNode.id, tree);
         }
       }
@@ -68,16 +72,13 @@ export class NodeDB {
   reset(nodeStructure: any, tree: any) {
     this.db = [];
 
-    var self = this;
-
     if (tree.CONFIG.animateOnInit) {
       nodeStructure.collapsed = true;
     }
-    console.log(tree);
 
     this.iterateChildren(nodeStructure, -1, tree); // root node
 
-    // this.createGeometries(tree);
+    this.createGeometries(tree);
 
     return this;
   }
@@ -99,8 +100,8 @@ export class NodeDB {
    * @param {number} nodeId
    * @returns {TreeNode}
    */
-  get(nodeId: number) {
-    return this.db[nodeId]; // get TreeNode by ID
+  get(nodeId: number): TreeNode {
+    return this.db[nodeId] as TreeNode; // get TreeNode by ID
   }
 
   /**
@@ -130,7 +131,7 @@ export class NodeDB {
     tree: any,
     stackParentId: number | null
   ) {
-    var node = new TreeNode(
+    var node = new TreeNode(tree).init(
       nodeStructure,
       this.db.length,
       parentId,

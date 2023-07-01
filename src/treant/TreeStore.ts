@@ -1,6 +1,7 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { Tree } from "./Tree";
 import "reflect-metadata";
+import { DI_LIST } from "./InjectableList";
 
 /**
  * Class: TreeStore
@@ -9,6 +10,8 @@ import "reflect-metadata";
  */
 @injectable()
 export class TreeStore {
+  constructor(@inject(DI_LIST.tree) public tree: Tree) { }
+
   store: any[] = [];
 
   /**
@@ -17,7 +20,7 @@ export class TreeStore {
    */
   createTree(jsonConfig: any) {
     var nNewTreeId = this.store.length;
-    this.store.push(new Tree(jsonConfig, nNewTreeId));
+    this.store.push(this.tree.init(jsonConfig, nNewTreeId));
     return this.get(nNewTreeId);
   }
 

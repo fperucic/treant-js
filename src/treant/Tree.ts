@@ -2,6 +2,9 @@ import { ImageLoader } from "./ImageLoader";
 import { NodeDB } from "./NodeDB";
 import { UTIL } from "./Util";
 import Raphael from "../../vendor/raphael.no-deps";
+import { DI_LIST } from "./InjectableList";
+import { inject, injectable } from "inversify";
+import { TreeNode } from "./TreeNode";
 
 /**
  * Tree constructor.
@@ -9,6 +12,7 @@ import Raphael from "../../vendor/raphael.no-deps";
  * @param {number} treeId
  * @constructor
  */
+@injectable()
 export class Tree {
   protected util: UTIL = new UTIL();
   protected imageLoader: ImageLoader = new ImageLoader();
@@ -17,12 +21,12 @@ export class Tree {
   initTreeId: number = 0;
   id: number = 0;
   drawArea: any;
-  nodeDB: any;
   connectionStore: any;
   loaded: boolean = false;
   _R: any;
   lastNodeOnLevel: any;
   levelMaxDim: any;
+  inAnimation: any;
   CONFIG: any = {
     maxDepth: 100,
     rootOrientation: "NORTH", // NORTH || EAST || WEST || SOUTH
@@ -67,39 +71,40 @@ export class Tree {
     },
 
     callback: {
-      onCreateNode: function (treeNode: any, treeNodeDom: any) {}, // this = Tree
+      onCreateNode: function (treeNode: any, treeNodeDom: any) { }, // this = Tree
       onCreateNodeCollapseSwitch: function (
         treeNode: any,
         treeNodeDom: any,
         switchDom: any
-      ) {}, // this = Tree
+      ) { }, // this = Tree
       onAfterAddNode: function (
         newTreeNode: any,
         parentTreeNode: any,
         nodeStructure: any
-      ) {}, // this = Tree
-      onBeforeAddNode: function (parentTreeNode: any, nodeStructure: any) {}, // this = Tree
+      ) { }, // this = Tree
+      onBeforeAddNode: function (parentTreeNode: any, nodeStructure: any) { }, // this = Tree
       onAfterPositionNode: function (
         treeNode: any,
         nodeDbIndex: any,
         containerCenter: any,
         treeCenter: any
-      ) {}, // this = Tree
+      ) { }, // this = Tree
       onBeforePositionNode: function (
         treeNode: any,
         nodeDbIndex: any,
         containerCenter: any,
         treeCenter: any
-      ) {}, // this = Tree
-      onToggleCollapseFinished: function (treeNode: any, bIsCollapsed: any) {}, // this = Tree
-      onAfterClickCollapseSwitch: function (nodeSwitch: any, event: any) {}, // this = TreeNode
-      onBeforeClickCollapseSwitch: function (nodeSwitch: any, event: any) {}, // this = TreeNode
-      onTreeLoaded: function (rootTreeNode: any) {}, // this = Tree
+      ) { }, // this = Tree
+      onToggleCollapseFinished: function (treeNode: any, bIsCollapsed: any) { }, // this = Tree
+      onAfterClickCollapseSwitch: function (nodeSwitch: any, event: any) { }, // this = TreeNode
+      onBeforeClickCollapseSwitch: function (nodeSwitch: any, event: any) { }, // this = TreeNode
+      onTreeLoaded: function (rootTreeNode: any) { }, // this = Tree
     },
   };
+  nodeDB: NodeDB = {} as NodeDB;
 
-  constructor(jsonConfig: any, treeId: number) {
-    this.reset(jsonConfig, treeId);
+  init(jsonConfig: any, treeId: number) {
+    return this.reset(jsonConfig, treeId);
   }
 
   /**
@@ -126,7 +131,7 @@ export class Tree {
     // kill of any child elements that may be there
     this.drawArea.innerHTML = "";
 
-    this.nodeDB = new NodeDB(jsonConfig.nodeStructure, this);
+    this.nodeDB = new NodeDB().init(jsonConfig.nodeStructure, this);
 
     // key store for storing reference to node connectors,
     // key = nodeId where the connector ends
@@ -168,11 +173,12 @@ export class Tree {
     const oNewNode: any = this.nodeDB.createNode(
       nodeDefinition,
       parentTreeNode.id,
-      this
+      this,
+      null
     );
     oNewNode.createGeometry(this);
 
-    // oNewNode.parent().createSwitchGeometry( this );
+    oNewNode.parent().createSwitchGeometry(this);
 
     this.positionTree();
 
@@ -212,7 +218,7 @@ export class Tree {
 
       if (this.CONFIG.animateOnInit) {
         setTimeout(function () {
-          root.toggleCollapse();
+          // root.toggleCollapse();
         }, this.CONFIG.animateOnInitDelay);
       }
 
@@ -426,8 +432,8 @@ export class Tree {
         align === "CENTER"
           ? yTmp + (levelHeight - nodesizeTmp) / 2
           : align === "TOP"
-          ? yTmp + (levelHeight - nodesizeTmp)
-          : yTmp;
+            ? yTmp + (levelHeight - nodesizeTmp)
+            : yTmp;
     }
 
     if (orient === "WEST" || orient === "EAST") {
@@ -482,9 +488,9 @@ export class Tree {
     this.handleOverflow(treeWidth, treeHeight);
 
     var containerCenter = {
-        x: self.drawArea.clientWidth / 2,
-        y: self.drawArea.clientHeight / 2,
-      },
+      x: self.drawArea.clientWidth / 2,
+      y: self.drawArea.clientHeight / 2,
+    },
       deltaX = containerCenter.x - treeCenter.x,
       deltaY = containerCenter.y - treeCenter.y,
       // all nodes must have positive X or Y coordinates, handle this with offsets
@@ -525,7 +531,7 @@ export class Tree {
           ? deltaY
           : this.CONFIG.padding);
 
-      var collapsedParent = node.collapsedParent(),
+      var collapsedParent = node.collapsedParent() as TreeNode,
         hidePoint = null;
 
       if (collapsedParent) {
@@ -549,7 +555,7 @@ export class Tree {
         this.setConnectionToParent(node, hidePoint); // skip the root node
       } else if (!this.CONFIG.hideRootNode && node.drawLineThrough) {
         // drawlinethrough is performed for for the root node also
-        node.drawLineThroughMe();
+        node.drawLineThroughMe(true);
       }
 
       self.CONFIG.callback.onAfterPositionNode.apply(self, [
@@ -569,9 +575,9 @@ export class Tree {
    */
   handleOverflow(treeWidth: number, treeHeight: number) {
     var viewWidth =
-        treeWidth < this.drawArea.clientWidth
-          ? this.drawArea.clientWidth
-          : treeWidth + this.CONFIG.padding * 2,
+      treeWidth < this.drawArea.clientWidth
+        ? this.drawArea.clientWidth
+        : treeWidth + this.CONFIG.padding * 2,
       viewHeight =
         treeHeight < this.drawArea.clientHeight
           ? this.drawArea.clientHeight
@@ -725,7 +731,7 @@ export class Tree {
    * @param {boolean} stacked
    * @returns {string}
    */
-  getPathString(from_node: any, to_node: any, stacked: boolean) {
+  getPathString(from_node: TreeNode, to_node: TreeNode, stacked: boolean) {
     var startPoint = from_node.connectorPoint(true),
       endPoint = to_node.connectorPoint(false),
       orientation = this.CONFIG.rootOrientation,

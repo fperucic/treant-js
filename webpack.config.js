@@ -2,6 +2,7 @@ const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require('webpack');
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   mode: 'development',
@@ -18,6 +19,11 @@ module.exports = {
       template: "src/basic-example/index.html",
     }),
     new webpack.HotModuleReplacementPlugin(),
+    new CopyPlugin({
+      patterns: [
+        { from: "src/basic-example/headshots", to: "headshots" }
+      ],
+    }),
   ],
   stats: {
     errorDetails: true,
@@ -51,6 +57,12 @@ module.exports = {
       //     ],
       //   }
       // },
+      { test: /\.(png|jp(e*)g|svg|gif)$/, use: {
+        loader: 'url-loader', // this need file-loader
+        options: {
+        limit: 50000
+    } }
+  },
       {
         test: /\.ts?$/,
         use: [
@@ -85,6 +97,7 @@ module.exports = {
   },
   devServer: {
     compress: true,
-    port: 9000
+    port: 9000,
+    hot: true,
   },
 };

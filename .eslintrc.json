@@ -1,21 +1,114 @@
 {
-    "env": {
-        "browser": true,
-        "es2021": true
-    },
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended"
+    "root": true,
+    "ignorePatterns": [
+      "projects/**/*"
     ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module"
-    },
     "plugins": [
-        "@typescript-eslint",
-        "prettier"
+      "@typescript-eslint",
+      "prettier",
+      "simple-import-sort",
+      "import",
+      "jsdoc"
     ],
-    "rules": {
-    }
-}
+    "overrides": [
+      {
+        "files": [
+          "*.ts"
+        ],
+        "parserOptions": {
+          "project": [
+            "tsconfig.json"
+          ],
+          "createDefaultProgram": true
+        },
+        "extends": [
+          "eslint:recommended",
+          "plugin:@typescript-eslint/eslint-recommended",
+          "plugin:@typescript-eslint/recommended"
+        ],
+        "rules": {
+          "@typescript-eslint/dot-notation": "off",
+          "@typescript-eslint/naming-convention": [
+            "error",
+            {
+              "selector": "default",
+              "format": [
+                "camelCase"
+              ],
+              "leadingUnderscore": "allow",
+              "trailingUnderscore": "allow"
+            },
+            {
+              "selector": "variable",
+              "format": [
+                "camelCase",
+                "UPPER_CASE"
+              ],
+              "leadingUnderscore": "allow",
+              "trailingUnderscore": "allow"
+            },
+            {
+              "selector": "typeLike",
+              "format": [
+                "PascalCase"
+              ]
+            },
+            {
+              "selector": "enumMember",
+              "format": [
+                "PascalCase"
+              ]
+            }
+          ],
+          "complexity": "error",
+          "max-len": [
+            "error",
+            {
+              "code": 140
+            }
+          ],
+          "no-new-wrappers": "error",
+          "no-throw-literal": "error",
+          "import/no-unresolved": "off",
+          "simple-import-sort/exports": "error",
+          "simple-import-sort/imports": [
+            "error",
+            {
+              "groups": [
+                [
+                  "^\\u0000"
+                ],
+                [
+                  "^@?(?!app)\\w"
+                ],
+                [
+                  "^@app?\\w"
+                ],
+                [
+                  "^[^.]"
+                ],
+                [
+                  "^\\."
+                ]
+              ]
+            }
+          ],
+          "sort-imports": "off",
+          "import/first": "error",
+          "import/newline-after-import": "error",
+          "import/no-duplicates": "error",
+          "@typescript-eslint/consistent-type-definitions": "error",
+          "no-shadow": "off",
+          "@typescript-eslint/no-shadow": "error",
+          "no-invalid-this": "off",
+          "@typescript-eslint/no-invalid-this": [
+            "warn"
+          ],
+          "@typescript-eslint/explicit-function-return-type": [
+            "error"
+          ]
+        }
+      }
+    ]
+  }
+  

@@ -8,12 +8,16 @@
  * @constructor
  */
 
+import { inject, injectable } from "inversify";
 import { TreeStore } from "./TreeStore";
 import { UTIL } from "./Util";
+import { DI_LIST } from "./InjectableList";
+import $ from 'jquery';
+import { Tree } from "./Tree";
 
+@injectable()
 export class TreeNode {
   protected util: UTIL = new UTIL();
-  protected treeStore: TreeStore = new TreeStore();
 
   id: number = 0;
   parentId: number = 0;
@@ -23,6 +27,7 @@ export class TreeNode {
   leftNeighborId: number | null = null;
   rightNeighborId: number | null = null;
   stackParentId: any = 0;
+  stackParent: boolean = false;
   pseudo: any;
   meta: string = "";
   image: string = "";
@@ -53,13 +58,19 @@ export class TreeNode {
   };
 
   constructor(
+    public tree: Tree
+  ) {
+    console.log('TreeNode constructor');
+    console.log(this.tree);
+  }
+
+  init(
     nodeStructure: any,
     id: number,
     parentId: number,
     tree: any,
-    stackParentId: number | null
-  ) {
-    this.reset(nodeStructure, id, parentId, tree, stackParentId);
+    stackParentId: number | null) {
+    return this.reset(nodeStructure, id, parentId, tree, stackParentId);
   }
 
   /**
@@ -131,15 +142,6 @@ export class TreeNode {
   }
 
   /**
-   * @returns {Tree}
-   */
-  getTree() {
-    console.log('getTree');
-    console.log(this.treeStore);
-    return this.treeStore.get(this.treeId);
-  }
-
-  /**
    * @returns {object}
    */
   getTreeConfig() {
@@ -164,8 +166,8 @@ export class TreeNode {
   /**
    * @returns {Tree}
    */
-  Tree() {
-    return this.treeStore.get(this.treeId);
+  getTree() {
+    return this.tree;
   }
 
   /**
@@ -193,6 +195,7 @@ export class TreeNode {
     } else if (orientation === "WEST" || orientation === "EAST") {
       return this.height;
     }
+    return 0;
   }
 
   /**
@@ -206,7 +209,7 @@ export class TreeNode {
    * @param {number} index
    * @returns {TreeNode}
    */
-  childAt(index: number) {
+  childAt(index: number): TreeNode {
     return this.dbGet(this.children[index]);
   }
 
@@ -220,7 +223,7 @@ export class TreeNode {
   /**
    * @returns {TreeNode}
    */
-  lastChild() {
+  lastChild(): TreeNode {
     return this.childAt(this.children.length - 1);
   }
 
@@ -285,7 +288,7 @@ export class TreeNode {
    * Find out if one of the node ancestors is collapsed
    * @returns {*}
    */
-  collapsedParent() {
+  collapsedParent(): TreeNode | boolean {
     var parent = this.parent();
     if (!parent) {
       return false;
@@ -302,7 +305,7 @@ export class TreeNode {
    * @param depth
    * @returns {*}
    */
-  leftMost(level: number, depth: number) {
+  leftMost(level: number, depth: number): TreeNode | void {
     if (level >= depth) {
       return this;
     }
@@ -319,8 +322,8 @@ export class TreeNode {
   }
 
   // returns start or the end point of the connector line, origin is upper-left
-  connectorPoint(startPoint: any) {
-    var orient = this.Tree().CONFIG.rootOrientation,
+  connectorPoint(startPoint: boolean) {
+    var orient = this.getTree().CONFIG.rootOrientation,
       point: any = {};
 
     if (this.stackParentId) {
@@ -335,23 +338,23 @@ export class TreeNode {
     // if pseudo, a virtual center is used
     if (orient === "NORTH") {
       point.x = this.pseudo
-        ? this.X - this.Tree().CONFIG.subTeeSeparation / 2
+        ? this.X - this.getTree().CONFIG.subTeeSeparation / 2
         : this.X + this.width / 2;
       point.y = startPoint ? this.Y + this.height : this.Y;
     } else if (orient === "SOUTH") {
       point.x = this.pseudo
-        ? this.X - this.Tree().CONFIG.subTeeSeparation / 2
+        ? this.X - this.getTree().CONFIG.subTeeSeparation / 2
         : this.X + this.width / 2;
       point.y = startPoint ? this.Y : this.Y + this.height;
     } else if (orient === "EAST") {
       point.x = startPoint ? this.X : this.X + this.width;
       point.y = this.pseudo
-        ? this.Y - this.Tree().CONFIG.subTeeSeparation / 2
+        ? this.Y - this.getTree().CONFIG.subTeeSeparation / 2
         : this.Y + this.height / 2;
     } else if (orient === "WEST") {
       point.x = startPoint ? this.X + this.width : this.X;
       point.y = this.pseudo
-        ? this.Y - this.Tree().CONFIG.subTeeSeparation / 2
+        ? this.Y - this.getTree().CONFIG.subTeeSeparation / 2
         : this.Y + this.height / 2;
     }
     return point;
@@ -376,13 +379,13 @@ export class TreeNode {
   /**
    * @param {object} hidePoint
    */
-  drawLineThroughMe(hidePoint: any) {
+  drawLineThroughMe(hidePoint: any): void {
     // hidepoint se proslijedjuje ako je node sakriven zbog collapsed
     var pathString = hidePoint
-      ? this.Tree().getPointPathString(hidePoint)
+      ? this.getTree().getPointPathString(hidePoint)
       : this.pathStringThrough();
 
-    this.lineThroughMe = this.lineThroughMe || this.Tree()._R.path(pathString);
+    this.lineThroughMe = this.lineThroughMe || this.getTree()._R.path(pathString);
 
     var line_style = this.util.cloneObj(this.connStyle.style);
 
@@ -545,7 +548,7 @@ export class TreeNode {
    * @returns {TreeNode}
    */
   hideConnector() {
-    var oTree = this.Tree();
+    var oTree = this.getTree();
     var oPath = oTree.connectionStore[this.id];
     if (oPath) {
       oPath.animate(
@@ -562,7 +565,7 @@ export class TreeNode {
 
     this.nodeDOM.style.visibility = "visible";
 
-    var oTree = this.Tree();
+    var oTree = this.getTree();
 
     var oNewState = {
       left: this.X,
@@ -603,7 +606,7 @@ export class TreeNode {
    * @returns {TreeNode}
    */
   showConnector() {
-    var oTree = this.Tree();
+    var oTree = this.getTree();
     var oPath = oTree.connectionStore[this.id];
     if (oPath) {
       oPath.animate(
@@ -669,8 +672,8 @@ export class TreeNode {
               this.text[key].val
                 ? this.text[key].val
                 : this.text[key] instanceof Object
-                ? "'val' param missing!"
-                : this.text[key]
+                  ? "'val' param missing!"
+                  : this.text[key]
             )
           );
 

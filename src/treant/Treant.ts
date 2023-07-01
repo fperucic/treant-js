@@ -29,12 +29,13 @@ export class Treant {
   ) {
     if (jsonConfig instanceof Array) {
       this.jsonConfig = this.jsonConfigService.make(jsonConfig);
+    } else {
+      this.jsonConfig = jsonConfig;
     }
     // optional
     if (jQuery) {
       $ = jQuery;
     }
-
     this.tree = this.treeStore.createTree(this.jsonConfig);
     this.tree.positionTree(callback);
   }
