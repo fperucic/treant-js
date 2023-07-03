@@ -278,9 +278,12 @@ export class TreeNode {
    * @returns {number}
    */
   childrenCenter() {
+    console.log('childrenCenter begin');
     var first = this.firstChild(),
       last = this.lastChild();
-
+    console.log(first);
+    console.log(last);
+    console.log('childrenCenter end');
     return first.prelim + (last.prelim - first.prelim + last.size()) / 2;
   }
 
@@ -713,6 +716,7 @@ export class TreeNode {
    * @param {Tree} tree
    */
   createGeometry(tree: any) {
+    // console.log('createGeometry begin');
     if (this.id === 0 && tree.CONFIG.hideRootNode) {
       this.width = 0;
       this.height = 0;
@@ -730,7 +734,7 @@ export class TreeNode {
     }
 
     if (this.nodeHTMLid) {
-      node.id = this.nodeHTMLid;
+      node.id = this.nodeHTMLid ?? this.id;
     }
 
     if (this.link.href) {
@@ -766,12 +770,18 @@ export class TreeNode {
     /////////// APPEND all //////////////
     drawArea.appendChild(node);
 
+    // console.log(node);
+
+    // console.log(node.offsetHeight);
+    // console.log(node.offsetWidth);
+
     this.width = node.offsetWidth;
     this.height = node.offsetHeight;
 
     this.nodeDOM = node;
 
     tree.imageLoader.processNode(this);
+    // console.log('createGeometry end');
   }
 
   /**

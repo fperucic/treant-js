@@ -5,6 +5,8 @@ const DI_LIST = {
   nodeDB: Symbol.for("NodeDB"),
   tree: Symbol.for("Tree"),
   util: Symbol.for("Util"),
+  imageLoader: Symbol.for("ImageLoader"),
+  nodeDBState: Symbol.for("NodeDBState"),
 };
 
 export { DI_LIST };

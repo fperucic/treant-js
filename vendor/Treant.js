@@ -309,6 +309,11 @@
                 node.height = node.nodeDOM.offsetHeight;
             }
 
+            console.log('image loader create');
+
+    console.log(image.src);
+    console.log(image.src.indexOf("data:"));
+
             if ( image.src.indexOf( 'data:' ) !== 0 ) {
                 this.loading.push( source );
 
@@ -331,6 +336,7 @@
          * @returns {boolean}
          */
         isNotLoading: function() {
+            console.log(this.loading.length);
             return ( this.loading.length === 0 );
         }
     };
@@ -746,84 +752,106 @@
          * 0,0 coordinate is in the upper left corner
          * @returns {Tree}
          */
-        positionNodes: function() {
+        positionNodes() {
+            console.log('positionNodes begin');
             var self = this,
-                treeSize = {
-                    x: self.nodeDB.getMinMaxCoord('X', null, null),
-                    y: self.nodeDB.getMinMaxCoord('Y', null, null)
-                },
-
-                treeWidth = treeSize.x.max - treeSize.x.min,
-                treeHeight = treeSize.y.max - treeSize.y.min,
-
-                treeCenter = {
-                    x: treeSize.x.max - treeWidth/2,
-                    y: treeSize.y.max - treeHeight/2
-                };
-
+              treeSize = {
+                x: self.nodeDB.getMinMaxCoord("X", null, null),
+                y: self.nodeDB.getMinMaxCoord("Y", null, null),
+              },
+              treeWidth = treeSize.x.max - treeSize.x.min,
+              treeHeight = treeSize.y.max - treeSize.y.min,
+              treeCenter = {
+                x: treeSize.x.max - treeWidth / 2,
+                y: treeSize.y.max - treeHeight / 2,
+              };
+        
+              console.log(`treeSize`);
+              console.log(treeSize);
+        
             this.handleOverflow(treeWidth, treeHeight);
-
-            var
-                containerCenter = {
-                    x: self.drawArea.clientWidth/2,
-                    y: self.drawArea.clientHeight/2
-                },
-
-                deltaX = containerCenter.x - treeCenter.x,
-                deltaY = containerCenter.y - treeCenter.y,
-
-                // all nodes must have positive X or Y coordinates, handle this with offsets
-                negOffsetX = ((treeSize.x.min + deltaX) <= 0) ? Math.abs(treeSize.x.min) : 0,
-                negOffsetY = ((treeSize.y.min + deltaY) <= 0) ? Math.abs(treeSize.y.min) : 0,
-                i, len, node;
-
+        
+            var containerCenter = {
+              x: self.drawArea.clientWidth / 2,
+              y: self.drawArea.clientHeight / 2,
+            },
+              deltaX = containerCenter.x - treeCenter.x,
+              deltaY = containerCenter.y - treeCenter.y,
+              // all nodes must have positive X or Y coordinates, handle this with offsets
+              negOffsetX = treeSize.x.min + deltaX <= 0 ? Math.abs(treeSize.x.min) : 0,
+              negOffsetY = treeSize.y.min + deltaY <= 0 ? Math.abs(treeSize.y.min) : 0,
+              i,
+              len,
+              node;
+        
             // position all the nodes
-            for ( i = 0, len = this.nodeDB.db.length; i < len; i++ ) {
-
-                node = this.nodeDB.get(i);
-
-                self.CONFIG.callback.onBeforePositionNode.apply( self, [node, i, containerCenter, treeCenter] );
-
-                if ( node.id === 0 && this.CONFIG.hideRootNode ) {
-                    self.CONFIG.callback.onAfterPositionNode.apply( self, [node, i, containerCenter, treeCenter] );
-                    continue;
-                }
-
-                // if the tree is smaller than the draw area, then center the tree within drawing area
-                node.X += negOffsetX + ((treeWidth < this.drawArea.clientWidth) ? deltaX : this.CONFIG.padding);
-                node.Y += negOffsetY + ((treeHeight < this.drawArea.clientHeight) ? deltaY : this.CONFIG.padding);
-
-                var collapsedParent = node.collapsedParent(),
-                    hidePoint = null;
-
-                if (collapsedParent) {
-                    // position the node behind the connector point of the parent, so future animations can be visible
-                    hidePoint = collapsedParent.connectorPoint( true );
-                    node.hide(hidePoint);
-
-                }
-                else if (node.positioned) {
-                    // node is already positioned,
-                    node.show();
-                }
-                else { // inicijalno stvaranje nodeova, postavi lokaciju
-                    node.nodeDOM.style.left = node.X + 'px';
-                    node.nodeDOM.style.top = node.Y + 'px';
-                    node.positioned = true;
-                }
-
-                if (node.id !== 0 && !(node.parent().id === 0 && this.CONFIG.hideRootNode)) {
-                    this.setConnectionToParent(node, hidePoint); // skip the root node
-                }
-                else if (!this.CONFIG.hideRootNode && node.drawLineThrough) {
-                    // drawlinethrough is performed for for the root node also
-                    node.drawLineThroughMe();
-                }
-
-                self.CONFIG.callback.onAfterPositionNode.apply( self, [node, i, containerCenter, treeCenter] );
+            for (i = 0, len = this.nodeDB.db.length; i < len; i++) {
+              node = this.nodeDB.get(i);
+        
+              self.CONFIG.callback.onBeforePositionNode.apply(self, [
+                node,
+                i,
+                containerCenter,
+                treeCenter,
+              ]);
+        
+              if (node.id === 0 && this.CONFIG.hideRootNode) {
+                self.CONFIG.callback.onAfterPositionNode.apply(self, [
+                  node,
+                  i,
+                  containerCenter,
+                  treeCenter,
+                ]);
+                continue;
+              }
+        
+              // if the tree is smaller than the draw area, then center the tree within drawing area
+              node.X +=
+                negOffsetX +
+                (treeWidth < this.drawArea.clientWidth ? deltaX : this.CONFIG.padding);
+              node.Y +=
+                negOffsetY +
+                (treeHeight < this.drawArea.clientHeight
+                  ? deltaY
+                  : this.CONFIG.padding);
+        
+              var collapsedParent = node.collapsedParent(),
+                hidePoint = null;
+        
+              if (collapsedParent) {
+                // position the node behind the connector point of the parent, so future animations can be visible
+                hidePoint = collapsedParent.connectorPoint(true);
+                node.hide(hidePoint);
+              } else if (node.positioned) {
+                // node is already positioned,
+                node.show();
+              } else {
+                // inicijalno stvaranje nodeova, postavi lokaciju
+                node.nodeDOM.style.left = node.X + "px";
+                node.nodeDOM.style.top = node.Y + "px";
+                node.positioned = true;
+              }
+        
+              if (
+                node.id !== 0 &&
+                !(node.parent().id === 0 && this.CONFIG.hideRootNode)
+              ) {
+                this.setConnectionToParent(node, hidePoint); // skip the root node
+              } else if (!this.CONFIG.hideRootNode && node.drawLineThrough) {
+                // drawlinethrough is performed for for the root node also
+                node.drawLineThroughMe(true);
+              }
+        
+              self.CONFIG.callback.onAfterPositionNode.apply(self, [
+                node,
+                i,
+                containerCenter,
+                treeCenter,
+              ]);
             }
+            console.log('positionNodes end');
             return this;
-        },
+          },
 
         /**
          * Create Raphael instance, (optionally set scroll bars if necessary)
@@ -1061,11 +1089,22 @@
          * @returns {Tree}
          */
         calcLevelDim: function( node, level ) { // root node is on level 0
-            this.levelMaxDim[level] = {
-                width: Math.max( this.levelMaxDim[level]? this.levelMaxDim[level].width: 0, node.width ),
-                height: Math.max( this.levelMaxDim[level]? this.levelMaxDim[level].height: 0, node.height )
-            };
-            return this;
+            console.log('calcLevelDim begin');
+    console.log(this.levelMaxDim[level]);
+    console.log(node.height);
+    console.log(node.width);
+    // root node is on level 0
+    this.levelMaxDim[level] = {
+      width: Math.max(
+        this.levelMaxDim[level] ? this.levelMaxDim[level].width : 0,
+        node.width
+      ),
+      height: Math.max(
+        this.levelMaxDim[level] ? this.levelMaxDim[level].height : 0,
+        node.height
+      ),
+    };
+    console.log('calcLevelDim end')
         },
 
         /**
@@ -1249,33 +1288,38 @@
             return node;
         },
 
-        getMinMaxCoord: function( dim, parent, MinMax ) { // used for getting the dimensions of the tree, dim = 'X' || 'Y'
+        getMinMaxCoord(dim, parent, MinMax) {
+            console.log('getMinMaxCoord begin');
+            console.log(parent);
+            // used for getting the dimensions of the tree, dim = 'X' || 'Y'
             // looks for min and max (X and Y) within the set of nodes
             parent = parent || this.get(0);
-
-            MinMax = MinMax || { // start with root node dimensions
-                    min: parent[dim],
-                    max: parent[dim] + ( ( dim === 'X' )? parent.width: parent.height )
-                };
-
+        
+            MinMax = MinMax || {
+              // start with root node dimensions
+              min: parent[dim],
+              max: parent[dim] + (dim === "X" ? parent.width : parent.height),
+            };
+        
             var i = parent.childrenCount();
-
-            while ( i-- ) {
-                var node = parent.childAt( i ),
-                    maxTest = node[dim] + ( ( dim === 'X' )? node.width: node.height ),
-                    minTest = node[dim];
-
-                if ( maxTest > MinMax.max ) {
-                    MinMax.max = maxTest;
-                }
-                if ( minTest < MinMax.min ) {
-                    MinMax.min = minTest;
-                }
-
-                this.getMinMaxCoord( dim, node, MinMax );
+        
+            while (i--) {
+              var node = parent.childAt(i),
+                maxTest = node[dim] + (dim === "X" ? node.width : node.height),
+                minTest = node[dim];
+        
+              if (maxTest > MinMax.max) {
+                MinMax.max = maxTest;
+              }
+              if (minTest < MinMax.min) {
+                MinMax.min = minTest;
+              }
+        
+              this.getMinMaxCoord(dim, node, MinMax);
             }
+            console.log('getMinMaxCoord end');
             return MinMax;
-        },
+          },
 
         /**
          * @param {object} nodeStructure
@@ -1499,12 +1543,15 @@
         /**
          * @returns {number}
          */
-        childrenCenter: function () {
+        childrenCenter() {
+            console.log('childrenCenter begin');
             var first = this.firstChild(),
-                last = this.lastChild();
-
-            return ( first.prelim + ((last.prelim - first.prelim) + last.size()) / 2 );
-        },
+              last = this.lastChild();
+            console.log(first);
+            console.log(last);
+            console.log('childrenCenter end');
+            return first.prelim + (last.prelim - first.prelim + last.size()) / 2;
+          },
 
         /**
          * Find out if one of the node ancestors is collapsed

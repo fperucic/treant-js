@@ -1,5 +1,7 @@
+import { injectable } from 'inversify';
 import $ from 'jquery';
 
+@injectable()
 export class UTIL {
 
     /**

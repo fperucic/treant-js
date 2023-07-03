@@ -15,7 +15,6 @@ import { TreeNode } from "./TreeNode";
 @injectable()
 export class Tree {
   protected util: UTIL = new UTIL();
-  protected imageLoader: ImageLoader = new ImageLoader();
 
   initJsonConfig: any;
   initTreeId: number = 0;
@@ -103,6 +102,9 @@ export class Tree {
   };
   nodeDB: NodeDB = {} as NodeDB;
 
+  constructor(@inject(DI_LIST.imageLoader) public imageLoader: ImageLoader,
+    @inject(DI_LIST.nodeDB) public nodeDBClass: NodeDB) { }
+
   init(jsonConfig: any, treeId: number) {
     return this.reset(jsonConfig, treeId);
   }
@@ -131,7 +133,7 @@ export class Tree {
     // kill of any child elements that may be there
     this.drawArea.innerHTML = "";
 
-    this.nodeDB = new NodeDB().init(jsonConfig.nodeStructure, this);
+    this.nodeDB = this.nodeDBClass.init(jsonConfig.nodeStructure, this);
 
     // key store for storing reference to node connectors,
     // key = nodeId where the connector ends
@@ -160,38 +162,6 @@ export class Tree {
   }
 
   /**
-   * @param {TreeNode} parentTreeNode
-   * @param {object} nodeDefinition
-   * @returns {TreeNode}
-   */
-  addNode(parentTreeNode: any, nodeDefinition: any) {
-    this.CONFIG.callback.onBeforeAddNode.apply(this, [
-      parentTreeNode,
-      nodeDefinition,
-    ]);
-
-    const oNewNode: any = this.nodeDB.createNode(
-      nodeDefinition,
-      parentTreeNode.id,
-      this,
-      null
-    );
-    oNewNode.createGeometry(this);
-
-    oNewNode.parent().createSwitchGeometry(this);
-
-    this.positionTree();
-
-    this.CONFIG.callback.onAfterAddNode.apply(this, [
-      oNewNode,
-      parentTreeNode,
-      nodeDefinition,
-    ]);
-
-    return oNewNode;
-  }
-
-  /**
    * @returns {Tree}
    */
   redraw() {
@@ -206,7 +176,7 @@ export class Tree {
   positionTree(callback?: any) {
     var self = this;
 
-    if (this.imageLoader.isNotLoading()) {
+    if (this.imageLoader.isNotLoading() === true) {
       var root = this.root();
 
       this.resetLevelData();
@@ -218,7 +188,7 @@ export class Tree {
 
       if (this.CONFIG.animateOnInit) {
         setTimeout(function () {
-          // root.toggleCollapse();
+          root.toggleCollapse();
         }, this.CONFIG.animateOnInitDelay);
       }
 
@@ -247,7 +217,7 @@ export class Tree {
    * @param {number} level
    * @returns {Tree}
    */
-  firstWalk(node: any, level: number) {
+  firstWalk(node: TreeNode, level: number) {
     node.prelim = null;
     node.modifier = null;
 
@@ -473,6 +443,7 @@ export class Tree {
    * @returns {Tree}
    */
   positionNodes() {
+    console.log('positionNodes begin');
     var self = this,
       treeSize = {
         x: self.nodeDB.getMinMaxCoord("X", null, null),
@@ -484,6 +455,9 @@ export class Tree {
         x: treeSize.x.max - treeWidth / 2,
         y: treeSize.y.max - treeHeight / 2,
       };
+
+    console.log(`treeSize`);
+    console.log(treeSize);
 
     this.handleOverflow(treeWidth, treeHeight);
 
@@ -565,6 +539,7 @@ export class Tree {
         treeCenter,
       ]);
     }
+    console.log('positionNodes end');
     return this;
   }
   /**
@@ -823,6 +798,10 @@ export class Tree {
    * @returns {Tree}
    */
   calcLevelDim(node: any, level: number) {
+    console.log('calcLevelDim begin');
+    console.log(this.levelMaxDim[level]);
+    console.log(node.height);
+    console.log(node.width);
     // root node is on level 0
     this.levelMaxDim[level] = {
       width: Math.max(
@@ -834,6 +813,7 @@ export class Tree {
         node.height
       ),
     };
+    console.log('calcLevelDim end')
     return this;
   }
 

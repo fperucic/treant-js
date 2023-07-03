@@ -2,8 +2,10 @@
 // Makes a JSON chart config out of Array config
 // #############################################
 
+import { ChartStructure } from "./Treant";
+
 export class JSONconfig {
-  jsonStructure: any;
+  jsonStructure: ChartStructure;
 
   make(configArray: any) {
     var i = configArray.length,
