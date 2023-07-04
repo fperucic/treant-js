@@ -1,5 +1,5 @@
 import { ChartConfigType } from "../../treant/Treant";
-import "./basic-example.css";
+import "./styles/main.scss";
 import image1 from '../headshots/1.jpg';
 import image2 from '../headshots/2.jpg';
 import image3 from '../headshots/3.jpg';

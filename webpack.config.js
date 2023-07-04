@@ -21,10 +21,17 @@ module.exports = {
       filename: "examples/basic-example/index.html",
       chunks: 'examples/basic-example'
     }),
+    // new HtmlWebpackPlugin({
+    //   inject: true,
+    //   template: "./src/examples/collapsable/index.html",
+    //   filename: "examples/collapsable/index.html",
+    //   chunks: 'examples/collapsable'
+    // }),
     new webpack.HotModuleReplacementPlugin(),
     new CopyPlugin({
       patterns: [
-        { from: "src/examples/headshots", to: "examples/headshots" }
+        { from: "src/examples/headshots", to: "examples/headshots" },
+        // { from: "src/examples/collapsable/img", to: "examples/collapsable/img" }
       ],
     }),
   ],
@@ -36,6 +43,7 @@ module.exports = {
     // main: "./src/examples/basic-example/basic-example.ts",
     // "./src/examples/basic-example/basic-example.ts": path.resolve(__dirname, '/dist/examples/basic-example/main.js'),
     "examples/basic-example/main.js": path.resolve(__dirname, 'src/examples/basic-example/basic-example.ts'),
+    // "examples/collapsable/main.js": path.resolve(__dirname, 'src/examples/collapsable/collapsable.ts'),
   },
   module: {
     rules: [
@@ -84,7 +92,7 @@ module.exports = {
       },
       {
         test: /\.(sass|scss|css)$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
       },
     ],
   },

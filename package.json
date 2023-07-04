@@ -46,7 +46,6 @@
     "treant-js": "^1.0.1",
     "ts-loader": "^8.4.0",
     "url": "^0.11.0",
-    "webpack": "^4.46.0",
     "webpack-node-externals": "^3.0.0"
   },
   "devDependencies": {
@@ -59,8 +58,11 @@
     "html-webpack-plugin": "^4.5.2",
     "jquery": "^1.11.0",
     "prettier": "^2.8.0",
+    "sass": "^1.63.6",
+    "sass-loader": "^13.3.2",
     "typescript": "^5.0.4",
     "url-loader": "^4.1.1",
+    "webpack": "^5.88.1",
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.15.0"
   }
