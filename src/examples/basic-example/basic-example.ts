@@ -1,26 +1,17 @@
-import { Container } from "inversify";
-import { ChartConfigType, ChartInterface, ChartStructure, NodeInterface, Treant } from "../treant/Treant";
+import { ChartConfigType } from "../../treant/Treant";
 import "./basic-example.css";
-import { DI_LIST } from "../treant/InjectableList";
-import { TreeStore } from "../treant/TreeStore";
-import { TreeNode } from "../treant/TreeNode";
-import "reflect-metadata";
-import { NodeDB, NodeDBState } from "../treant/NodeDB";
-import { Tree } from "../treant/Tree";
-import image1 from './headshots/1.jpg';
-import image2 from './headshots/2.jpg';
-import image3 from './headshots/3.jpg';
-import image4 from './headshots/4.jpg';
-import image5 from './headshots/5.jpg';
-import image6 from './headshots/6.jpg';
-import image7 from './headshots/7.jpg';
-import image8 from './headshots/8.jpg';
-import image9 from './headshots/9.jpg';
-import image10 from './headshots/10.jpg';
-import image11 from './headshots/11.jpg';
-import { UTIL } from "../treant/Util";
-import { ImageLoader } from "../treant/ImageLoader";
-import { GraphJS } from "../graphjs/graphjs";
+import image1 from '../headshots/1.jpg';
+import image2 from '../headshots/2.jpg';
+import image3 from '../headshots/3.jpg';
+import image4 from '../headshots/4.jpg';
+import image5 from '../headshots/5.jpg';
+import image6 from '../headshots/6.jpg';
+import image7 from '../headshots/7.jpg';
+import image8 from '../headshots/8.jpg';
+import image9 from '../headshots/9.jpg';
+import image10 from '../headshots/10.jpg';
+import image11 from '../headshots/11.jpg';
+import { GraphJS } from "../../graphjs/graphjs";
 
 
 const config = {
@@ -39,7 +30,7 @@ const config = {
             title: "Chief executive officer",
             contact: "Tel: 01 213 123 134",
         },
-        image: "./headshots/2.jpg",
+        image: "../headshots/2.jpg",
     },
     cto = {
         parent: ceo,
@@ -48,7 +39,7 @@ const config = {
             title: "Chief Technology Officer",
         },
         stackChildren: true,
-        image: "./headshots/1.jpg",
+        image: "../headshots/1.jpg",
     },
     cbo = {
         parent: ceo,
@@ -57,7 +48,7 @@ const config = {
             name: "Linda May",
             title: "Chief Business Officer",
         },
-        image: "./headshots/5.jpg",
+        image: "../headshots/5.jpg",
     },
     cdo = {
         parent: ceo,
@@ -66,7 +57,7 @@ const config = {
             title: "Chief accounting officer",
             contact: "Tel: 01 213 123 134",
         },
-        image: "./headshots/6.jpg",
+        image: "../headshots/6.jpg",
     },
     cio = {
         parent: cto,
@@ -74,7 +65,7 @@ const config = {
             name: "Ron Blomquist",
             title: "Chief Information Security Officer",
         },
-        image: "./headshots/8.jpg",
+        image: "../headshots/8.jpg",
     },
     ciso = {
         parent: cto,
@@ -83,7 +74,7 @@ const config = {
             title: "Chief Innovation Officer",
             contact: { val: "we@aregreat.com", href: "mailto:we@aregreat.com" },
         },
-        image: "./headshots/9.jpg",
+        image: "../headshots/9.jpg",
     },
     cio2 = {
         parent: cdo,
@@ -94,7 +85,7 @@ const config = {
         link: {
             href: "http://www.google.com",
         },
-        image: "./headshots/10.jpg",
+        image: "../headshots/10.jpg",
     },
     ciso2 = {
         parent: cbo,
@@ -102,7 +93,7 @@ const config = {
             name: "Alice Lopez",
             title: "Chief Communications Officer",
         },
-        image: "./headshots/7.jpg",
+        image: "../headshots/7.jpg",
     },
     ciso3 = {
         parent: cbo,
@@ -110,7 +101,7 @@ const config = {
             name: "Mary Johnson",
             title: "Chief Brand Officer",
         },
-        image: "./headshots/4.jpg",
+        image: "../headshots/4.jpg",
     },
     ciso4 = {
         parent: cbo,
@@ -118,7 +109,7 @@ const config = {
             name: "Kirk Douglas",
             title: "Chief Business Development Officer",
         },
-        image: "./headshots/11.jpg",
+        image: "../headshots/11.jpg",
     };
 
 const chart_config = [

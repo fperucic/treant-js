@@ -16,12 +16,15 @@ module.exports = {
       // ignoreOrder: false, // Enable to remove warnings about conflicting order
     }),
     new HtmlWebpackPlugin({
-      template: "src/basic-example/index.html",
+      inject: true,
+      template: "./src/examples/basic-example/index.html",
+      filename: "examples/basic-example/index.html",
+      chunks: 'examples/basic-example'
     }),
     new webpack.HotModuleReplacementPlugin(),
     new CopyPlugin({
       patterns: [
-        { from: "src/basic-example/headshots", to: "headshots" }
+        { from: "src/examples/headshots", to: "examples/headshots" }
       ],
     }),
   ],
@@ -30,7 +33,9 @@ module.exports = {
     children: true,
   },
   entry: {
-    main: "./src/basic-example/basic-example.ts",
+    // main: "./src/examples/basic-example/basic-example.ts",
+    // "./src/examples/basic-example/basic-example.ts": path.resolve(__dirname, '/dist/examples/basic-example/main.js'),
+    "examples/basic-example/main.js": path.resolve(__dirname, 'src/examples/basic-example/basic-example.ts'),
   },
   module: {
     rules: [

@@ -1,4 +1,5 @@
 import { Container } from "inversify";
+import "reflect-metadata";
 import { ImageLoader } from "../treant/ImageLoader";
 import { DI_LIST } from "../treant/InjectableList";
 import { NodeDB, NodeDBState } from "../treant/NodeDB";
