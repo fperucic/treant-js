@@ -1,17 +1,14 @@
 var config = {
-    container: "#collapsable-example",
-    animateOnInit: true,
-    node: {
-        collapsable: true
+    container: "#basic-example",
+    
+    connectors: {
+        type: 'step'
     },
-    animation: {
-        nodeAnimation: "easeOutBounce",
-        nodeSpeed: 700,
-        connectorsAnimation: "bounce",
-        connectorsSpeed: 700
+    node: {
+        HTMLclass: 'nodeExample1'
     }
 },
-node0 = {text: {feature: 'Attribute: method_Subtractive', threshold: '0.5', samples: 'Samples: 29', percentage: 'Percent: 100.0', average: 'Average: 853.5492172135976'}},
+node0 = {text: {feature: 'method_Subtractive', threshold: '0.5', samples: 'Samples: 29', percentage: 'Percent: 100.0', average: 'Average: 853.5492172135976'}},
 node1 = {parent: node0, text: {feature: 'Attribute: lead_time', threshold: 'Threshold: 55585.5', samples: 'Samples: 10', percentage: 'Percent: 34.48275862068966', average: 'Average: 292.1247299194336', filter: 'Filter: method_Subtractive not Present'}, folders: ['config_2_10', 'config_2_7', 'config_2_7', 'config_1_10', 'config_3_2', 'config_3_2', 'config_3_5', 'config_3_5', 'config_1_7', 'config_1_7']},
 node2 = {parent: node1, text: {feature: 'Attribute: lead_time', threshold: 'Threshold: 33879.0', samples: 'Samples: 8', percentage: 'Percent: 27.586206896551722', average: 'Average: 203.18336296081543', filter: 'Filter: lead_time <= 55585.5 and method_Subtractive not Present'}, folders: ['config_2_10', 'config_2_7', 'config_2_7', 'config_1_10', 'config_3_5', 'config_3_5', 'config_1_7', 'config_1_7']},
 node3 = {parent: node2, text: {feature: 'Attribute: cost', threshold: 'Threshold: 47450.0', samples: 'Samples: 6', percentage: 'Percent: 20.689655172413794', average: 'Average: 162.97780100504556', filter: 'Filter: lead_time <= 33879.0 and lead_time <= 55585.5 and method_Subtractive not Present'}, folders: ['config_2_10', 'config_1_10', 'config_3_5', 'config_3_5', 'config_1_7', 'config_1_7']},
