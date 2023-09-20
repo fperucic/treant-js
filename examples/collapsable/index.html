@@ -12,7 +12,8 @@
 
 </head>
 <body>
-    <div class="chart" id="collapsable-example"></div>
+    <div class="chart" id="cost"></div>
+    <div class="chart" id="lead_time"></div>
     <script src="../../vendor/raphael.js"></script>
     <script src="../../Treant.js"></script>
     
@@ -20,9 +21,14 @@
     <script src="../../vendor/jquery.easing.js"></script>
     
     
-    <script src="collapsable.js"></script>
+    <script src="tree_cost.js"></script>
     <script>
         tree = new Treant( chart_config );
+    </script>
+    <script src="tree_lead_time.js">  </script>
+    <script>
+        tree = new Treant( chart_config );
+    </script>
     </script>
 </body>
 </html>
